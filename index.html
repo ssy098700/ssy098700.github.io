@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -228,8 +227,9 @@ function App(){
 
   const notify=(msg,type='ok')=>{setToast({msg,type});setTimeout(()=>setToast(null),3000)}
   const saveApiKey=()=>{localStorage.setItem('d2c:apikey',apiKeyInput);setApiKey(apiKeyInput);setShowApiSetup(false);notify('API 키 저장됐습니다.')}
-  const getRow=(dateKey)=>dbData.find(r=>r.date_key===dateKey)
-  const kptRow=dbData.find(r=>r.date_key==='__kpt')
+  const safeData=Array.isArray(dbData)?dbData:[]
+  const getRow=(dateKey)=>safeData.find(r=>r.date_key===dateKey)
+  const kptRow=safeData.find(r=>r.date_key==='__kpt')
 
   const upsertDay=async(dateKey,tasks,notes)=>{
     await dbUpsert({week_key:curWeek,date_key:dateKey,tasks,notes,updated_at:new Date().toISOString()})
@@ -276,7 +276,7 @@ function App(){
   }
 
   const genKpt=async()=>{
-    const allTasks=dbData.filter(r=>r.tasks?.length).flatMap(r=>r.tasks)
+    const allTasks=safeData.filter(r=>r.tasks?.length).flatMap(r=>r.tasks)
     if(!allTasks.length){notify('업무 데이터가 없습니다','err');return}
     setKptBusy(true)
     try{
@@ -294,7 +294,7 @@ function App(){
   if(isReadOnly&&loading)return <div className="loading"><i className="ti ti-loader" style={{fontSize:20}}/>불러오는 중...</div>
 
   const days=wdays(curWeek),today=dk()
-  const allTasks=dbData.filter(r=>r.tasks?.length&&!r.date_key.startsWith('__')).flatMap(r=>r.tasks)
+  const allTasks=safeData.filter(r=>r.tasks?.length&&!r.date_key.startsWith('__')).flatMap(r=>r.tasks)
   const NAV=[{id:'dashboard',icon:'ti-home',lbl:'홈'},{id:'input',icon:'ti-edit',lbl:'입력'},{id:'weekly',icon:'ti-calendar',lbl:'주간'},{id:'history',icon:'ti-clock',lbl:'기록'}]
 
   return(
@@ -338,7 +338,7 @@ function App(){
           {!loading&&view==='dashboard'&&(
             <div>
               <div className="stat-grid">
-                {[{lbl:'이번 주 완료',val:allTasks.filter(t=>t.done).length},{lbl:'전체 업무',val:allTasks.length},{lbl:'기록된 날',val:dbData.filter(r=>!r.date_key.startsWith('__')&&r.tasks?.length>0).length}].map((s,i)=>(
+                {[{lbl:'이번 주 완료',val:allTasks.filter(t=>t.done).length},{lbl:'전체 업무',val:allTasks.length},{lbl:'기록된 날',val:safeData.filter(r=>!r.date_key.startsWith('__')&&r.tasks?.length>0).length}].map((s,i)=>(
                   <div key={i} className="stat-card"><div className="stat-label">{s.lbl}</div><div className="stat-val">{s.val}</div></div>
                 ))}
               </div>
