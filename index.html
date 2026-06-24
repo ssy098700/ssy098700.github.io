@@ -162,7 +162,7 @@ function TaskItem({task, onToggle, onUpdate, onDelete, readOnly, allTags}){
             style={{flex:1,fontSize:13,fontWeight:task.bold?700:400,border:'2px solid #4F63D2',borderRadius:6,padding:'2px 9px',outline:'none',background:'#EBF4FF'}}
           />
         ):(
-          <span style={{flex:1,fontSize:13,lineHeight:1.6,fontWeight:task.bold?700:500,color:task.done?'#A0AEC0':'#2D3748',textDecoration:task.done?'line-through':'none',letterSpacing:'-.1px'}}>
+          <span style={{flex:1,fontSize:13,lineHeight:1.6,fontWeight:task.bold?700:500,color:task.done?'#A0AEC0':'#2D3748',textDecoration:task.done?'line-through':'none',textDecorationColor:'#CBD5E0',letterSpacing:'-.1px'}}>
             {task.text}
           </span>
         )}
@@ -287,6 +287,7 @@ function App(){
   const [busy, setBusy]=useState(false)
   const [kptBusy, setKptBusy]=useState(false)
   const [loading, setLoading]=useState(true)
+  const [scrollTarget, setScrollTarget]=useState(null)
   const [toast, setToast]=useState(null)
   const [apiKey, setApiKey]=useState('')
   const [apiInput, setApiInput]=useState('')
@@ -308,6 +309,17 @@ function App(){
     try{const k=localStorage.getItem('d2c:key');if(k)setApiKey(k)}catch(e){}
   },[curWeek])
 
+  useEffect(()=>{
+    if(scrollTarget&&view==='weekly'){
+      const timer=setTimeout(()=>{
+        const el=document.getElementById('day-'+scrollTarget)
+        if(el)el.scrollIntoView({behavior:'smooth',block:'start'})
+        setScrollTarget(null)
+      },150)
+      return ()=>clearTimeout(timer)
+    }
+  },[scrollTarget,view])
+
   function notify(msg,type='ok'){setToast({msg,type});setTimeout(()=>setToast(null),3000)}
 
   function addCustomTag(tag){
@@ -320,10 +332,15 @@ function App(){
   const kptRow=rows.find(r=>r.date_key==='__kpt')
   const safeRows=Array.isArray(rows)?rows:[]
 
-  async function upsert(dateKey,tasks,notes){
+  function updateLocal(dateKey,tasks,notes){
+    setRows(prev=>Array.isArray(prev)?prev.map(r=>r.date_key===dateKey?{...r,tasks,notes:notes||r.notes||''}:r):prev)
+  }
+
+  async function upsert(dateKey,tasks,notes,reload=false){
+    updateLocal(dateKey,tasks,notes)
     const ok=await dbSave({week_key:curWeek,date_key:dateKey,tasks,notes,updated_at:new Date().toISOString()})
-    if(ok) await load(curWeek)
-    else notify('저장 실패','err')
+    if(!ok) notify('저장 실패','err')
+    else if(reload) await load(curWeek)
   }
 
   async function toggleTask(dateKey,idx){
@@ -348,7 +365,8 @@ function App(){
   async function addTask(dateKey,task){
     const row=getRow(dateKey)
     const tasks=row?[...row.tasks,task]:[task]
-    await upsert(dateKey,tasks,row?.notes||'')
+    await upsert(dateKey,tasks,row?.notes||'',!row)
+    if(!row) await load(curWeek)
     setView('weekly')
     notify('추가됐습니다!')
   }
@@ -470,7 +488,7 @@ function App(){
                     const row=getRow(d),isT=d===today,dt=new Date(d)
                     const done=(row?.tasks||[]).filter(t=>t.done).length,total=(row?.tasks||[]).length
                     return(
-                      <div key={d} className={`day-pill${isT?' today-pill':''}`} onClick={()=>setView('weekly')}>
+                      <div key={d} className={`day-pill${isT?' today-pill':''}`} onClick={()=>{setView('weekly');setScrollTarget(d)}}>
                         <div style={{fontSize:9,color:isT?'#2B6CB0':'#A0AEC0',fontWeight:700}}>{DAYS_EN[dt.getDay()]}</div>
                         <div style={{fontSize:15,fontWeight:700,color:isT?'#2B6CB0':'#1A202C',margin:'3px 0'}}>{dt.getDate()}</div>
                         <div style={{fontSize:9,color:isT?'#4299E1':'#A0AEC0'}}>{total>0?`${done}/${total}`:'—'}</div>
@@ -542,7 +560,7 @@ function App(){
                 const row=getRow(d),isT=d===today
                 const done=(row?.tasks||[]).filter(t=>t.done).length,total=(row?.tasks||[]).length
                 return(
-                  <div key={d} className={`card${isT?' today':''}`}>
+                  <div key={d} id={'day-'+d} className={`card${isT?' today':''}`}>
                     <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:row?10:0,paddingBottom:row?10:0,borderBottom:row?'1px solid #EDF2F7':'none'}}>
                       <div style={{display:'flex',alignItems:'center',gap:8}}>
                         <span style={{fontSize:13,fontWeight:700,color:isT?'#4F63D2':'#1A202C'}}>{fmtDate(d)}</span>
