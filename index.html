@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<!-- saved from url=(0134)file:///C:/Users/hmkco/Downloads/D2C_%EC%97%85%EB%AC%B4%EC%9D%BC%EC%A7%80_%EC%B5%9C%EC%A2%85_2026_6%EC%9B%944%EC%A3%BC%EC%B0%A8_2.html -->
+<html lang="ko"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>D2C 업무일지 — 2026년 6월 4주차</title>
+<style>
+  :root {
+    --bg-main: #fbfbfa;
+    --bg-sidebar: #f7f7f5;
+    --text-main: #37352f;
+    --text-muted: #7c7b77;
+    --border-color: #ededeb;
+    --accent-blue: #2383e2;
+    --accent-green: #0f7b6c;
+    --accent-orange: #d9730d;
+    --accent-red: #e03e3e;
+    --bg-hover: #efeee8;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Malgun Gothic", Arial, sans-serif;
+    color: var(--text-main);
+    background: var(--bg-main);
+    display: flex;
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  /* ── 사이드바 ── */
+  .sidebar {
+    width: 248px;
+    background: var(--bg-sidebar);
+    border-right: 1px solid var(--border-color);
+    padding: 20px 10px 20px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    position: fixed;
+    height: 100vh;
+    overflow-y: auto;
+    z-index: 100;
+  }
+
+  .sidebar-logo {
+    padding: 4px 8px 14px 8px;
+    border-bottom: 1px solid var(--border-color);
+  }
+  .sidebar-logo .logo-main { font-size: 14px; font-weight: 700; color: var(--text-main); }
+  .sidebar-logo .logo-sub  { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+  .sb-section-title {
+    font-size: 10.5px; font-weight: 700; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.7px; padding-left: 8px;
+  }
+
+  .nav-list { list-style: none; display: flex; flex-direction: column; gap: 1px; }
+
+  .nav-item a {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 10px; color: var(--text-main); text-decoration: none;
+    font-size: 13px; border-radius: 5px; font-weight: 500;
+    transition: background .15s;
+  }
+  .nav-item a:hover { background: var(--bg-hover); }
+  .nav-item.active a { background: #e5e4e0; font-weight: 600; }
+  .nav-item.today a { color: var(--accent-blue); font-weight: 700; }
+
+  /* 사이드바 긴급 마감 */
+  .sb-urgent-box {
+    background: #fff8f8; border: 1px solid #f5c6c6;
+    border-radius: 8px; padding: 10px 12px; font-size: 11.5px;
+  }
+  .sb-urgent-box .ub-title {
+    font-size: 10.5px; font-weight: 700; color: var(--accent-red);
+    text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;
+  }
+  .sb-urgent-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 3px 0; border-bottom: 1px dashed #f5c6c6;
+  }
+  .sb-urgent-row:last-child { border-bottom: none; }
+  .sb-urgent-row .label { color: var(--text-muted); }
+  .sb-urgent-row .val   { font-weight: 700; color: var(--accent-red); }
+  .sb-urgent-row .val.ok { color: var(--accent-green); }
+
+  /* 사이드바 내보내기 버튼 */
+  .sb-export-btn {
+    width: 100%; padding: 9px 0; background: var(--accent-blue); color: #fff;
+    border: none; border-radius: 7px; font-size: 13px; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
+    transition: background .15s;
+  }
+  .sb-export-btn:hover { background: #1a6bcc; }
+
+  .sb-save-indicator {
+    text-align: center; font-size: 11px; color: var(--text-muted);
+    display: flex; align-items: center; justify-content: center; gap: 5px;
+  }
+  .save-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-green); flex-shrink: 0; }
+  .save-dot.dirty { background: var(--accent-orange); animation: pulse 1.2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+  /* ── 메인 ── */
+  .main-container {
+    margin-left: 248px; flex: 1;
+    padding: 48px 60px 100px 60px; max-width: 1020px;
+  }
+
+  .header { margin-bottom: 32px; }
+  .page-title { font-size: 28px; font-weight: 700; margin-bottom: 8px; letter-spacing: -.4px; }
+  .page-meta {
+    font-size: 12.5px; color: var(--text-muted);
+    display: flex; gap: 14px; flex-wrap: wrap; align-items: center;
+  }
+  .page-meta strong { color: var(--text-main); }
+
+  /* ── 프로모션 배너 ── */
+  .promo-banner {
+    background: linear-gradient(135deg,#1a3557,#2e75b6);
+    border-radius: 9px; padding: 14px 20px; color: #fff;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 8px; margin-bottom: 22px;
+  }
+  .promo-banner .pb-title { font-size: 14px; font-weight: 700; margin-bottom: 3px; }
+  .promo-banner .pb-meta  { font-size: 11.5px; opacity: .8; }
+  .pb-chip {
+    background: rgba(255,255,255,.18); border-radius: 20px;
+    padding: 4px 12px; font-size: 11.5px; font-weight: 700;
+  }
+
+  /* ── 섹션 블록 ── */
+  .section-block {
+    background: #fff; border-radius: 10px; border: 1px solid var(--border-color);
+    padding: 22px 26px; margin-bottom: 18px;
+    box-shadow: var(--shadow-sm); scroll-margin-top: 40px;
+  }
+  .section-block.today-block { border-color: #b8d4f5; box-shadow: 0 0 0 2px rgba(35,131,226,.1), var(--shadow-sm); }
+  .section-block.dimmed { opacity: .55; }
+
+  .section-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px; padding-bottom: 9px; border-bottom: 1px solid #f0f0ee;
+  }
+  .section-title { font-size: 15.5px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+  .section-date  { font-size: 12.5px; color: var(--text-muted); font-weight: 400; }
+
+  /* 배지 */
+  .badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 600; }
+  .badge-done    { background: #e2f5ec; color: var(--accent-green); }
+  .badge-today   { background: #dbeafe; color: var(--accent-blue); }
+  .badge-plan    { background: #fdecc8; color: var(--accent-orange); }
+  .badge-pending { background: #efefef; color: #888; }
+  .badge-urgent  { background: #fde8e8; color: var(--accent-red); }
+
+  /* 서브 레이블 */
+  .sub-label {
+    font-size: 10.5px; font-weight: 700; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: .5px;
+    margin-bottom: 8px; margin-top: 14px;
+  }
+  .sub-label:first-of-type { margin-top: 0; }
+
+  /* ── 체크리스트 ── */
+  .task-list { display: flex; flex-direction: column; gap: 4px; }
+
+  .task-item {
+    display: flex; align-items: flex-start; gap: 9px;
+    font-size: 13.5px; padding: 5px 8px; border-radius: 6px;
+    transition: background .1s; position: relative;
+  }
+  .task-item:hover { background: var(--bg-hover); }
+
+  .task-item input[type="checkbox"] {
+    margin-top: 3px; width: 15px; height: 15px;
+    cursor: pointer; accent-color: var(--accent-blue); flex-shrink: 0;
+  }
+
+  /* contenteditable 레이블 */
+  .task-label {
+    flex: 1; outline: none; line-height: 1.55; min-height: 1em;
+    border-radius: 3px; padding: 0 2px;
+  }
+  .task-label:focus { background: #f0f7ff; box-shadow: 0 0 0 1px #b3d4f5; }
+  .task-label:empty::before { content: attr(placeholder); color: #bbb; }
+
+  .task-item.completed .task-label { color: var(--text-muted); text-decoration: line-through; }
+
+  .task-tag {
+    font-size: 10.5px; padding: 2px 7px; border-radius: 4px;
+    font-weight: 600; white-space: nowrap; flex-shrink: 0; margin-top: 2px;
+  }
+  .tag-logistics  { background: #e8f4fd; color: #1a73e8; }
+  .tag-marketing  { background: #f0e6ff; color: #7c3aed; }
+  .tag-cs         { background: #fef3c7; color: #b45309; }
+  .tag-ads        { background: #ffe4e6; color: #be123c; }
+  .tag-research   { background: #ecfdf5; color: #065f46; }
+  .tag-urgent     { background: #fde8e8; color: var(--accent-red); }
+  .tag-recurring  { background: #f1f5f9; color: #475569; }
+  .tag-broadcast  { background: #fdf4ff; color: #9333ea; }
+
+  /* 행 추가 버튼 */
+  .add-task-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 5px 8px; margin-top: 4px; border-radius: 5px;
+    font-size: 12.5px; color: var(--text-muted); cursor: pointer;
+    border: 1px dashed #d0d0ce; background: transparent;
+    transition: all .15s; width: 100%;
+  }
+  .add-task-btn:hover { background: var(--bg-hover); color: var(--text-main); border-color: #b0b0ae; }
+
+  /* 구분선 */
+  .divider { border: none; border-top: 1px dashed var(--border-color); margin: 12px 0 8px; }
+
+  /* contenteditable 메모 블록 */
+  .notes-block {
+    background: #fafaf9; border: 1px solid #f0f0ee;
+    border-radius: 6px; padding: 12px 14px;
+    font-size: 13px; line-height: 1.75; color: var(--text-main);
+    min-height: 60px; outline: none;
+  }
+  .notes-block:focus { background: #f4f8ff; border-color: #b3d4f5; }
+  .notes-block:empty::before { content: attr(placeholder); color: #bcbbba; }
+
+  .note-line { display: flex; gap: 8px; padding: 2px 0; }
+  .bullet     { color: var(--accent-blue); flex-shrink: 0; }
+  .sub-bullet { color: var(--text-muted); margin-left: 18px; flex-shrink: 0; }
+  .note-text  { flex: 1; }
+  .note-text.muted { color: var(--text-muted); font-style: italic; }
+
+  /* ── 예정 업무 테이블 ── */
+  .todo-table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-top: 4px; }
+  .todo-table th {
+    background: #f4f4f2; padding: 7px 11px; text-align: left;
+    font-weight: 700; font-size: 11px; text-transform: uppercase;
+    letter-spacing: .4px; color: var(--text-muted);
+    border-bottom: 1px solid var(--border-color);
+  }
+  .todo-table td {
+    padding: 8px 11px; border-bottom: 1px solid #f4f4f2;
+    vertical-align: top;
+  }
+  .todo-table tr:last-child td { border-bottom: none; }
+  .todo-table tr:hover td { background: #fafaf9; }
+  .dl-urgent { color: var(--accent-red); font-weight: 700; }
+  .dl-normal { color: var(--text-muted); }
+
+  /* ── KPT ── */
+  .kpt-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-top: 4px; }
+  .kpt-card { border-radius: 8px; padding: 14px; font-size: 13px; }
+  .kpt-card.keep    { background: #e8f5e9; border: 1px solid #c8e6c9; }
+  .kpt-card.problem { background: #fce4ec; border: 1px solid #f8bbd0; }
+  .kpt-card.try     { background: #fff8e1; border: 1px solid #ffe082; }
+  .kpt-card .kpt-title { font-size: 12.5px; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 5px; }
+  .kpt-card.keep    .kpt-title { color: #2e7d32; }
+  .kpt-card.problem .kpt-title { color: #c62828; }
+  .kpt-card.try     .kpt-title { color: #e65100; }
+
+  /* contenteditable kpt list */
+  .kpt-list { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+  .kpt-list li {
+    padding-left: 13px; position: relative; line-height: 1.5;
+    outline: none; border-radius: 3px; min-height: 1em;
+  }
+  .kpt-list li:focus { background: rgba(255,255,255,.6); }
+  .kpt-list li:empty::before { content: "내용 입력..."; color: #bbb; font-style: italic; font-size: 12px; }
+  .kpt-list li::before { content: "·"; position: absolute; left: 0; font-size: 18px; line-height: 1.1; }
+  .kpt-card.keep    .kpt-list li::before { color: #388e3c; }
+  .kpt-card.problem .kpt-list li::before { color: #d32f2f; }
+  .kpt-card.try     .kpt-list li::before { color: #f57c00; }
+
+  /* ── 내보내기 모달 ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.45); z-index: 999;
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: #fff; border-radius: 12px; padding: 28px 30px;
+    width: 680px; max-width: 95vw; max-height: 85vh;
+    display: flex; flex-direction: column; gap: 14px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.18);
+  }
+  .modal-title { font-size: 16px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+  .modal-desc  { font-size: 12.5px; color: var(--text-muted); line-height: 1.6; }
+  .modal-desc strong { color: var(--accent-blue); }
+  .modal-textarea {
+    flex: 1; min-height: 300px; border: 1px solid var(--border-color);
+    border-radius: 7px; padding: 12px; font-size: 12.5px;
+    font-family: "Consolas", "Malgun Gothic", monospace;
+    line-height: 1.6; color: var(--text-main); resize: none;
+    background: #fafafa;
+  }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+  .modal-btn {
+    padding: 8px 18px; border-radius: 6px; font-size: 13px;
+    font-weight: 600; cursor: pointer; border: none;
+  }
+  .modal-btn.copy { background: var(--accent-blue); color: #fff; }
+  .modal-btn.copy:hover { background: #1a6bcc; }
+  .modal-btn.close-btn { background: #f1f1ef; color: var(--text-main); }
+  .modal-btn.close-btn:hover { background: #e0e0de; }
+  .copied-toast {
+    position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+    background: #202124; color: #fff; border-radius: 8px;
+    padding: 10px 20px; font-size: 13px; font-weight: 500;
+    z-index: 1100; opacity: 0; transition: opacity .3s;
+    pointer-events: none;
+  }
+  .copied-toast.show { opacity: 1; }
+
+  /* 주차 구분선 */
+  .week-divider {
+    display: flex; align-items: center; gap: 10px;
+    margin: 6px 0 14px; font-size: 11px; font-weight: 700;
+    color: var(--text-muted); text-transform: uppercase; letter-spacing: .6px;
+  }
+  .week-divider::before, .week-divider::after {
+    content: ""; flex: 1; height: 1px; background: var(--border-color);
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══ 사이드바 ═══ -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-main">📦 D2C팀 업무일지</div>
+    <div class="logo-sub">Shopee PH · KR · JP | 2026년 6월 4주차</div>
+  </div>
+
+  <div>
+    <div class="sb-section-title" style="margin-bottom:7px;">이번 주 일지</div>
+    <ul class="nav-list">
+      <li class="nav-item active"><a href="file:///C:/Users/hmkco/Downloads/D2C_%EC%97%85%EB%AC%B4%EC%9D%BC%EC%A7%80_%EC%B5%9C%EC%A2%85_2026_6%EC%9B%944%EC%A3%BC%EC%B0%A8_2.html#monday">📅 월요일 <span style="font-size:11px;color:var(--text-muted)">6/22</span></a></li>
+      <li class="nav-item today"><a href="file:///C:/Users/hmkco/Downloads/D2C_%EC%97%85%EB%AC%B4%EC%9D%BC%EC%A7%80_%EC%B5%9C%EC%A2%85_2026_6%EC%9B%944%EC%A3%BC%EC%B0%A8_2.html#tuesday">📌 화요일 <span style="font-size:11px">6/23 TODAY</span></a></li>
+      <li class="nav-item"><a href="file:///C:/Users/hmkco/Downloads/D2C_%EC%97%85%EB%AC%B4%EC%9D%BC%EC%A7%80_%EC%B5%9C%EC%A2%85_2026_6%EC%9B%944%EC%A3%BC%EC%B0%A8_2.html#wednesday">📅 수요일 <span style="font-size:11px;color:var(--text-muted)">6/24</span></a></li>
+      <li class="nav-item"><a href="file:///C:/Users/hmkco/Downloads/D2C_%EC%97%85%EB%AC%B4%EC%9D%BC%EC%A7%80_%EC%B5%9C%EC%A2%85_2026_6%EC%9B%944%EC%A3%BC%EC%B0%A8_2.html#thursday">📅 목요일 <span style="font-size:11px;color:var(--text-muted)">6/25</span></a></li>
+      <li class="nav-item"><a href="file:///C:/Users/hmkco/Downloads/D2C_%EC%97%85%EB%AC%B4%EC%9D%BC%EC%A7%80_%EC%B5%9C%EC%A2%85_2026_6%EC%9B%944%EC%A3%BC%EC%B0%A8_2.html#friday">📅 금요일 <span style="font-size:11px;color:var(--text-muted)">6/26</span></a></li>
+      <li class="nav-item"><a href="file:///C:/Users/hmkco/Downloads/D2C_%EC%97%85%EB%AC%B4%EC%9D%BC%EC%A7%80_%EC%B5%9C%EC%A2%85_2026_6%EC%9B%944%EC%A3%BC%EC%B0%A8_2.html#kpt">🔁 KPT 주간 회고</a></li>
+    </ul>
+  </div>
+
+  <div class="sb-urgent-box">
+    <div class="ub-title">⚡ 긴급 마감</div>
+    <div class="sb-urgent-row"><span class="label">7.7 노미네이트</span><span class="val">6/24</span></div>
+    <div class="sb-urgent-row"><span class="label">페이데이 노미네이트</span><span class="val">6/24</span></div>
+    <div class="sb-urgent-row"><span class="label">프로모션 종료</span><span class="val">6/25</span></div>
+    <div class="sb-urgent-row"><span class="label">FBS 가격 확정</span><span class="val ok">7/2</span></div>
+    <div class="sb-urgent-row"><span class="label">FBS 출고</span><span class="val ok">7/2 전</span></div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:8px;">
+    <button class="sb-export-btn" onclick="openExportModal()">
+      📋 Claude에게 변경사항 전달
+    </button>
+    <div class="sb-save-indicator">
+      <span class="save-dot" id="saveDot"></span>
+      <span id="saveStatus">변경사항 없음</span>
+    </div>
+  </div>
+</nav>
+
+
+<!-- ═══ 메인 콘텐츠 ═══ -->
+<main class="main-container">
+
+  <header class="header">
+    <h1 class="page-title">📝 D2C 팀 주간 업무일지</h1>
+    <div class="page-meta">
+      <span>📂 <strong>팀:</strong> D2C팀</span>
+      <span>🛍️ <strong>채널:</strong> Shopee Philippines / 일본몰 / KR 인플루언서</span>
+      <span>🏷️ <strong>카테고리:</strong> 컬러 콘택트렌즈 (프리미엄 · 한국 제조)</span>
+      <span>📆 <strong>주차:</strong> 2026년 6월 4주차</span>
+    </div>
+  </header>
+
+  <!-- 프로모션 배너 -->
+  <div class="promo-banner">
+    <div>
+      <div class="pb-title">🔴 신제품 런칭 프로모션 진행 중 — Shopee Philippines</div>
+      <div class="pb-meta">Void 2종 + Toffee 1종 · 30% 할인 · 2026.06.19(목) ~ 06.25(수) · 종료 후 성과 분석 예정</div>
+    </div>
+    <div class="pb-chip">D-2 종료</div>
+  </div>
+
+  <div class="week-divider">이번 주 일지</div>
+
+
+  <!-- ─── 월요일 ─── -->
+  <section id="monday" class="section-block dimmed">
+    <div class="section-header">
+      <div class="section-title">📅 월요일 <span class="section-date">2026년 6월 22일</span></div>
+      <span class="badge badge-pending">기록 없음</span>
+    </div>
+    <div class="notes-block" contenteditable="true" placeholder="월요일 업무 내용을 직접 입력하세요..." data-field="monday-notes" oninput="markDirty()"></div>
+  </section>
+
+
+  <!-- ─── 화요일 (TODAY) ─── -->
+  <section id="tuesday" class="section-block today-block">
+    <div class="section-header">
+      <div class="section-title">📌 화요일 <span class="section-date">2026년 6월 23일</span></div>
+      <span class="badge badge-today">✦ TODAY</span>
+    </div>
+
+    <div class="sub-label">✅ 완료 업무 체크리스트</div>
+    <div class="task-list" id="tuesday-tasks">
+
+      <div class="task-item completed" data-id="t1">
+        <input type="checkbox" id="t1" checked="" onchange="onCheck(this)">
+        <span class="task-label" contenteditable="true" data-field="t1-label" oninput="markDirty()">Shopee Philippines FBS 패킹 완료 — 디테일 패킹 정보 작성 (무게 / 아웃박스 크기 / 카튼 수량), 카튼 라벨 출력 준비 완료 · 출고: 차주 (7/2 이전)</span>
+        <span class="task-tag tag-logistics">물류</span>
+      </div>
+
+      <div class="task-item completed" data-id="t2">
+        <input type="checkbox" id="t2" checked="" onchange="onCheck(this)">
+        <span class="task-label" contenteditable="true" data-field="t2-label" oninput="markDirty()">KR 인플루언서 콘텐츠 업로드 현황 확인 및 내용 작성 완료, 콘텐츠 에셋 다운로드 완료</span>
+        <span class="task-tag tag-marketing">마케팅</span>
+      </div>
+
+      <div class="task-item completed" data-id="t3">
+        <input type="checkbox" id="t3" checked="" onchange="onCheck(this)">
+        <span class="task-label" contenteditable="true" data-field="t3-label" oninput="markDirty()">일본몰 송장 출력 완료 및 운송장 전달 완료</span>
+        <span class="task-tag tag-logistics">물류·JP</span>
+      </div>
+
+      <div class="task-item completed" data-id="t4">
+        <input type="checkbox" id="t4" checked="" onchange="onCheck(this)">
+        <span class="task-label" contenteditable="true" data-field="t4-label" oninput="markDirty()">Shopee Philippines CS 당일 접수 건 처리 완료</span>
+        <span class="task-tag tag-cs">CS</span>
+      </div>
+
+      <div class="task-item completed" data-id="t5">
+        <input type="checkbox" id="t5" checked="" onchange="onCheck(this)">
+        <span class="task-label" contenteditable="true" data-field="t5-label" oninput="markDirty()">Shopee PH 광고 성과 분석 (6/8~6/21, 약 2주간) — 누적 파일 업데이트 완료, 이번 주 운영 방향 결정 및 캠페인 집행 실행 (Lune / Purityshine / Daymood · Product 광고)</span>
+        <span class="task-tag tag-ads">광고</span>
+      </div>
+
+      <div class="task-item completed" data-id="t6">
+        <input type="checkbox" id="t6" checked="" onchange="onCheck(this)">
+        <span class="task-label" contenteditable="true" data-field="t6-label" oninput="markDirty()">국내 블로거 서칭 진행 및 신제품 시딩 준비 완료 (KR)</span>
+        <span class="task-tag tag-marketing">시딩</span>
+      </div>
+
+      <div class="task-item completed" data-id="t7">
+        <input type="checkbox" id="t7" checked="" onchange="onCheck(this)">
+        <span class="task-label" contenteditable="true" data-field="t7-label" oninput="markDirty()">오로라렌즈 키워드 데이터 조사 — 인스타비오·아이템스카우트 활용, 검색량 / 클릭량 등 주요 지표 수집</span>
+        <span class="task-tag tag-research">리서치</span>
+      </div>
+
+      <!-- ★ 신규: Chat Broadcasting -->
+      <div class="task-item completed" data-id="t8">
+        <input type="checkbox" id="t8" checked="" onchange="onCheck(this)">
+        <span class="task-label" contenteditable="true" data-field="t8-label" oninput="markDirty()">Shopee PH Chat Broadcasting — Inform Promotions 발송 완료 (Void 2종·Toffee 1종 30% 프로모션 고객 홍보)</span>
+        <span class="task-tag tag-broadcast">브로드캐스팅</span>
+      </div>
+
+    </div>
+
+    <button class="add-task-btn" onclick="addTask(&#39;tuesday-tasks&#39;)">＋ 업무 추가</button>
+
+    <hr class="divider">
+
+    <div class="sub-label">📋 상세 기록 및 특이사항</div>
+    <div class="notes-block" contenteditable="true" data-field="tuesday-notes" oninput="markDirty()" placeholder="오늘 업무의 상세 내용, 수치 데이터, 특이사항을 자유롭게 기록하세요...">
+<div class="note-line"><span class="bullet">•</span><span class="note-text"><strong>[FBS 물류]</strong> 패킹 작업 및 카튼 라벨 출력용 데이터 작성 완료. 출고 타깃: 7/2 이전 (차주 진행 예정)</span></div>
+<div class="note-line"><span class="sub-bullet">↳</span><span class="note-text muted">무게 / 아웃박스 크기 / 카튼 수량 전 항목 기재 완료+부착 완료</span></div>
+<div class="note-line" style="margin-top:5px;"><span class="bullet">•</span><span class="note-text"><strong>[광고 운영]</strong> 6/8~6/21 성과 분석 후 이번 주 Product 광고 집행 실행 — Lune, Purityshine, Daymood 3개 제품</span></div>
+<div class="note-line"><span class="sub-bullet">↳</span><span class="note-text muted">광고 성과 수치 (ROAS / CPC / CTR): [확인 필요 — 수치 미입력]</span></div>
+<div class="note-line" style="margin-top:5px;"><span class="bullet">•</span><span class="note-text"><strong>[Chat Broadcasting]</strong> Inform Promotions 기능 활용 — 신제품 출시 기념 30% 할인 프로모션 진행 중 메시지 고객 발송 완료</span></div>
+<div class="note-line"><span class="sub-bullet">↳</span><span class="note-text muted">발송 메시지 핵심: "신제품 출시 기념 프로모션 진행 중 + 바우처 혜택" 프레이밍 → 단순 신상품 알림 대비 클릭률·구매 전환율 향상 기대</span></div>
+<div class="note-line"><span class="sub-bullet">↳</span><span class="note-text muted">발송 대상 수·오픈율·클릭률: [확인 필요 — 수치 미입력]</span></div>
+<div class="note-line" style="margin-top:5px;"><span class="bullet">•</span><span class="note-text"><strong>[키워드 리서치]</strong> 오로라렌즈 검색량·클릭량 조사 완료. 다음 광고 소재 및 SEO 최적화에 반영 예정</span></div>
+<div class="note-line"><span class="sub-bullet">↳</span><span class="note-text muted">조사 결과 수치: [확인 필요 — 수치 미입력]</span></div>
+    </div>
+  </section>
+
+
+  <!-- ─── 수요일 ─── -->
+  <section id="wednesday" class="section-block">
+    <div class="section-header">
+      <div class="section-title">📅 수요일 <span class="section-date">2026년 6월 24일</span></div>
+      <span class="badge badge-urgent">⚠ 마감 집중일</span>
+    </div>
+
+    <div class="sub-label">🎯 예정 업무</div>
+    <div class="task-list" id="wednesday-tasks">
+
+      <div class="task-item" data-id="w1">
+        <input type="checkbox" id="w1" onchange="onCheck(this)">
+        <span class="task-label" contenteditable="true" data-field="w1-label" oninput="markDirty()"><strong>[마감 D-Day]</strong> Shopee PH 7.7 더블데이 캠페인 노미네이트 제출</span>
+        <span class="task-tag tag-urgent">D-day</span>
+      </div>
+
+      <div class="task-item" data-id="w2">
+        <input type="checkbox" id="w2" onchange="onCheck(this)">
+        <span class="task-label" contenteditable="true" data-field="w2-label" oninput="markDirty()"><strong>[마감 D-Day]</strong> 6월말 페이데이 캠페인 노미네이트 제출 <span style="color:#d9730d;font-size:12px;font-weight:600;">(6/30 당일 프로모션만 참여)</span></span>
+        <span class="task-tag tag-urgent">D-day</span>
+      </div>
+
+      <div class="task-item" data-id="w3">
+        <input type="checkbox" id="w3" onchange="onCheck(this)">
+        <span class="task-label" contenteditable="true" data-field="w3-label" oninput="markDirty()">MNM(물류사) 제출용 FBS 서류 작성 착수 — 인보이스·CIPL 등</span>
+        <span class="task-tag tag-logistics">물류</span>
+      </div>
+
+    </div>
+
+    <button class="add-task-btn" onclick="addTask(&#39;wednesday-tasks&#39;)">＋ 업무 추가</button>
+
+    <hr class="divider">
+    <div class="sub-label">📋 상세 기록 및 특이사항</div>
+    <div class="notes-block" contenteditable="true" data-field="wednesday-notes" oninput="markDirty()" placeholder="수요일 업무 완료 후 내용을 여기에 기록하세요..."></div>
+  </section>
+
+
+  <!-- ─── 목요일 ─── -->
+  <section id="thursday" class="section-block">
+    <div class="section-header">
+      <div class="section-title">📅 목요일 <span class="section-date">2026년 6월 25일</span></div>
+      <span class="badge badge-plan">예정</span>
+    </div>
+
+    <div class="sub-label">🎯 예정 업무</div>
+    <div class="task-list" id="thursday-tasks">
+
+      <div class="task-item" data-id="th1">
+        <input type="checkbox" id="th1" onchange="onCheck(this)">
+        <span class="task-label" contenteditable="true" data-field="th1-label" oninput="markDirty()">7.7 더블데이 홍보 배너 제작 (Shopee PH)</span>
+        <span class="task-tag tag-marketing">배너</span>
+      </div>
+
+      <div class="task-item" data-id="th2">
+        <input type="checkbox" id="th2" onchange="onCheck(this)">
+        <span class="task-label" contenteditable="true" data-field="th2-label" oninput="markDirty()">6월말 페이데이 홍보 배너 제작 (Shopee PH)</span>
+        <span class="task-tag tag-marketing">배너</span>
+      </div>
+
+      <div class="task-item" data-id="th3">
+        <input type="checkbox" id="th3" onchange="onCheck(this)">
+        <span class="task-label" contenteditable="true" data-field="th3-label" oninput="markDirty()">신제품 프로모션 성과 분석 — Void 2종·Toffee 1종 30% 할인 (6/19~6/25 종료 후)</span>
+        <span class="task-tag tag-ads">성과분석</span>
+      </div>
+
+      <div class="task-item" data-id="th4">
+        <input type="checkbox" id="th4" onchange="onCheck(this)">
+        <span class="task-label" contenteditable="true" data-field="th4-label" oninput="markDirty()">MNM FBS 서류 (인보이스·CIPL) 완성 및 제출</span>
+        <span class="task-tag tag-logistics">물류</span>
+      </div>
+
+    </div>
+
+    <button class="add-task-btn" onclick="addTask(&#39;thursday-tasks&#39;)">＋ 업무 추가</button>
+
+    <hr class="divider">
+    <div class="sub-label">📋 상세 기록 및 특이사항</div>
+    <div class="notes-block" contenteditable="true" data-field="thursday-notes" oninput="markDirty()" placeholder="목요일 업무 완료 후 내용을 여기에 기록하세요..."></div>
+  </section>
+
+
+  <!-- ─── 금요일 ─── -->
+  <section id="friday" class="section-block">
+    <div class="section-header">
+      <div class="section-title">📅 금요일 <span class="section-date">2026년 6월 26일</span></div>
+      <span class="badge badge-plan">예정</span>
+    </div>
+
+    <div class="sub-label">🎯 예정 업무</div>
+    <div class="task-list" id="friday-tasks">
+
+      <div class="task-item" data-id="f1">
+        <input type="checkbox" id="f1" onchange="onCheck(this)">
+        <span class="task-label" contenteditable="true" data-field="f1-label" oninput="markDirty()">D2C 팀 주간 KPI 시트 업데이트 — 주간 매출 / 인기 제품 / 프로모션 계획·성과 기입 (매주 정기 반복)</span>
+        <span class="task-tag tag-recurring">매주반복</span>
+      </div>
+
+      <div class="task-item" data-id="f2">
+        <input type="checkbox" id="f2" onchange="onCheck(this)">
+        <span class="task-label" contenteditable="true" data-field="f2-label" oninput="markDirty()">미유·렌즈케이스 FBS 전환 후 할인가 확정 및 업데이트</span>
+        <span class="task-tag tag-logistics">가격정책</span>
+      </div>
+
+      <div class="task-item" data-id="f3">
+        <input type="checkbox" id="f3" onchange="onCheck(this)">
+        <span class="task-label" contenteditable="true" data-field="f3-label" oninput="markDirty()">이번 주 Shopee PH 광고 성과 중간 점검 (Lune·Purityshine·Daymood)</span>
+        <span class="task-tag tag-ads">광고</span>
+      </div>
+
+    </div>
+
+    <button class="add-task-btn" onclick="addTask(&#39;friday-tasks&#39;)">＋ 업무 추가</button>
+
+    <hr class="divider">
+    <div class="sub-label">📋 상세 기록 및 특이사항</div>
+    <div class="notes-block" contenteditable="true" data-field="friday-notes" oninput="markDirty()" placeholder="금요일 업무 완료 후 내용을 여기에 기록하세요..."></div>
+  </section>
+
+
+  <!-- ─── KPT 회고 ─── -->
+  <section id="kpt" class="section-block">
+    <div class="section-header">
+      <div class="section-title">🔁 KPT 주간 회고</div>
+      <span class="badge badge-pending">6월 4주차</span>
+    </div>
+
+    <div class="kpt-grid">
+      <div class="kpt-card keep">
+        <div class="kpt-title">✅ KEEP — 잘하고 있는 것</div>
+        <ul class="kpt-list" id="kpt-keep">
+          <li contenteditable="true" oninput="markDirty()">FBS 패킹 및 출고 준비를 7/2 마감 전 선제적으로 완료 → 일정 리스크 최소화</li>
+          <li contenteditable="true" oninput="markDirty()">광고 성과 누적 파일 관리 유지 → 주차별 비교 분석 가능한 데이터 구조 정착</li>
+          <li contenteditable="true" oninput="markDirty()">Chat Broadcasting Inform Promotions 활용 → 신제품 프로모션 고객 노출 극대화</li>
+        </ul>
+        <button class="add-task-btn" style="margin-top:8px;" onclick="addKptItem(&#39;kpt-keep&#39;)">＋ 항목 추가</button>
+      </div>
+
+      <div class="kpt-card problem">
+        <div class="kpt-title">⚡ PROBLEM — 개선이 필요한 것</div>
+        <ul class="kpt-list" id="kpt-problem">
+          <li contenteditable="true" oninput="markDirty()">광고 핵심 수치 (ROAS·CPC·CTR) 미기재 → 정량 평가 불가</li>
+          <li contenteditable="true" oninput="markDirty()">CS 처리 건수, 시딩 제품명 등 디테일 데이터 누락 반복</li>
+          <li contenteditable="true" oninput="markDirty()">캠페인 노미네이트 (6/24 마감) 전일 미처리 → 내일 오전 최우선 처리 필수</li>
+        </ul>
+        <button class="add-task-btn" style="margin-top:8px;" onclick="addKptItem(&#39;kpt-problem&#39;)">＋ 항목 추가</button>
+      </div>
+
+      <div class="kpt-card try">
+        <div class="kpt-title">🚀 TRY — 다음에 시도할 것</div>
+        <ul class="kpt-list" id="kpt-try">
+          <li contenteditable="true" oninput="markDirty()">6/24 오전 노미네이트 완료 후 즉시 FBS 서류 착수</li>
+          <li contenteditable="true" oninput="markDirty()">일지 작성 시 광고 수치 (ROAS·CPC·CTR) 필수 기재 루틴 확립</li>
+          <li contenteditable="true" oninput="markDirty()">Broadcasting 발송 후 오픈율·클릭률 수치 다음 일지에 기록</li>
+        </ul>
+        <button class="add-task-btn" style="margin-top:8px;" onclick="addKptItem(&#39;kpt-try&#39;)">＋ 항목 추가</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+
+<!-- ═══ 내보내기 모달 ═══ -->
+<div class="modal-overlay" id="exportModal" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-title">📋 Claude에게 변경사항 전달하기</div>
+    <div class="modal-desc">
+      아래 텍스트를 전체 복사(Ctrl+A → Ctrl+C)한 뒤,
+      <strong>Claude 채팅창에 붙여넣기</strong>하면 변경사항을 자동으로 파악하고 일지를 업데이트해드립니다.
+    </div>
+    <textarea class="modal-textarea" id="exportText" readonly=""></textarea>
+    <div class="modal-actions">
+      <button class="modal-btn close-btn" onclick="closeModal()">닫기</button>
+      <button class="modal-btn copy" onclick="copyExport()">📋 전체 복사</button>
+    </div>
+  </div>
+</div>
+
+<div class="copied-toast" id="copiedToast">✅ 클립보드에 복사됐습니다!</div>
+
+
+<script>
+// ── 변경 감지
+let isDirty = false;
+let taskCounter = 100;
+
+function markDirty() {
+  isDirty = true;
+  const dot = document.getElementById('saveDot');
+  const status = document.getElementById('saveStatus');
+  dot.classList.add('dirty');
+  status.textContent = '미전달 변경사항 있음';
+}
+
+function clearDirty() {
+  isDirty = false;
+  const dot = document.getElementById('saveDot');
+  const status = document.getElementById('saveStatus');
+  dot.classList.remove('dirty');
+  status.textContent = '전달 완료 ✓';
+  setTimeout(() => { if (!isDirty) status.textContent = '변경사항 없음'; }, 3000);
+}
+
+// ── 체크박스 토글
+function onCheck(checkbox) {
+  const item = checkbox.closest('.task-item');
+  item.classList.toggle('completed', checkbox.checked);
+  markDirty();
+}
+
+// ── 업무 행 추가
+function addTask(listId) {
+  const list = document.getElementById(listId);
+  taskCounter++;
+  const id = 'task-' + taskCounter;
+  const div = document.createElement('div');
+  div.className = 'task-item';
+  div.setAttribute('data-id', id);
+  div.innerHTML = `
+    <input type="checkbox" id="${id}" onchange="onCheck(this)">
+    <span class="task-label" contenteditable="true" data-field="${id}-label"
+          oninput="markDirty()" placeholder="업무 내용 입력..."></span>
+    <span class="task-tag tag-logistics" style="cursor:pointer;"
+          onclick="cycleTag(this)" title="클릭해서 카테고리 변경">기타</span>
+  `;
+  list.appendChild(div);
+  div.querySelector('.task-label').focus();
+  markDirty();
+}
+
+// ── 태그 순환 변경
+const TAGS = [
+  ['기타','tag-logistics'],['물류','tag-logistics'],['마케팅','tag-marketing'],
+  ['광고','tag-ads'],['CS','tag-cs'],['리서치','tag-research'],
+  ['긴급','tag-urgent'],['반복','tag-recurring'],['브로드캐스팅','tag-broadcast']
+];
+function cycleTag(el) {
+  const current = TAGS.findIndex(t => t[0] === el.textContent.trim());
+  const next = TAGS[(current + 1) % TAGS.length];
+  el.textContent = next[0];
+  el.className = 'task-tag ' + next[1];
+  markDirty();
+}
+
+// ── KPT 항목 추가
+function addKptItem(listId) {
+  const ul = document.getElementById(listId);
+  const li = document.createElement('li');
+  li.contentEditable = 'true';
+  li.setAttribute('oninput', 'markDirty()');
+  li.textContent = '';
+  ul.appendChild(li);
+  li.focus();
+  markDirty();
+}
+
+// ── 사이드바 스크롤 추적
+const sections = document.querySelectorAll('section[id]');
+const navItems = document.querySelectorAll('.nav-item');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      navItems.forEach(n => {
+        n.classList.toggle('active', n.querySelector('a').getAttribute('href') === '#' + e.target.id);
+      });
+    }
+  });
+}, { rootMargin: '-25% 0px -65% 0px' });
+sections.forEach(s => observer.observe(s));
+
+// ── 내보내기 텍스트 생성
+function buildExportText() {
+  const lines = [];
+  lines.push('=== D2C 업무일지 변경사항 전달 (2026년 6월 4주차) ===');
+  lines.push('전달 시각: ' + new Date().toLocaleString('ko-KR'));
+  lines.push('');
+
+  const dayNames = {
+    'tuesday': '화요일 6/23 (TODAY)',
+    'wednesday': '수요일 6/24',
+    'thursday': '목요일 6/25',
+    'friday': '금요일 6/26',
+    'monday': '월요일 6/22'
+  };
+
+  ['tuesday','wednesday','thursday','friday','monday'].forEach(day => {
+    const taskList = document.getElementById(day + '-tasks');
+    const notes = document.querySelector(`[data-field="${day}-notes"]`);
+    if (!taskList && !notes) return;
+
+    lines.push(`── ${dayNames[day]} ──`);
+
+    if (taskList) {
+      const items = taskList.querySelectorAll('.task-item');
+      items.forEach(item => {
+        const cb = item.querySelector('input[type="checkbox"]');
+        const label = item.querySelector('.task-label');
+        const tag = item.querySelector('.task-tag');
+        if (!label) return;
+        const status = cb && cb.checked ? '[✅ 완료]' : '[  ] 미완';
+        const tagText = tag ? `[${tag.textContent.trim()}]` : '';
+        lines.push(`  ${status} ${tagText} ${label.textContent.trim()}`);
+      });
+    }
+
+    if (notes && notes.textContent.trim()) {
+      lines.push('  메모: ' + notes.textContent.replace(/\s+/g,' ').trim());
+    }
+    lines.push('');
+  });
+
+  // KPT
+  lines.push('── KPT 회고 ──');
+  const kptSections = [
+    { id: 'kpt-keep', label: 'KEEP' },
+    { id: 'kpt-problem', label: 'PROBLEM' },
+    { id: 'kpt-try', label: 'TRY' }
+  ];
+  kptSections.forEach(({ id, label }) => {
+    const ul = document.getElementById(id);
+    if (!ul) return;
+    lines.push(`  [${label}]`);
+    ul.querySelectorAll('li').forEach(li => {
+      if (li.textContent.trim()) lines.push(`    · ${li.textContent.trim()}`);
+    });
+  });
+
+  lines.push('');
+  lines.push('=== 위 내용을 바탕으로 업무일지를 업데이트해 주세요 ===');
+  return lines.join('\n');
+}
+
+function openExportModal() {
+  const text = buildExportText();
+  document.getElementById('exportText').value = text;
+  document.getElementById('exportModal').classList.add('open');
+  clearDirty();
+}
+
+function closeModal() {
+  document.getElementById('exportModal').classList.remove('open');
+}
+
+function closeModalOutside(e) {
+  if (e.target === document.getElementById('exportModal')) closeModal();
+}
+
+function copyExport() {
+  const ta = document.getElementById('exportText');
+  ta.select();
+  ta.setSelectionRange(0, 99999);
+  navigator.clipboard.writeText(ta.value).then(() => {
+    const toast = document.getElementById('copiedToast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }).catch(() => {
+    document.execCommand('copy');
+    const toast = document.getElementById('copiedToast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  });
+}
+
+// ── 키보드 단축키
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
+    e.preventDefault();
+    openExportModal();
+  }
+});
+</script>
+
+
+</body></html>
