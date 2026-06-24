@@ -128,6 +128,109 @@ function Tag({t}) {
 }
 
 function TaskItem({task, onToggle, onEdit, onDelete}) {
+  const [editingText, setEditingText] = useState(false)
+  const [editingMemo, setEditingMemo] = useState(false)
+  const [val, setVal] = useState(task.text)
+  const [memo, setMemo] = useState(task.memo || '')
+
+  function saveText() {
+    setEditingText(false)
+    const trimmed = val.trim()
+    if (trimmed && trimmed !== task.text) onEdit({...task, text: trimmed})
+    else setVal(task.text)
+  }
+
+  function saveMemo() {
+    setEditingMemo(false)
+    if (memo !== (task.memo || '')) onEdit({...task, memo})
+  }
+
+  function toggleBold() {
+    onEdit({...task, bold: !task.bold})
+  }
+
+  function setColor(color) {
+    onEdit({...task, color})
+  }
+
+  const COLORS = [
+    {val:'default', bg:'transparent', label:'기본'},
+    {val:'red',     bg:'#FEE2E2',    label:'빨강'},
+    {val:'yellow',  bg:'#FEF9C3',    label:'노랑'},
+    {val:'green',   bg:'#DCFCE7',    label:'초록'},
+    {val:'blue',    bg:'#DBEAFE',    label:'파랑'},
+  ]
+
+  const rowBg = task.color === 'red' ? '#FEF2F2'
+    : task.color === 'yellow' ? '#FEFCE8'
+    : task.color === 'green'  ? '#F0FDF4'
+    : task.color === 'blue'   ? '#EFF6FF'
+    : 'transparent'
+
+  return (
+    <div style={{borderRadius:6,background:rowBg,marginBottom:2,padding:'4px 8px'}}>
+      <div style={{display:'flex',alignItems:'flex-start',gap:8}}>
+        <div
+          onClick={onToggle}
+          style={{width:15,height:15,borderRadius:3,flexShrink:0,marginTop:3,border:task.done?'none':'1.5px solid #CBD5E1',background:task.done?'#2563EB':'transparent',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer'}}
+        >
+          {task.done && <i className="ti ti-check" style={{fontSize:9,color:'#fff'}} />}
+        </div>
+
+        {editingText ? (
+          <input autoFocus value={val} onChange={e=>setVal(e.target.value)}
+            onBlur={saveText}
+            onKeyDown={e=>{if(e.key==='Enter'){e.preventDefault();saveText()}if(e.key==='Escape'){setVal(task.text);setEditingText(false)}}}
+            style={{flex:1,fontSize:13,border:'2px solid #2563EB',borderRadius:5,padding:'2px 8px',outline:'none',background:'#EFF6FF'}}
+          />
+        ) : (
+          <span style={{
+            flex:1,fontSize:13,lineHeight:1.55,
+            fontWeight: task.bold ? 700 : 400,
+            color: task.done ? '#94A3B8' : '#334155',
+            textDecoration: task.done ? 'line-through' : 'none'
+          }}>
+            {task.text}
+          </span>
+        )}
+
+        <Tag t={task.tag} />
+
+        {!editingText && (
+          <div style={{display:'flex',gap:2,flexShrink:0,alignItems:'center'}}>
+            <button onClick={toggleBold} title="굵게" style={{border:'none',background:task.bold?'#E0E7FF':'transparent',color:task.bold?'#4F46E5':'#CBD5E1',cursor:'pointer',padding:'1px 4px',borderRadius:3,fontSize:12,fontWeight:700}}>B</button>
+            {COLORS.map(c=>(
+              <div key={c.val} onClick={()=>setColor(task.color===c.val?'default':c.val)}
+                title={c.label}
+                style={{width:12,height:12,borderRadius:50,background:c.val==='default'?'#E5E7EB':c.bg,cursor:'pointer',border:task.color===c.val?'2px solid #2563EB':'1px solid #CBD5E1',flexShrink:0}}
+              />
+            ))}
+            <button onClick={()=>{setVal(task.text);setEditingText(true)}} title="수정" style={{border:'none',background:'transparent',color:'#CBD5E1',cursor:'pointer',padding:'1px 3px',fontSize:13}}><i className="ti ti-pencil" /></button>
+            <button onClick={e=>{e.stopPropagation();onDelete()}} title="삭제" style={{border:'none',background:'transparent',color:'#FCA5A5',cursor:'pointer',padding:'1px 3px',fontSize:13}}><i className="ti ti-trash" /></button>
+          </div>
+        )}
+      </div>
+
+      {/* 비고 */}
+      <div style={{marginLeft:23,marginTop:2}}>
+        {editingMemo ? (
+          <input autoFocus value={memo} onChange={e=>setMemo(e.target.value)}
+            onBlur={saveMemo}
+            onKeyDown={e=>{if(e.key==='Enter'){e.preventDefault();saveMemo()}if(e.key==='Escape'){setMemo(task.memo||'');setEditingMemo(false)}}}
+            placeholder="비고 입력..."
+            style={{width:'100%',fontSize:11,border:'1px solid #93C5FD',borderRadius:4,padding:'2px 7px',outline:'none',background:'#F0F9FF',color:'#334155'}}
+          />
+        ) : task.memo ? (
+          <span onClick={()=>setEditingMemo(true)} style={{fontSize:11,color:'#64748B',cursor:'text',fontStyle:'italic'}}>
+            📝 {task.memo}
+          </span>
+        ) : (
+          <span onClick={()=>setEditingMemo(true)} style={{fontSize:10,color:'#CBD5E1',cursor:'pointer'}}>+ 비고</span>
+        )}
+      </div>
+    </div>
+  )
+}
   const [editing, setEditing] = useState(false)
   const [val, setVal] = useState(task.text)
 
@@ -397,10 +500,10 @@ function App() {
     await upsert(dateKey, tasks, row.notes || '')
   }
 
-  async function editTask(dateKey, idx, newText) {
+  async function editTask(dateKey, idx, updatedTask) {
     const row = getRow(dateKey)
     if (!row) return
-    const tasks = row.tasks.map((t,i) => i===idx ? {...t, text:newText} : t)
+    const tasks = row.tasks.map((t,i) => i===idx ? {...t, ...updatedTask} : t)
     await upsert(dateKey, tasks, row.notes || '')
   }
 
@@ -642,7 +745,7 @@ function App() {
                             key={i}
                             task={t}
                             onToggle={() => toggleTask(d, i)}
-                            onEdit={(newText) => editTask(d, i, newText)}
+                            onEdit={(updatedTask) => editTask(d, i, updatedTask)}
                             onDelete={() => deleteTask(d, i)}
                           />
                         ))}
