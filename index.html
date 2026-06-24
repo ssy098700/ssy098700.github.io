@@ -102,13 +102,13 @@ async function dbLoad(weekKey) {
 }
 
 async function dbSave(row) {
-  const r = await fetch(`${SB_URL}/rest/v1/worklog`, {
+  const r = await fetch(`${SB_URL}/rest/v1/worklog?on_conflict=week_key,date_key`, {
     method: 'POST',
     headers: {
       'apikey': SB_KEY,
       'Authorization': `Bearer ${SB_KEY}`,
       'Content-Type': 'application/json',
-      'Prefer': 'resolution=merge-duplicates'
+      'Prefer': 'resolution=merge-duplicates,return=minimal'
     },
     body: JSON.stringify(row)
   })
