@@ -12,41 +12,27 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic',sans-serif;background:#F1F5F9;min-height:100vh}
 input,textarea,select,button{font-family:inherit}
-button{cursor:pointer}
 .app{display:flex;min-height:100vh}
 .sidebar{width:56px;flex-shrink:0;background:#fff;border-right:1px solid #E2E8F0;display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:4px;position:sticky;top:0;height:100vh;z-index:20}
 .sb-logo{width:32px;height:32px;border-radius:8px;background:#EFF6FF;display:flex;align-items:center;justify-content:center;margin-bottom:12px;color:#2563EB;font-size:16px}
-.sb-btn{width:38px;height:38px;border-radius:7px;border:1px solid transparent;background:transparent;display:flex;align-items:center;justify-content:center;color:#94A3B8;font-size:18px;transition:all .15s}
-.sb-btn:hover{background:#F1F5F9;color:#475569}
+.sb-btn{width:38px;height:38px;border-radius:7px;border:1px solid transparent;background:transparent;display:flex;align-items:center;justify-content:center;color:#94A3B8;font-size:18px;cursor:pointer}
 .sb-btn.active{background:#EFF6FF;border-color:#BFDBFE;color:#2563EB}
 .main{flex:1;overflow:auto}
 .topbar{background:#fff;border-bottom:1px solid #E2E8F0;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
-.topbar-title{font-size:14px;font-weight:600;color:#1E293B}
-.topbar-sub{font-size:11px;color:#94A3B8;margin-top:1px}
 .content{padding:20px;max-width:760px}
 .card{background:#fff;border:1px solid #E2E8F0;border-radius:12px;padding:14px 16px;margin-bottom:12px}
 .card.today{border-color:#BFDBFE;box-shadow:0 0 0 2px #EFF6FF}
+.tag{display:inline-block;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:500;white-space:nowrap}
 .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:9px;margin-bottom:16px}
 .stat-card{background:#F8FAFC;border-radius:10px;padding:12px 14px}
-.stat-label{font-size:11px;color:#64748B;margin-bottom:3px}
-.stat-val{font-size:22px;font-weight:600;color:#1E293B}
-.tag{display:inline-block;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:500;white-space:nowrap;flex-shrink:0}
-.task-row{display:flex;align-items:flex-start;gap:8px;padding:5px 8px;border-radius:6px;transition:background .1s}
-.task-row:hover{background:#F8FAFC}
-.check-box{width:15px;height:15px;border-radius:3px;flex-shrink:0;margin-top:2px;border:1.5px solid #CBD5E1;background:transparent;display:flex;align-items:center;justify-content:center;transition:all .15s;cursor:pointer}
-.check-box.done{background:#2563EB;border-color:#2563EB}
-.task-text{flex:1;font-size:13px;line-height:1.5;color:#334155;cursor:text}
-.task-text.done{color:#94A3B8;text-decoration:line-through}
-.sec-label{font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
-.btn-primary{padding:7px 14px;border-radius:7px;background:#2563EB;color:#fff;border:none;font-size:13px;font-weight:500;display:flex;align-items:center;gap:5px}
+.btn-primary{padding:7px 14px;border-radius:7px;background:#2563EB;color:#fff;border:none;font-size:13px;font-weight:500;display:flex;align-items:center;gap:5px;cursor:pointer}
 .btn-primary:disabled{background:#CBD5E1;cursor:not-allowed}
-.btn-outline{padding:5px 10px;border-radius:6px;background:#fff;color:#475569;border:1px solid #E2E8F0;font-size:12px;display:flex;align-items:center;gap:4px}
-.btn-share{padding:7px 14px;border-radius:7px;background:#7C3AED;color:#fff;border:none;font-size:13px;font-weight:500;display:flex;align-items:center;gap:5px}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:10px 18px;border-radius:8px;font-size:13px;font-weight:500;z-index:999;display:flex;align-items:center;gap:7px;box-shadow:0 4px 12px rgba(0,0,0,.15);animation:slideUp .3s ease}
+.btn-outline{padding:5px 10px;border-radius:6px;background:#fff;color:#475569;border:1px solid #E2E8F0;font-size:12px;display:flex;align-items:center;gap:4px;cursor:pointer}
+.btn-share{padding:7px 14px;border-radius:7px;background:#7C3AED;color:#fff;border:none;font-size:13px;font-weight:500;display:flex;align-items:center;gap:5px;cursor:pointer}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:10px 18px;border-radius:8px;font-size:13px;font-weight:500;z-index:999;display:flex;align-items:center;gap:7px;box-shadow:0 4px 12px rgba(0,0,0,.15)}
 .toast.ok{background:#059669;color:#fff}
 .toast.err{background:#DC2626;color:#fff}
-@keyframes slideUp{from{transform:translateX(-50%) translateY(20px);opacity:0}to{transform:translateX(-50%) translateY(0);opacity:1}}
-.day-pill{flex:1;border-radius:8px;padding:9px 6px;text-align:center;cursor:pointer;transition:all .15s;border:1px solid transparent}
+.day-pill{flex:1;border-radius:8px;padding:9px 6px;text-align:center;cursor:pointer;border:1px solid transparent}
 .day-pill.today-pill{background:#EFF6FF;border-color:#BFDBFE}
 .day-pill:not(.today-pill){background:#F8FAFC}
 .kpt-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:9px}
@@ -55,307 +41,413 @@ button{cursor:pointer}
 .kpt-card.problem{background:#FFF1F2;border:1px solid #FECDD3}
 .kpt-card.try{background:#FFFBEB;border:1px solid #FDE68A}
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px}
-.modal{background:#fff;border-radius:14px;padding:24px;width:100%;max-width:480px;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.modal{background:#fff;border-radius:14px;padding:24px;width:100%;max-width:480px}
 .loading{display:flex;align-items:center;justify-content:center;padding:40px;color:#94A3B8;font-size:13px;gap:8px}
 textarea{width:100%;border:1px solid #E2E8F0;border-radius:8px;padding:10px 12px;font-size:13px;line-height:1.6;resize:vertical;background:#F8FAFC;color:#334155;outline:none}
-textarea:focus{border-color:#93C5FD;background:#fff}
-input[type=text],input[type=date],input[type=password]{border:1px solid #E2E8F0;border-radius:6px;padding:6px 10px;font-size:13px;color:#334155;outline:none;background:#fff}
-input:focus{border-color:#93C5FD}
+input[type=date],input[type=password]{border:1px solid #E2E8F0;border-radius:6px;padding:6px 10px;font-size:13px;color:#334155;outline:none;background:#fff}
 .report-header{background:linear-gradient(135deg,#1E3A5F,#2563EB);padding:24px 28px;color:#fff;border-radius:12px 12px 0 0}
 </style>
 </head>
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const {useState,useEffect,useCallback}=React
+const {useState,useEffect,useCallback} = React
 
-const SUPABASE_URL='https://zxfytktctzgkssxbqbyj.supabase.co'
-const SUPABASE_ANON='sb_publishable_815pQE6fA0sXIBS3RcmDAA_6FptB6NS'
-const SUPABASE_SECRET='sb_secret_exVGa0Fzrty28gHjhgP15Q_mpxGrM2X'
+const SB_URL = 'https://zxfytktctzgkssxbqbyj.supabase.co'
+const SB_KEY = 'sb_publishable_815pQE6fA0sXIBS3RcmDAA_6FptB6NS'
 
-async function dbGet(weekKey){
-  const r=await fetch(`${SUPABASE_URL}/rest/v1/worklog?week_key=eq.${weekKey}&select=*`,{
-    headers:{'apikey':SUPABASE_ANON,'Authorization':`Bearer ${SUPABASE_ANON}`}
-  })
-  return await r.json()
+const TAG_COLORS = {
+  '물류':    {bg:'#DBEAFE',c:'#1E40AF'},
+  '마케팅':  {bg:'#EDE9FE',c:'#5B21B6'},
+  '광고':    {bg:'#FFE4E6',c:'#9F1239'},
+  'CS':      {bg:'#FEF3C7',c:'#92400E'},
+  '리서치':  {bg:'#D1FAE5',c:'#064E3B'},
+  '시딩':    {bg:'#F3E8FF',c:'#6B21A8'},
+  '브로드캐스팅':{bg:'#F5F3FF',c:'#7C3AED'},
+  'KPI':     {bg:'#F1F5F9',c:'#334155'},
+  '캠페인':  {bg:'#FEF9C3',c:'#854D0E'},
+  '가격정책':{bg:'#E0F2FE',c:'#075985'},
+  '기타':    {bg:'#F3F4F6',c:'#374151'},
 }
 
-async function dbUpsert(row){
-  const r=await fetch(`${SUPABASE_URL}/rest/v1/worklog`,{
-    method:'POST',
-    headers:{
-      'apikey':SUPABASE_ANON,
-      'Authorization':`Bearer ${SUPABASE_ANON}`,
-      'Content-Type':'application/json',
-      'Prefer':'resolution=merge-duplicates'
+const DAYS_KO = ['일','월','화','수','목','금','토']
+const DAYS_EN = ['SUN','MON','TUE','WED','THU','FRI','SAT']
+
+function toDate(d = new Date()) { return d.toISOString().split('T')[0] }
+function weekStart(d = new Date()) {
+  const dt = new Date(d), day = dt.getDay()
+  dt.setDate(dt.getDate() - day + (day === 0 ? -6 : 1))
+  return toDate(dt)
+}
+function weekDays(ws) {
+  return Array.from({length:5}, (_,i) => {
+    const d = new Date(ws); d.setDate(d.getDate()+i); return toDate(d)
+  })
+}
+function fmtDate(s) {
+  const d = new Date(s)
+  return `${d.getMonth()+1}/${d.getDate()} (${DAYS_KO[d.getDay()]})`
+}
+function fmtWeek(ws) {
+  const d = new Date(ws)
+  return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${Math.ceil(d.getDate()/7)}주차`
+}
+
+async function dbLoad(weekKey) {
+  const r = await fetch(`${SB_URL}/rest/v1/worklog?week_key=eq.${weekKey}&select=*`, {
+    headers: {'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`}
+  })
+  const data = await r.json()
+  return Array.isArray(data) ? data : []
+}
+
+async function dbSave(row) {
+  const r = await fetch(`${SB_URL}/rest/v1/worklog`, {
+    method: 'POST',
+    headers: {
+      'apikey': SB_KEY,
+      'Authorization': `Bearer ${SB_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'resolution=merge-duplicates'
     },
-    body:JSON.stringify(row)
+    body: JSON.stringify(row)
   })
   return r.ok
 }
 
-async function dbDelete(weekKey,dateKey){
-  await fetch(`${SUPABASE_URL}/rest/v1/worklog?week_key=eq.${weekKey}&date_key=eq.${dateKey}`,{
-    method:'DELETE',
-    headers:{'apikey':SUPABASE_ANON,'Authorization':`Bearer ${SUPABASE_ANON}`}
+async function dbRemove(weekKey, dateKey) {
+  await fetch(`${SB_URL}/rest/v1/worklog?week_key=eq.${weekKey}&date_key=eq.${dateKey}`, {
+    method: 'DELETE',
+    headers: {'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`}
   })
 }
 
-const DAYS_KO=['일','월','화','수','목','금','토']
-const DAYS_EN=['SUN','MON','TUE','WED','THU','FRI','SAT']
-const TAG_COLORS={
-  '물류':{bg:'#DBEAFE',c:'#1E40AF'},'마케팅':{bg:'#EDE9FE',c:'#5B21B6'},
-  '광고':{bg:'#FFE4E6',c:'#9F1239'},'CS':{bg:'#FEF3C7',c:'#92400E'},
-  '리서치':{bg:'#D1FAE5',c:'#064E3B'},'시딩':{bg:'#F3E8FF',c:'#6B21A8'},
-  '브로드캐스팅':{bg:'#F5F3FF',c:'#7C3AED'},'KPI':{bg:'#F1F5F9',c:'#334155'},
-  '캠페인':{bg:'#FEF9C3',c:'#854D0E'},'가격정책':{bg:'#E0F2FE',c:'#075985'},
-  '기타':{bg:'#F3F4F6',c:'#374151'}
+function Tag({t}) {
+  const c = TAG_COLORS[t] || TAG_COLORS['기타']
+  return <span className="tag" style={{background:c.bg,color:c.c}}>{t}</span>
 }
 
-function dk(d=new Date()){return d.toISOString().split('T')[0]}
-function wstart(d=new Date()){const dt=new Date(d),day=dt.getDay();dt.setDate(dt.getDate()-day+(day===0?-6:1));return dk(dt)}
-function wdays(ws){return Array.from({length:5},(_,i)=>{const d=new Date(ws);d.setDate(d.getDate()+i);return dk(d)})}
-function fmtDate(s){const d=new Date(s);return `${d.getMonth()+1}/${d.getDate()} (${DAYS_KO[d.getDay()]})`}
-function fmtWeek(ws){const d=new Date(ws);return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${Math.ceil(d.getDate()/7)}주차`}
+function TaskItem({task, onToggle, onEdit}) {
+  const [editing, setEditing] = useState(false)
+  const [val, setVal] = useState(task.text)
 
-function Tag({t}){const c=TAG_COLORS[t]||TAG_COLORS['기타'];return <span className="tag" style={{background:c.bg,color:c.c}}>{t}</span>}
-
-function TaskRow({task,onToggle,onEdit}){
-  const [editing,setEditing]=React.useState(false)
-  const [val,setVal]=React.useState(task.text)
-  const save=()=>{
-    setEditing(false)
-    if(val.trim()&&val.trim()!==task.text)onEdit(val.trim())
-    else setVal(task.text)
+  function startEdit(e) {
+    e.stopPropagation()
+    setVal(task.text)
+    setEditing(true)
   }
-  return(
-    <div style={{display:'flex',alignItems:'flex-start',gap:8,padding:'5px 8px',borderRadius:6}}>
-      <div className={`check-box${task.done?' done':''}`} onClick={onToggle} style={{cursor:'pointer',flexShrink:0,marginTop:2}}>
-        {task.done&&<i className="ti ti-check" style={{fontSize:9,color:'#fff'}}/>}
+
+  function save() {
+    setEditing(false)
+    const trimmed = val.trim()
+    if (trimmed && trimmed !== task.text) {
+      onEdit(trimmed)
+    }
+  }
+
+  function handleKey(e) {
+    if (e.key === 'Enter') { e.preventDefault(); save() }
+    if (e.key === 'Escape') { setEditing(false); setVal(task.text) }
+  }
+
+  return (
+    <div style={{display:'flex',alignItems:'flex-start',gap:8,padding:'6px 8px',borderRadius:6,background:editing?'#F0F9FF':'transparent'}}>
+      <div
+        onClick={onToggle}
+        style={{
+          width:15,height:15,borderRadius:3,flexShrink:0,marginTop:2,
+          border:task.done?'none':'1.5px solid #CBD5E1',
+          background:task.done?'#2563EB':'transparent',
+          display:'flex',alignItems:'center',justifyContent:'center',
+          cursor:'pointer'
+        }}
+      >
+        {task.done && <i className="ti ti-check" style={{fontSize:9,color:'#fff'}} />}
       </div>
-      {editing?(
-        <input autoFocus value={val}
-          onChange={e=>setVal(e.target.value)}
+
+      {editing ? (
+        <input
+          autoFocus
+          value={val}
+          onChange={e => setVal(e.target.value)}
+          onKeyDown={handleKey}
           onBlur={save}
-          onKeyDown={e=>{if(e.key==='Enter'){e.preventDefault();save()}if(e.key==='Escape'){setVal(task.text);setEditing(false)}}}
-          style={{flex:1,fontSize:13,border:'2px solid #2563EB',borderRadius:5,padding:'3px 8px',outline:'none',background:'#EFF6FF',color:'#1E293B'}}
+          style={{
+            flex:1,fontSize:13,
+            border:'2px solid #2563EB',borderRadius:5,
+            padding:'3px 8px',outline:'none',
+            background:'#EFF6FF',color:'#1E293B'
+          }}
         />
-      ):(
-        <span style={{flex:1,fontSize:13,lineHeight:1.5,color:task.done?'#94A3B8':'#334155',textDecoration:task.done?'line-through':'none'}}>{task.text}</span>
+      ) : (
+        <span style={{
+          flex:1,fontSize:13,lineHeight:1.55,
+          color:task.done?'#94A3B8':'#334155',
+          textDecoration:task.done?'line-through':'none'
+        }}>
+          {task.text}
+        </span>
       )}
-      <Tag t={task.tag}/>
-      {!editing&&<button onClick={()=>{setVal(task.text);setEditing(true)}} style={{border:'none',background:'transparent',cursor:'pointer',color:'#CBD5E1',padding:'0 2px',flexShrink:0}} title="수정"><i className="ti ti-pencil" style={{fontSize:13}}/></button>}
-      {editing&&<button onClick={save} style={{border:'none',background:'#2563EB',cursor:'pointer',color:'#fff',padding:'2px 8px',borderRadius:4,fontSize:11,flexShrink:0}}>저장</button>}
+
+      <Tag t={task.tag} />
+
+      {editing ? (
+        <button
+          onClick={save}
+          style={{
+            border:'none',background:'#2563EB',color:'#fff',
+            cursor:'pointer',padding:'3px 10px',borderRadius:5,
+            fontSize:11,fontWeight:600,flexShrink:0
+          }}
+        >저장</button>
+      ) : (
+        <button
+          onClick={startEdit}
+          style={{
+            border:'none',background:'transparent',color:'#CBD5E1',
+            cursor:'pointer',padding:'1px 3px',flexShrink:0,fontSize:13
+          }}
+          title="수정"
+        >
+          <i className="ti ti-pencil" />
+        </button>
+      )}
     </div>
   )
 }
 
-function ReadOnlyReport({data,weekKey}){
-  const days=wdays(weekKey)
-  const rows=data.filter(r=>!r.date_key.startsWith('__'))
-  const kptRow=data.find(r=>r.date_key==='__kpt')
-  return(
+function ReadOnlyView({data, weekKey}) {
+  const days = weekDays(weekKey)
+  const rows = data.filter(r => !r.date_key.startsWith('__'))
+  const kptRow = data.find(r => r.date_key === '__kpt')
+  return (
     <div style={{minHeight:'100vh',background:'#F1F5F9',padding:20}}>
       <div className="report-header" style={{maxWidth:760,margin:'0 auto 16px'}}>
         <div style={{fontSize:12,opacity:.7,marginBottom:4}}>D2C팀 업무일지 · 보기 전용</div>
         <div style={{fontSize:24,fontWeight:700}}>{fmtWeek(weekKey)}</div>
-        <span style={{display:'inline-block',padding:'3px 10px',borderRadius:12,background:'rgba(255,255,255,.2)',fontSize:11,fontWeight:600,marginTop:6}}>Shopee Philippines · KR · JP</span>
       </div>
       <div style={{maxWidth:760,margin:'0 auto'}}>
-        {days.map(d=>{
-          const row=rows.find(r=>r.date_key===d)
-          if(!row||!row.tasks?.length)return null
-          const done=row.tasks.filter(t=>t.done).length
-          return(
+        {days.map(d => {
+          const row = rows.find(r => r.date_key === d)
+          if (!row || !row.tasks?.length) return null
+          const done = row.tasks.filter(t => t.done).length
+          return (
             <div key={d} className="card" style={{marginBottom:12}}>
-              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10,paddingBottom:8,borderBottom:'1px solid #F1F5F9'}}>
-                <span style={{fontWeight:600,fontSize:13,color:'#1E293B'}}>{fmtDate(d)}</span>
-                <span style={{fontSize:11,color:'#64748B'}}>{done}/{row.tasks.length} 완료</span>
+              <div style={{display:'flex',justifyContent:'space-between',marginBottom:10,paddingBottom:8,borderBottom:'1px solid #F1F5F9'}}>
+                <span style={{fontWeight:600,fontSize:13}}>{fmtDate(d)}</span>
+                <span style={{fontSize:11,color:'#64748B'}}>{done}/{row.tasks.length}</span>
               </div>
-              {row.tasks.map((t,i)=>(
-                <div key={i} style={{display:'flex',alignItems:'flex-start',gap:8,padding:'4px 0'}}>
-                  <span style={{color:t.done?'#059669':'#CBD5E1',marginTop:2,fontSize:14}}>{t.done?'✓':'○'}</span>
+              {row.tasks.map((t,i) => (
+                <div key={i} style={{display:'flex',gap:8,padding:'4px 0'}}>
+                  <span style={{color:t.done?'#059669':'#CBD5E1',fontSize:14}}>{t.done?'✓':'○'}</span>
                   <span style={{flex:1,fontSize:13,color:t.done?'#64748B':'#334155',textDecoration:t.done?'line-through':'none'}}>{t.text}</span>
-                  <Tag t={t.tag}/>
+                  <Tag t={t.tag} />
                 </div>
               ))}
-              {row.notes&&<div style={{marginTop:8,padding:'7px 9px',background:'#F8FAFC',borderRadius:6,fontSize:12,color:'#64748B',lineHeight:1.6}}>{row.notes}</div>}
             </div>
           )
         })}
-        {kptRow?.kpt&&(
-          <div className="card">
-            <div style={{fontSize:12,fontWeight:600,color:'#64748B',marginBottom:10,textTransform:'uppercase',letterSpacing:'.5px'}}>KPT 주간 회고</div>
-            <div className="kpt-grid">
-              {[{k:'keep',lbl:'KEEP',cls:'keep',c:'#15803D'},{k:'problem',lbl:'PROBLEM',cls:'problem',c:'#BE123C'},{k:'try',lbl:'TRY',cls:'try',c:'#B45309'}].map(({k,lbl,cls,c})=>(
-                <div key={k} className={`kpt-card ${cls}`}>
-                  <div style={{fontSize:11,fontWeight:700,color:c,marginBottom:6}}>{lbl}</div>
-                  {(kptRow.kpt[k]||[]).map((item,i)=><div key={i} style={{fontSize:11.5,color:'#374151',lineHeight:1.5,paddingLeft:10,position:'relative',marginBottom:2}}><span style={{position:'absolute',left:0,color:c}}>·</span>{item}</div>)}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   )
 }
 
-function App(){
-  const[view,setView]=useState('dashboard')
-  const[dbData,setDbData]=useState([])
-  const[curWeek,setCurWeek]=useState(wstart())
-  const[selDate,setSelDate]=useState(dk())
-  const[raw,setRaw]=useState('')
-  const[busy,setBusy]=useState(false)
-  const[kptBusy,setKptBusy]=useState(false)
-  const[loading,setLoading]=useState(true)
-  const[toast,setToast]=useState(null)
-  const[apiKey,setApiKey]=useState('')
-  const[apiKeyInput,setApiKeyInput]=useState('')
-  const[showApiSetup,setShowApiSetup]=useState(false)
-  const[showShare,setShowShare]=useState(false)
-  const[isReadOnly]=useState(()=>new URLSearchParams(window.location.search).get('readonly')==='1')
-  const[readOnlyWeek]=useState(()=>new URLSearchParams(window.location.search).get('week')||wstart())
+function App() {
+  const [view, setView] = useState('weekly')
+  const [rows, setRows] = useState([])
+  const [curWeek, setCurWeek] = useState(weekStart())
+  const [selDate, setSelDate] = useState(toDate())
+  const [raw, setRaw] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [kptBusy, setKptBusy] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [toast, setToast] = useState(null)
+  const [apiKey, setApiKey] = useState('')
+  const [apiInput, setApiInput] = useState('')
+  const [showApi, setShowApi] = useState(false)
+  const [showShare, setShowShare] = useState(false)
 
-  const loadWeek=useCallback(async(wk)=>{
+  const params = new URLSearchParams(window.location.search)
+  const isReadOnly = params.get('readonly') === '1'
+  const roWeek = params.get('week') || weekStart()
+
+  const load = useCallback(async (wk) => {
     setLoading(true)
-    try{const rows=await dbGet(wk);setDbData(Array.isArray(rows)?rows:[])}
-    catch(e){setDbData([])}
-    finally{setLoading(false)}
-  },[])
+    try {
+      const data = await dbLoad(wk)
+      setRows(data)
+    } catch(e) {
+      setRows([])
+    } finally {
+      setLoading(false)
+    }
+  }, [])
 
-  useEffect(()=>{
-    if(isReadOnly){loadWeek(readOnlyWeek);return}
-    loadWeek(curWeek)
-    try{const k=localStorage.getItem('d2c:apikey');if(k)setApiKey(k)}catch(e){}
-  },[curWeek,isReadOnly])
+  useEffect(() => {
+    if (isReadOnly) { load(roWeek); return }
+    load(curWeek)
+    try { const k = localStorage.getItem('d2c:key'); if(k) setApiKey(k) } catch(e) {}
+  }, [curWeek, isReadOnly])
 
-  const notify=(msg,type='ok')=>{setToast({msg,type});setTimeout(()=>setToast(null),3000)}
-  const saveApiKey=()=>{localStorage.setItem('d2c:apikey',apiKeyInput);setApiKey(apiKeyInput);setShowApiSetup(false);notify('API 키 저장됐습니다.')}
-  const safeData=Array.isArray(dbData)?dbData:[]
-  const getRow=(dateKey)=>safeData.find(r=>r.date_key===dateKey)
-  const kptRow=safeData.find(r=>r.date_key==='__kpt')
-
-  const upsertDay=async(dateKey,tasks,notes)=>{
-    await dbUpsert({week_key:curWeek,date_key:dateKey,tasks,notes,updated_at:new Date().toISOString()})
-    await loadWeek(curWeek)
+  function notify(msg, type='ok') {
+    setToast({msg,type})
+    setTimeout(() => setToast(null), 3000)
   }
 
-  const toggleTask=async(dateKey,idx)=>{
-    const row=getRow(dateKey);if(!row)return
-    const tasks=[...row.tasks];tasks[idx]={...tasks[idx],done:!tasks[idx].done}
-    await upsertDay(dateKey,tasks,row.notes||'')
+  function getRow(dk) { return rows.find(r => r.date_key === dk) }
+  const kptRow = rows.find(r => r.date_key === '__kpt')
+  const safeRows = Array.isArray(rows) ? rows : []
+
+  async function upsert(dateKey, tasks, notes) {
+    const ok = await dbSave({week_key:curWeek, date_key:dateKey, tasks, notes, updated_at:new Date().toISOString()})
+    if (ok) await load(curWeek)
+    else notify('저장 실패', 'err')
   }
 
-  const editTask=async(dateKey,idx,newText)=>{
-    const row=getRow(dateKey);if(!row)return
-    const tasks=[...row.tasks];tasks[idx]={...tasks[idx],text:newText}
-    await upsertDay(dateKey,tasks,row.notes||'')
+  async function toggleTask(dateKey, idx) {
+    const row = getRow(dateKey)
+    if (!row) return
+    const tasks = row.tasks.map((t,i) => i===idx ? {...t, done:!t.done} : t)
+    await upsert(dateKey, tasks, row.notes || '')
   }
 
-  const delDay=async(dateKey)=>{
-    await dbDelete(curWeek,dateKey);await loadWeek(curWeek);notify('삭제됐습니다.')
+  async function editTask(dateKey, idx, newText) {
+    const row = getRow(dateKey)
+    if (!row) return
+    const tasks = row.tasks.map((t,i) => i===idx ? {...t, text:newText} : t)
+    await upsert(dateKey, tasks, row.notes || '')
   }
 
-  const callClaude=async(prompt)=>{
-    if(!apiKey){setShowApiSetup(true);throw new Error('no key')}
-    const r=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01'},
-      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,messages:[{role:'user',content:prompt}]})
+  async function deleteDay(dateKey) {
+    await dbRemove(curWeek, dateKey)
+    await load(curWeek)
+    notify('삭제됐습니다.')
+  }
+
+  async function callClaude(prompt) {
+    if (!apiKey) { setShowApi(true); throw new Error('no key') }
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01'},
+      body: JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,messages:[{role:'user',content:prompt}]})
     })
-    const d=await r.json()
-    if(d.error)throw new Error(d.error.message)
-    const txt=d.content?.map(c=>c.text||'').join('')||''
+    const d = await r.json()
+    if (d.error) throw new Error(d.error.message)
+    const txt = d.content?.map(c => c.text||'').join('') || ''
     return JSON.parse(txt.replace(/```json|```/g,'').trim())
   }
 
-  const processInput=async()=>{
-    if(!raw.trim())return;setBusy(true)
-    try{
-      const parsed=await callClaude(`다음 업무 내용을 JSON으로 구조화. JSON만 출력:\n\n${raw}\n\n형식:\n{"tasks":[{"text":"업무내용(간결)","tag":"물류|마케팅|광고|CS|리서치|시딩|브로드캐스팅|KPI|캠페인|가격정책|기타","done":true}],"notes":"상세메모(없으면 빈문자열)"}`)
-      await upsertDay(selDate,parsed.tasks||[],parsed.notes||'')
-      setRaw('');setCurWeek(wstart(new Date(selDate)));setView('weekly');notify('저장 완료!')
-    }catch(e){if(e.message!=='no key')notify('처리 실패. API 키 확인해주세요.','err')}
-    finally{setBusy(false)}
+  async function processInput() {
+    if (!raw.trim()) return
+    setBusy(true)
+    try {
+      const parsed = await callClaude(
+        `다음 업무 내용을 JSON으로 구조화. JSON만 출력:\n\n${raw}\n\n형식:\n{"tasks":[{"text":"업무내용(간결)","tag":"물류|마케팅|광고|CS|리서치|시딩|브로드캐스팅|KPI|캠페인|가격정책|기타","done":true}],"notes":"상세메모(없으면 빈문자열)"}`
+      )
+      await upsert(selDate, parsed.tasks||[], parsed.notes||'')
+      setRaw(''); setCurWeek(weekStart(new Date(selDate))); setView('weekly')
+      notify('저장 완료!')
+    } catch(e) {
+      if (e.message !== 'no key') notify('처리 실패. API 키 확인해주세요.', 'err')
+    } finally {
+      setBusy(false)
+    }
   }
 
-  const genKpt=async()=>{
-    const allTasks=safeData.filter(r=>r.tasks?.length).flatMap(r=>r.tasks)
-    if(!allTasks.length){notify('업무 데이터가 없습니다','err');return}
+  async function genKpt() {
+    const all = safeRows.filter(r => r.tasks?.length).flatMap(r => r.tasks)
+    if (!all.length) { notify('업무 데이터가 없습니다', 'err'); return }
     setKptBusy(true)
-    try{
-      const kpt=await callClaude(`이번 주 업무를 보고 KPT 회고를 JSON으로. JSON만 출력:\n\n${allTasks.map(t=>`[${t.done?'완료':'미완'}] ${t.text}`).join('\n')}\n\n형식:\n{"keep":["..."],"problem":["..."],"try":["..."]}`)
-      await dbUpsert({week_key:curWeek,date_key:'__kpt',tasks:[],notes:'',kpt,updated_at:new Date().toISOString()})
-      await loadWeek(curWeek);notify('KPT 생성 완료!')
-    }catch(e){if(e.message!=='no key')notify('KPT 생성 실패','err')}
-    finally{setKptBusy(false)}
+    try {
+      const kpt = await callClaude(
+        `이번 주 업무를 보고 KPT 회고를 JSON으로. JSON만 출력:\n\n${all.map(t=>`[${t.done?'완료':'미완'}] ${t.text}`).join('\n')}\n\n형식:\n{"keep":["..."],"problem":["..."],"try":["..."]}`
+      )
+      await dbSave({week_key:curWeek, date_key:'__kpt', tasks:[], notes:'', kpt, updated_at:new Date().toISOString()})
+      await load(curWeek)
+      notify('KPT 생성 완료!')
+    } catch(e) {
+      if (e.message !== 'no key') notify('KPT 생성 실패', 'err')
+    } finally {
+      setKptBusy(false)
+    }
   }
 
-  const shareUrl=`${window.location.origin}${window.location.pathname}?readonly=1&week=${curWeek}`
-  const copyShare=()=>{navigator.clipboard.writeText(shareUrl).then(()=>notify('링크 복사됐습니다! 대표님께 전달하세요.'))}
+  if (isReadOnly && !loading) return <ReadOnlyView data={rows} weekKey={roWeek} />
+  if (isReadOnly && loading) return <div className="loading"><i className="ti ti-loader" />불러오는 중...</div>
 
-  if(isReadOnly&&!loading)return <ReadOnlyReport data={dbData} weekKey={readOnlyWeek}/>
-  if(isReadOnly&&loading)return <div className="loading"><i className="ti ti-loader" style={{fontSize:20}}/>불러오는 중...</div>
+  const days = weekDays(curWeek)
+  const today = toDate()
+  const allTasks = safeRows.filter(r => r.tasks?.length && !r.date_key.startsWith('__')).flatMap(r => r.tasks)
+  const shareUrl = `${window.location.origin}${window.location.pathname}?readonly=1&week=${curWeek}`
 
-  const days=wdays(curWeek),today=dk()
-  const allTasks=safeData.filter(r=>r.tasks?.length&&!r.date_key.startsWith('__')).flatMap(r=>r.tasks)
-  const NAV=[{id:'dashboard',icon:'ti-home',lbl:'홈'},{id:'input',icon:'ti-edit',lbl:'입력'},{id:'weekly',icon:'ti-calendar',lbl:'주간'},{id:'history',icon:'ti-clock',lbl:'기록'}]
+  const NAV = [
+    {id:'dashboard', icon:'ti-home', lbl:'홈'},
+    {id:'input',     icon:'ti-edit', lbl:'입력'},
+    {id:'weekly',    icon:'ti-calendar', lbl:'주간'},
+  ]
 
-  return(
+  return (
     <div className="app">
       <div className="sidebar">
-        <div className="sb-logo"><i className="ti ti-notebook"/></div>
-        {NAV.map(n=>(
-          <button key={n.id} className={`sb-btn${view===n.id?' active':''}`} onClick={()=>setView(n.id)} title={n.lbl}>
-            <i className={`ti ${n.icon}`}/>
+        <div className="sb-logo"><i className="ti ti-notebook" /></div>
+        {NAV.map(n => (
+          <button key={n.id} className={`sb-btn${view===n.id?' active':''}`} onClick={() => setView(n.id)} title={n.lbl}>
+            <i className={`ti ${n.icon}`} />
           </button>
         ))}
-        <div style={{flex:1}}/>
-        <button className="sb-btn" title="API 키 설정" onClick={()=>setShowApiSetup(true)}>
-          <i className="ti ti-settings" style={{fontSize:16}}/>
+        <div style={{flex:1}} />
+        <button className="sb-btn" title="API 키" onClick={() => setShowApi(true)}>
+          <i className="ti ti-settings" style={{fontSize:16}} />
         </button>
       </div>
 
       <div className="main">
         <div className="topbar">
           <div>
-            <div className="topbar-title">{NAV.find(n=>n.id===view)?.lbl}</div>
-            <div className="topbar-sub">D2C팀 · {fmtWeek(curWeek)}</div>
+            <div style={{fontSize:14,fontWeight:600,color:'#1E293B'}}>{NAV.find(n=>n.id===view)?.lbl}</div>
+            <div style={{fontSize:11,color:'#94A3B8'}}>D2C팀 · {fmtWeek(curWeek)}</div>
           </div>
           <div style={{display:'flex',gap:8}}>
-            {(view==='weekly'||view==='dashboard')&&(
-              <button className="btn-share" onClick={()=>setShowShare(true)}>
-                <i className="ti ti-share" style={{fontSize:13}}/>대표님 공유
+            {(view==='weekly'||view==='dashboard') && (
+              <button className="btn-share" onClick={() => setShowShare(true)}>
+                <i className="ti ti-share" style={{fontSize:13}} />대표님 공유
               </button>
             )}
-            {view==='input'&&(
+            {view==='input' && (
               <button className="btn-primary" onClick={processInput} disabled={busy||!raw.trim()}>
-                <i className="ti ti-sparkles" style={{fontSize:13}}/>{busy?'처리 중...':'Claude에게 정리 요청'}
+                <i className="ti ti-sparkles" style={{fontSize:13}} />
+                {busy ? '처리 중...' : 'Claude에게 정리 요청'}
               </button>
             )}
           </div>
         </div>
 
         <div className="content">
-          {loading&&<div className="loading"><i className="ti ti-loader" style={{fontSize:18}}/>불러오는 중...</div>}
+          {loading && <div className="loading"><i className="ti ti-loader" />불러오는 중...</div>}
 
-          {!loading&&view==='dashboard'&&(
+          {!loading && view==='dashboard' && (
             <div>
               <div className="stat-grid">
-                {[{lbl:'이번 주 완료',val:allTasks.filter(t=>t.done).length},{lbl:'전체 업무',val:allTasks.length},{lbl:'기록된 날',val:safeData.filter(r=>!r.date_key.startsWith('__')&&r.tasks?.length>0).length}].map((s,i)=>(
-                  <div key={i} className="stat-card"><div className="stat-label">{s.lbl}</div><div className="stat-val">{s.val}</div></div>
+                {[
+                  {lbl:'이번 주 완료', val: allTasks.filter(t=>t.done).length},
+                  {lbl:'전체 업무',    val: allTasks.length},
+                  {lbl:'기록된 날',   val: safeRows.filter(r=>!r.date_key.startsWith('__')&&r.tasks?.length>0).length},
+                ].map((s,i) => (
+                  <div key={i} className="stat-card">
+                    <div style={{fontSize:11,color:'#64748B',marginBottom:3}}>{s.lbl}</div>
+                    <div style={{fontSize:22,fontWeight:600,color:'#1E293B'}}>{s.val}</div>
+                  </div>
                 ))}
               </div>
               <div className="card">
-                <div className="sec-label" style={{marginBottom:10}}>이번 주 현황</div>
+                <div style={{fontSize:11,fontWeight:600,color:'#64748B',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:10}}>이번 주 현황</div>
                 <div style={{display:'flex',gap:7}}>
-                  {days.map(d=>{
-                    const row=getRow(d),isT=d===today,dt=new Date(d)
-                    const done=(row?.tasks||[]).filter(t=>t.done).length,total=(row?.tasks||[]).length
-                    return(
-                      <div key={d} className={`day-pill${isT?' today-pill':''}`} onClick={()=>setView('weekly')}>
+                  {days.map(d => {
+                    const row = getRow(d), isT = d===today, dt = new Date(d)
+                    const done = (row?.tasks||[]).filter(t=>t.done).length
+                    const total = (row?.tasks||[]).length
+                    return (
+                      <div key={d} className={`day-pill${isT?' today-pill':''}`} onClick={() => setView('weekly')}>
                         <div style={{fontSize:9,color:isT?'#2563EB':'#94A3B8',fontWeight:600}}>{DAYS_EN[dt.getDay()]}</div>
                         <div style={{fontSize:14,fontWeight:600,color:isT?'#2563EB':'#1E293B',margin:'2px 0'}}>{dt.getDate()}</div>
                         <div style={{fontSize:9,color:isT?'#3B82F6':'#94A3B8'}}>{total>0?`${done}/${total}`:'—'}</div>
@@ -365,88 +457,115 @@ function App(){
                 </div>
               </div>
               <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:9}}>
-                {[{lbl:'오늘 업무 입력',sub:'Claude가 자동 정리',icon:'ti-plus',c:'#2563EB',act:()=>setView('input')},{lbl:'주간 일지 보기',sub:'이번 주 전체 현황',icon:'ti-calendar-week',c:'#059669',act:()=>setView('weekly')}].map((a,i)=>(
+                {[
+                  {lbl:'오늘 업무 입력',sub:'Claude가 자동 정리',icon:'ti-plus',c:'#2563EB',act:()=>setView('input')},
+                  {lbl:'주간 일지 보기',sub:'이번 주 전체 현황',icon:'ti-calendar-week',c:'#059669',act:()=>setView('weekly')},
+                ].map((a,i) => (
                   <div key={i} className="card" style={{cursor:'pointer',display:'flex',alignItems:'center',gap:10}} onClick={a.act}>
-                    <i className={`ti ${a.icon}`} style={{fontSize:20,color:a.c}}/>
-                    <div><div style={{fontSize:12,fontWeight:600,color:'#1E293B'}}>{a.lbl}</div><div style={{fontSize:10,color:'#94A3B8',marginTop:1}}>{a.sub}</div></div>
+                    <i className={`ti ${a.icon}`} style={{fontSize:20,color:a.c}} />
+                    <div>
+                      <div style={{fontSize:12,fontWeight:600,color:'#1E293B'}}>{a.lbl}</div>
+                      <div style={{fontSize:10,color:'#94A3B8',marginTop:1}}>{a.sub}</div>
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
           )}
 
-          {!loading&&view==='input'&&(
+          {!loading && view==='input' && (
             <div>
               <div className="card">
-                <div className="sec-label">날짜 선택</div>
-                <input type="date" value={selDate} onChange={e=>setSelDate(e.target.value)} style={{width:160}}/>
+                <div style={{fontSize:11,fontWeight:600,color:'#64748B',marginBottom:8}}>날짜 선택</div>
+                <input type="date" value={selDate} onChange={e=>setSelDate(e.target.value)} style={{width:160}} />
               </div>
               <div className="card">
-                <div className="sec-label">업무 내용 입력 <span style={{fontSize:10,color:'#94A3B8',textTransform:'none',marginLeft:6}}>날것 그대로 → Claude가 정리</span></div>
-                <textarea value={raw} onChange={e=>setRaw(e.target.value)} rows={8} placeholder={"오늘 업무를 자유롭게 적어주세요.\n\n예시:\n1. 쇼피 FBS 패킹 완료\n2. 인플루언서 콘텐츠 확인\n3. 광고 분석 완료"}/>
+                <div style={{fontSize:11,fontWeight:600,color:'#64748B',marginBottom:8}}>업무 내용 입력</div>
+                <textarea value={raw} onChange={e=>setRaw(e.target.value)} rows={8}
+                  placeholder={"오늘 업무를 자유롭게 적어주세요.\n\n1. FBS 패킹 완료\n2. CS 처리\n3. 광고 분석"} />
               </div>
-              {!apiKey&&<div style={{padding:'9px 12px',borderRadius:8,background:'#FFF7ED',border:'1px solid #FED7AA',fontSize:12,color:'#92400E'}}>
-                <i className="ti ti-key" style={{marginRight:5}}/>API 키 미설정 —
-                <button onClick={()=>setShowApiSetup(true)} style={{background:'none',border:'none',color:'#2563EB',cursor:'pointer',fontSize:12,textDecoration:'underline',marginLeft:4}}>여기서 설정</button>
-              </div>}
+              {!apiKey && (
+                <div style={{padding:'9px 12px',borderRadius:8,background:'#FFF7ED',border:'1px solid #FED7AA',fontSize:12,color:'#92400E'}}>
+                  API 키 미설정 —
+                  <button onClick={()=>setShowApi(true)} style={{background:'none',border:'none',color:'#2563EB',cursor:'pointer',fontSize:12,textDecoration:'underline',marginLeft:4}}>설정하기</button>
+                </div>
+              )}
             </div>
           )}
 
-          {!loading&&view==='weekly'&&(
+          {!loading && view==='weekly' && (
             <div>
               <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:14}}>
-                <button className="btn-outline" style={{width:30,height:30,padding:0,justifyContent:'center'}} onClick={()=>{const d=new Date(curWeek);d.setDate(d.getDate()-7);setCurWeek(wstart(d))}}>
-                  <i className="ti ti-chevron-left" style={{fontSize:13}}/>
+                <button className="btn-outline" style={{width:30,height:30,padding:0,justifyContent:'center'}}
+                  onClick={() => { const d=new Date(curWeek); d.setDate(d.getDate()-7); setCurWeek(weekStart(d)) }}>
+                  <i className="ti ti-chevron-left" style={{fontSize:13}} />
                 </button>
                 <span style={{flex:1,textAlign:'center',fontSize:13,fontWeight:600,color:'#1E293B'}}>{fmtWeek(curWeek)}</span>
-                <button className="btn-outline" style={{width:30,height:30,padding:0,justifyContent:'center'}} onClick={()=>{const d=new Date(curWeek);d.setDate(d.getDate()+7);setCurWeek(wstart(d))}}>
-                  <i className="ti ti-chevron-right" style={{fontSize:13}}/>
+                <button className="btn-outline" style={{width:30,height:30,padding:0,justifyContent:'center'}}
+                  onClick={() => { const d=new Date(curWeek); d.setDate(d.getDate()+7); setCurWeek(weekStart(d)) }}>
+                  <i className="ti ti-chevron-right" style={{fontSize:13}} />
                 </button>
               </div>
-              {days.map(d=>{
-                const row=getRow(d),isT=d===today
-                const done=(row?.tasks||[]).filter(t=>t.done).length,total=(row?.tasks||[]).length
-                return(
+
+              {days.map(d => {
+                const row = getRow(d), isT = d===today
+                const done = (row?.tasks||[]).filter(t=>t.done).length
+                const total = (row?.tasks||[]).length
+                return (
                   <div key={d} className={`card${isT?' today':''}`}>
                     <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:row?8:0,paddingBottom:row?8:0,borderBottom:row?'1px solid #F1F5F9':'none'}}>
                       <div style={{display:'flex',alignItems:'center',gap:7}}>
                         <span style={{fontSize:12,fontWeight:600,color:isT?'#2563EB':'#1E293B'}}>{fmtDate(d)}</span>
-                        {isT&&<span style={{fontSize:9,padding:'2px 6px',borderRadius:10,background:'#2563EB',color:'#fff',fontWeight:600}}>TODAY</span>}
+                        {isT && <span style={{fontSize:9,padding:'2px 6px',borderRadius:10,background:'#2563EB',color:'#fff',fontWeight:600}}>TODAY</span>}
                       </div>
                       <div style={{display:'flex',alignItems:'center',gap:6}}>
-                        {total>0&&<span style={{fontSize:10,color:'#64748B'}}>{done}/{total}</span>}
-                        <button className="btn-outline" style={{padding:'2px 7px',fontSize:10}} onClick={()=>{setSelDate(d);setView('input')}}>
-                          <i className="ti ti-plus" style={{fontSize:10}}/>{row?'추가':'입력'}
+                        {total>0 && <span style={{fontSize:10,color:'#64748B'}}>{done}/{total}</span>}
+                        <button className="btn-outline" style={{padding:'2px 7px',fontSize:10}} onClick={() => { setSelDate(d); setView('input') }}>
+                          <i className="ti ti-plus" style={{fontSize:10}} />{row?'추가':'입력'}
                         </button>
-                        {row&&<button onClick={()=>delDay(d)} style={{width:22,height:22,border:'none',background:'transparent',display:'flex',alignItems:'center',justifyContent:'center',borderRadius:4,color:'#CBD5E1'}}>
-                          <i className="ti ti-trash" style={{fontSize:12}}/>
-                        </button>}
+                        {row && (
+                          <button onClick={() => deleteDay(d)} style={{width:22,height:22,border:'none',background:'transparent',cursor:'pointer',color:'#CBD5E1',borderRadius:4,display:'flex',alignItems:'center',justifyContent:'center'}}>
+                            <i className="ti ti-trash" style={{fontSize:12}} />
+                          </button>
+                        )}
                       </div>
                     </div>
-                    {row?(
-                      <div style={{padding:'0 2px'}}>
-                        {row.tasks?.map((t,i)=><TaskRow key={i} task={t} onToggle={()=>toggleTask(d,i)} onEdit={(newText)=>editTask(d,i,newText)}/>)}
-                        {row.notes&&<div style={{margin:'6px 6px 2px',padding:'7px 9px',background:'#F8FAFC',borderRadius:6,fontSize:11.5,color:'#64748B',lineHeight:1.6}}>{row.notes}</div>}
+                    {row ? (
+                      <div>
+                        {row.tasks?.map((t,i) => (
+                          <TaskItem
+                            key={i}
+                            task={t}
+                            onToggle={() => toggleTask(d, i)}
+                            onEdit={(newText) => editTask(d, i, newText)}
+                          />
+                        ))}
+                        {row.notes && (
+                          <div style={{margin:'6px 6px 2px',padding:'7px 9px',background:'#F8FAFC',borderRadius:6,fontSize:11.5,color:'#64748B',lineHeight:1.6}}>
+                            {row.notes}
+                          </div>
+                        )}
                       </div>
-                    ):(
+                    ) : (
                       <div style={{textAlign:'center',padding:'12px',fontSize:11,color:'#94A3B8',fontStyle:'italic'}}>업무 기록 없음</div>
                     )}
                   </div>
                 )
               })}
+
               <div className="card">
                 <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:10}}>
                   <span style={{fontSize:12,fontWeight:600,color:'#1E293B'}}>KPT 주간 회고</span>
                   <button className="btn-outline" style={{background:'#EFF6FF',borderColor:'#BFDBFE',color:'#2563EB'}} onClick={genKpt} disabled={kptBusy}>
-                    <i className="ti ti-sparkles" style={{fontSize:11}}/>{kptBusy?'생성 중...':'Claude로 자동 생성'}
+                    <i className="ti ti-sparkles" style={{fontSize:11}} />{kptBusy?'생성 중...':'Claude로 자동 생성'}
                   </button>
                 </div>
-                {kptRow?.kpt?(
+                {kptRow?.kpt ? (
                   <div className="kpt-grid">
-                    {[{k:'keep',lbl:'KEEP',cls:'keep',c:'#15803D'},{k:'problem',lbl:'PROBLEM',cls:'problem',c:'#BE123C'},{k:'try',lbl:'TRY',cls:'try',c:'#B45309'}].map(({k,lbl,cls,c})=>(
+                    {[{k:'keep',lbl:'KEEP',cls:'keep',c:'#15803D'},{k:'problem',lbl:'PROBLEM',cls:'problem',c:'#BE123C'},{k:'try',lbl:'TRY',cls:'try',c:'#B45309'}].map(({k,lbl,cls,c}) => (
                       <div key={k} className={`kpt-card ${cls}`}>
                         <div style={{fontSize:10,fontWeight:700,color:c,marginBottom:6}}>{lbl}</div>
-                        {(kptRow.kpt[k]||[]).map((item,i)=>(
+                        {(kptRow.kpt[k]||[]).map((item,i) => (
                           <div key={i} style={{fontSize:11.5,color:'#374151',lineHeight:1.5,paddingLeft:9,position:'relative',marginBottom:2}}>
                             <span style={{position:'absolute',left:0,color:c}}>·</span>{item}
                           </div>
@@ -454,58 +573,52 @@ function App(){
                       </div>
                     ))}
                   </div>
-                ):(
+                ) : (
                   <div style={{textAlign:'center',padding:'14px',fontSize:11,color:'#94A3B8'}}>업무 입력 후 버튼을 눌러 KPT 자동 생성</div>
                 )}
               </div>
             </div>
           )}
-
-          {!loading&&view==='history'&&(
-            <div style={{textAlign:'center',padding:'36px',background:'#fff',borderRadius:12,border:'1px solid #E2E8F0'}}>
-              <i className="ti ti-clock" style={{fontSize:28,color:'#CBD5E1',display:'block',marginBottom:8}}/>
-              <div style={{fontSize:12,color:'#64748B'}}>히스토리 기능은 준비 중입니다</div>
-            </div>
-          )}
         </div>
       </div>
 
-      {showApiSetup&&(
-        <div className="modal-bg" onClick={()=>setShowApiSetup(false)}>
-          <div className="modal" onClick={e=>e.stopPropagation()}>
-            <div style={{fontSize:15,fontWeight:700,color:'#1E293B',marginBottom:6}}><i className="ti ti-key" style={{marginRight:6,color:'#2563EB'}}/>Anthropic API 키 설정</div>
-            <div style={{fontSize:12,color:'#64748B',lineHeight:1.6,marginBottom:14}}>
-              Claude 자동 정리 기능에 필요합니다.<br/>
+      {showApi && (
+        <div className="modal-bg" onClick={() => setShowApi(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <div style={{fontSize:15,fontWeight:700,color:'#1E293B',marginBottom:6}}>API 키 설정</div>
+            <div style={{fontSize:12,color:'#64748B',marginBottom:14,lineHeight:1.6}}>
               <a href="https://console.anthropic.com" target="_blank" style={{color:'#2563EB'}}>console.anthropic.com</a>에서 발급
             </div>
-            <input type="password" value={apiKeyInput} onChange={e=>setApiKeyInput(e.target.value)} placeholder="sk-ant-api03-..." style={{width:'100%',marginBottom:12}}/>
+            <input type="password" value={apiInput} onChange={e=>setApiInput(e.target.value)} placeholder="sk-ant-api03-..." style={{width:'100%',marginBottom:12}} />
             <div style={{display:'flex',gap:8,justifyContent:'flex-end'}}>
-              <button className="btn-outline" onClick={()=>setShowApiSetup(false)}>취소</button>
-              <button className="btn-primary" onClick={saveApiKey} disabled={!apiKeyInput.trim()}>저장</button>
+              <button className="btn-outline" onClick={() => setShowApi(false)}>취소</button>
+              <button className="btn-primary" onClick={() => { localStorage.setItem('d2c:key',apiInput); setApiKey(apiInput); setShowApi(false); notify('저장됐습니다.') }} disabled={!apiInput.trim()}>저장</button>
             </div>
           </div>
         </div>
       )}
 
-      {showShare&&(
-        <div className="modal-bg" onClick={()=>setShowShare(false)}>
-          <div className="modal" onClick={e=>e.stopPropagation()}>
-            <div style={{fontSize:15,fontWeight:700,color:'#1E293B',marginBottom:6}}><i className="ti ti-share" style={{marginRight:6,color:'#7C3AED'}}/>대표님 공유 링크</div>
-            <div style={{fontSize:12,color:'#64748B',lineHeight:1.6,marginBottom:12}}>
-              아래 링크를 대표님께 전달하시면 이번 주 업무 보고서를 보실 수 있습니다.<br/>읽기 전용 · 로그인 불필요
+      {showShare && (
+        <div className="modal-bg" onClick={() => setShowShare(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <div style={{fontSize:15,fontWeight:700,color:'#1E293B',marginBottom:6}}>대표님 공유 링크</div>
+            <div style={{fontSize:12,color:'#64748B',marginBottom:12,lineHeight:1.6}}>읽기 전용 · 로그인 불필요</div>
+            <div style={{background:'#F8FAFC',border:'1px solid #E2E8F0',borderRadius:8,padding:'10px 12px',fontSize:11,color:'#475569',wordBreak:'break-all',marginBottom:12}}>
+              {shareUrl}
             </div>
-            <div style={{background:'#F8FAFC',border:'1px solid #E2E8F0',borderRadius:8,padding:'10px 12px',fontSize:11,color:'#475569',wordBreak:'break-all',lineHeight:1.5,marginBottom:12}}>{shareUrl}</div>
             <div style={{display:'flex',gap:8,justifyContent:'flex-end'}}>
-              <button className="btn-outline" onClick={()=>setShowShare(false)}>닫기</button>
-              <button className="btn-share" onClick={copyShare}><i className="ti ti-copy" style={{fontSize:13}}/>링크 복사</button>
+              <button className="btn-outline" onClick={() => setShowShare(false)}>닫기</button>
+              <button className="btn-share" onClick={() => { navigator.clipboard.writeText(shareUrl).then(() => notify('링크 복사됐습니다!')) }}>
+                <i className="ti ti-copy" style={{fontSize:13}} />링크 복사
+              </button>
             </div>
           </div>
         </div>
       )}
 
-      {toast&&(
+      {toast && (
         <div className={`toast ${toast.type}`}>
-          <i className={`ti ${toast.type==='ok'?'ti-circle-check':'ti-alert-circle'}`}/>
+          <i className={`ti ${toast.type==='ok'?'ti-circle-check':'ti-alert-circle'}`} />
           {toast.msg}
         </div>
       )}
@@ -513,7 +626,7 @@ function App(){
   )
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(<App/>)
+ReactDOM.createRoot(document.getElementById('root')).render(<App />)
 </script>
 </body>
 </html>
