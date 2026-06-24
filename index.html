@@ -252,6 +252,50 @@ function ReadOnlyView({data, weekKey}) {
   )
 }
 
+function ManualInput({onSave}) {
+  const TAGS = ['물류','마케팅','광고','CS','리서치','시딩','브로드캐스팅','KPI','캠페인','가격정책','기타']
+  const [text, setText] = useState('')
+  const [tag, setTag] = useState('기타')
+
+  function save() {
+    if (!text.trim()) return
+    onSave({text: text.trim(), tag, done: false})
+    setText('')
+    setTag('기타')
+  }
+
+  return (
+    <div className="card">
+      <div style={{fontSize:11,fontWeight:600,color:'#64748B',marginBottom:8}}>업무 직접 추가</div>
+      <input
+        type="text"
+        value={text}
+        onChange={e=>setText(e.target.value)}
+        onKeyDown={e=>{if(e.key==='Enter')save()}}
+        placeholder="업무 내용 입력 후 Enter 또는 추가 버튼"
+        style={{width:'100%',border:'1px solid #E2E8F0',borderRadius:7,padding:'8px 12px',fontSize:13,outline:'none',marginBottom:8,boxSizing:'border-box'}}
+      />
+      <div style={{display:'flex',gap:8,alignItems:'center',flexWrap:'wrap',marginBottom:8}}>
+        {['물류','마케팅','광고','CS','리서치','시딩','브로드캐스팅','KPI','캠페인','가격정책','기타'].map(t=>(
+          <button key={t} onClick={()=>setTag(t)} style={{
+            padding:'3px 10px',borderRadius:20,fontSize:11,fontWeight:500,cursor:'pointer',border:'none',
+            background:tag===t?'#2563EB':'#F1F5F9',
+            color:tag===t?'#fff':'#475569'
+          }}>{t}</button>
+        ))}
+      </div>
+      <button
+        onClick={save}
+        disabled={!text.trim()}
+        style={{padding:'7px 16px',borderRadius:7,background:text.trim()?'#2563EB':'#CBD5E1',color:'#fff',border:'none',fontSize:13,fontWeight:500,cursor:text.trim()?'pointer':'not-allowed',display:'flex',alignItems:'center',gap:5}}
+      >
+        <i className="ti ti-plus" style={{fontSize:13}} />추가
+      </button>
+    </div>
+  )
+}
+
+
 function App() {
   const [view, setView] = useState('weekly')
   const [rows, setRows] = useState([])
@@ -479,15 +523,26 @@ function App() {
                 <div style={{fontSize:11,fontWeight:600,color:'#64748B',marginBottom:8}}>날짜 선택</div>
                 <input type="date" value={selDate} onChange={e=>setSelDate(e.target.value)} style={{width:160}} />
               </div>
-              <div className="card">
-                <div style={{fontSize:11,fontWeight:600,color:'#64748B',marginBottom:8}}>업무 내용 입력</div>
-                <textarea value={raw} onChange={e=>setRaw(e.target.value)} rows={8}
-                  placeholder={"오늘 업무를 자유롭게 적어주세요.\n\n1. FBS 패킹 완료\n2. CS 처리\n3. 광고 분석"} />
-              </div>
-              {!apiKey && (
-                <div style={{padding:'9px 12px',borderRadius:8,background:'#FFF7ED',border:'1px solid #FED7AA',fontSize:12,color:'#92400E'}}>
-                  API 키 미설정 —
-                  <button onClick={()=>setShowApi(true)} style={{background:'none',border:'none',color:'#2563EB',cursor:'pointer',fontSize:12,textDecoration:'underline',marginLeft:4}}>설정하기</button>
+              <ManualInput
+                onSave={async(task)=>{
+                  const row = rows.find(r=>r.date_key===selDate)
+                  const tasks = row ? [...row.tasks, task] : [task]
+                  await upsert(selDate, tasks, row?.notes||'')
+                  setView('weekly')
+                  notify('저장 완료!')
+                }}
+              />
+              {apiKey && (
+                <div className="card" style={{marginTop:0}}>
+                  <div style={{fontSize:11,fontWeight:600,color:'#64748B',marginBottom:8}}>
+                    Claude 자동 정리 <span style={{fontSize:10,color:'#94A3B8',fontWeight:400,marginLeft:4}}>날것 그대로 입력 → 자동 분류</span>
+                  </div>
+                  <textarea value={raw} onChange={e=>setRaw(e.target.value)} rows={5}
+                    placeholder={"예시:\n1. FBS 패킹 완료\n2. CS 처리\n3. 광고 분석"} />
+                  <button className="btn-primary" onClick={processInput} disabled={busy||!raw.trim()} style={{marginTop:8}}>
+                    <i className="ti ti-sparkles" style={{fontSize:13}} />
+                    {busy ? '처리 중...' : 'Claude에게 정리 요청'}
+                  </button>
                 </div>
               )}
             </div>
