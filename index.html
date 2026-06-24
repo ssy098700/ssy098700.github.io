@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -123,23 +124,29 @@ function Tag({t}){const c=TAG_COLORS[t]||TAG_COLORS['기타'];return <span class
 function TaskRow({task,onToggle,onEdit}){
   const [editing,setEditing]=React.useState(false)
   const [val,setVal]=React.useState(task.text)
-  const save=()=>{setEditing(false);if(val.trim()&&val.trim()!==task.text)onEdit(val.trim())}
+  const save=()=>{
+    setEditing(false)
+    if(val.trim()&&val.trim()!==task.text)onEdit(val.trim())
+    else setVal(task.text)
+  }
   return(
-    <div className="task-row">
-      <div className={`check-box${task.done?' done':''}`} onClick={onToggle}>
+    <div style={{display:'flex',alignItems:'flex-start',gap:8,padding:'5px 8px',borderRadius:6}}>
+      <div className={`check-box${task.done?' done':''}`} onClick={onToggle} style={{cursor:'pointer',flexShrink:0,marginTop:2}}>
         {task.done&&<i className="ti ti-check" style={{fontSize:9,color:'#fff'}}/>}
       </div>
       {editing?(
         <input autoFocus value={val}
           onChange={e=>setVal(e.target.value)}
           onBlur={save}
-          onKeyDown={e=>{if(e.key==='Enter')save();if(e.key==='Escape'){setVal(task.text);setEditing(false)}}}
-          style={{flex:1,fontSize:13,border:'1px solid #93C5FD',borderRadius:5,padding:'2px 8px',outline:'none',background:'#EFF6FF'}}
+          onKeyDown={e=>{if(e.key==='Enter'){e.preventDefault();save()}if(e.key==='Escape'){setVal(task.text);setEditing(false)}}}
+          style={{flex:1,fontSize:13,border:'2px solid #2563EB',borderRadius:5,padding:'3px 8px',outline:'none',background:'#EFF6FF',color:'#1E293B'}}
         />
       ):(
-        <span className={`task-text${task.done?' done':''}`} onClick={()=>setEditing(true)} title="클릭해서 수정">{task.text}</span>
+        <span style={{flex:1,fontSize:13,lineHeight:1.5,color:task.done?'#94A3B8':'#334155',textDecoration:task.done?'line-through':'none'}}>{task.text}</span>
       )}
       <Tag t={task.tag}/>
+      {!editing&&<button onClick={()=>{setVal(task.text);setEditing(true)}} style={{border:'none',background:'transparent',cursor:'pointer',color:'#CBD5E1',padding:'0 2px',flexShrink:0}} title="수정"><i className="ti ti-pencil" style={{fontSize:13}}/></button>}
+      {editing&&<button onClick={save} style={{border:'none',background:'#2563EB',cursor:'pointer',color:'#fff',padding:'2px 8px',borderRadius:4,fontSize:11,flexShrink:0}}>저장</button>}
     </div>
   )
 }
