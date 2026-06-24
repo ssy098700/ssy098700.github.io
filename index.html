@@ -95,9 +95,24 @@ const ROW_COLORS = {
 const DAYS_KO = ['일','월','화','수','목','금','토']
 const DAYS_EN = ['SUN','MON','TUE','WED','THU','FRI','SAT']
 
-function toDate(d=new Date()){return d.toISOString().split('T')[0]}
-function weekStart(d=new Date()){const dt=new Date(d),day=dt.getDay();dt.setDate(dt.getDate()-day+(day===0?-6:1));return toDate(dt)}
-function weekDays(ws){return Array.from({length:5},(_,i)=>{const d=new Date(ws);d.setDate(d.getDate()+i);return toDate(d)})}
+function toDate(d=new Date()){
+  const y=d.getFullYear()
+  const m=String(d.getMonth()+1).padStart(2,'0')
+  const day=String(d.getDate()).padStart(2,'0')
+  return `${y}-${m}-${day}`
+}
+function weekStart(d=new Date()){
+  const dt=new Date(d),day=dt.getDay()
+  dt.setDate(dt.getDate()-day+(day===0?-6:1))
+  return toDate(dt)
+}
+function weekDays(ws){
+  return Array.from({length:5},(_,i)=>{
+    const d=new Date(ws+'T00:00:00')
+    d.setDate(d.getDate()+i)
+    return toDate(d)
+  })
+}
 function fmtDate(s){const d=new Date(s);return `${d.getMonth()+1}/${d.getDate()} (${DAYS_KO[d.getDay()]})`}
 function fmtWeek(ws){const d=new Date(ws);return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${Math.ceil(d.getDate()/7)}주차`}
 
@@ -293,6 +308,8 @@ function App(){
   const [apiInput, setApiInput]=useState('')
   const [showApi, setShowApi]=useState(false)
   const [showShare, setShowShare]=useState(false)
+  const [notionWebhook, setNotionWebhook]=useState(()=>{try{return localStorage.getItem('d2c:notion')||''}catch(e){return ''}})
+  const [notionInput, setNotionInput]=useState('')
   const [customTags, setCustomTags]=useState(()=>{try{return JSON.parse(localStorage.getItem('d2c:tags')||'[]')}catch(e){return[]}})
 
   const allTags=[...DEFAULT_TAGS,...customTags]
@@ -367,6 +384,7 @@ function App(){
     const tasks=row?[...row.tasks,task]:[task]
     await upsert(dateKey,tasks,row?.notes||'',!row)
     if(!row) await load(curWeek)
+    sendToNotion(dateKey,tasks)
     setView('weekly')
     notify('추가됐습니다!')
   }
@@ -388,6 +406,28 @@ function App(){
     if(d.error)throw new Error(d.error.message)
     const txt=d.content?.map(c=>c.text||'').join('')||''
     return JSON.parse(txt.replace(/```json|```/g,'').trim())
+  }
+
+  async function sendToNotion(dateKey, tasks){
+    if(!notionWebhook) return
+    try{
+      await fetch(notionWebhook, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          date: dateKey,
+          week: fmtWeek(curWeek),
+          tasks: tasks.map(t=>({
+            text: t.text,
+            tag: t.tag,
+            done: t.done,
+            memo: t.memo||''
+          })),
+          timestamp: new Date().toLocaleString('ko-KR'),
+          source: 'D2C 업무일지'
+        })
+      })
+    }catch(e){console.log('Notion webhook error',e)}
   }
 
   async function processInput(){
@@ -646,10 +686,29 @@ function App(){
               Claude 자동 정리 기능에 필요합니다.<br/>
               <a href="https://console.anthropic.com" target="_blank" style={{color:'#4F63D2'}}>console.anthropic.com</a>에서 발급
             </div>
-            <input type="password" value={apiInput} onChange={e=>setApiInput(e.target.value)} placeholder="sk-ant-api03-..." style={{width:'100%',marginBottom:12}}/>
+            <input type="password" value={apiInput} onChange={e=>setApiInput(e.target.value)} placeholder="sk-ant-api03-..." style={{width:'100%',marginBottom:16}}/>
+
+            <div style={{borderTop:'1px solid #EDF2F7',paddingTop:14,marginBottom:8}}>
+              <div style={{fontSize:13,fontWeight:700,color:'#1A202C',marginBottom:4,display:'flex',alignItems:'center',gap:6}}>
+                <span style={{fontSize:16}}>📋</span> 노션 연동 (선택)
+              </div>
+              <div style={{fontSize:11.5,color:'#718096',lineHeight:1.7,marginBottom:10}}>
+                업무 입력 시 대표님 노션으로 자동 알림<br/>
+                <a href="https://make.com" target="_blank" style={{color:'#4F63D2'}}>Make.com</a> 무료 가입 → Webhook 생성 → URL 붙여넣기<br/>
+                <span style={{color:'#A0AEC0',fontSize:11}}>Make.com에서 Webhook → Notion 시나리오 연결하시면 됩니다</span>
+              </div>
+              <input type="text" value={notionInput||notionWebhook} onChange={e=>setNotionInput(e.target.value)}
+                placeholder="https://hook.make.com/..." style={{width:'100%',marginBottom:8,fontSize:12}}/>
+              {notionWebhook&&<div style={{fontSize:11,color:'#38A169',marginBottom:4}}>✅ 노션 연동 설정됨</div>}
+            </div>
+
             <div style={{display:'flex',gap:8,justifyContent:'flex-end'}}>
               <button className="btn-outline" onClick={()=>setShowApi(false)}>취소</button>
-              <button className="btn-primary" onClick={()=>{localStorage.setItem('d2c:key',apiInput);setApiKey(apiInput);setShowApi(false);notify('저장됐습니다.')}} disabled={!apiInput.trim()}>저장</button>
+              <button className="btn-primary" onClick={()=>{
+                if(apiInput.trim()){localStorage.setItem('d2c:key',apiInput);setApiKey(apiInput)}
+                if(notionInput.trim()){localStorage.setItem('d2c:notion',notionInput);setNotionWebhook(notionInput)}
+                setShowApi(false);notify('저장됐습니다.')
+              }}>저장</button>
             </div>
           </div>
         </div>
