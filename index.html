@@ -4,665 +4,493 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>D2C 업무일지</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
 <script src="https://unpkg.com/@babel/standalone@7.23.0/babel.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Malgun Gothic',sans-serif;background:#F1F5F9;min-height:100vh}
+body{font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F0F4F8;min-height:100vh;color:#1A202C;-webkit-font-smoothing:antialiased}
 input,textarea,select,button{font-family:inherit}
 .app{display:flex;min-height:100vh}
-.sidebar{width:56px;flex-shrink:0;background:#fff;border-right:1px solid #E2E8F0;display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:4px;position:sticky;top:0;height:100vh;z-index:20}
-.sb-logo{width:32px;height:32px;border-radius:8px;background:#EFF6FF;display:flex;align-items:center;justify-content:center;margin-bottom:12px;color:#2563EB;font-size:16px}
-.sb-btn{width:38px;height:38px;border-radius:7px;border:1px solid transparent;background:transparent;display:flex;align-items:center;justify-content:center;color:#94A3B8;font-size:18px;cursor:pointer}
-.sb-btn.active{background:#EFF6FF;border-color:#BFDBFE;color:#2563EB}
+.sidebar{width:60px;flex-shrink:0;background:#1A202C;display:flex;flex-direction:column;align-items:center;padding:14px 0;gap:4px;position:sticky;top:0;height:100vh;z-index:20}
+.sb-logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#4F63D2,#6B46C1);display:flex;align-items:center;justify-content:center;margin-bottom:14px;color:#fff;font-size:16px}
+.sb-btn{width:40px;height:40px;border-radius:10px;border:none;background:transparent;display:flex;align-items:center;justify-content:center;color:#718096;font-size:18px;cursor:pointer;transition:all .15s}
+.sb-btn:hover{background:rgba(255,255,255,.08);color:#E2E8F0}
+.sb-btn.active{background:rgba(99,102,241,.25);color:#818CF8}
 .main{flex:1;overflow:auto}
-.topbar{background:#fff;border-bottom:1px solid #E2E8F0;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
-.content{padding:20px;max-width:760px}
-.card{background:#fff;border:1px solid #E2E8F0;border-radius:12px;padding:14px 16px;margin-bottom:12px}
-.card.today{border-color:#BFDBFE;box-shadow:0 0 0 2px #EFF6FF}
-.tag{display:inline-block;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:500;white-space:nowrap}
-.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:9px;margin-bottom:16px}
-.stat-card{background:#F8FAFC;border-radius:10px;padding:12px 14px}
-.btn-primary{padding:7px 14px;border-radius:7px;background:#2563EB;color:#fff;border:none;font-size:13px;font-weight:500;display:flex;align-items:center;gap:5px;cursor:pointer}
-.btn-primary:disabled{background:#CBD5E1;cursor:not-allowed}
-.btn-outline{padding:5px 10px;border-radius:6px;background:#fff;color:#475569;border:1px solid #E2E8F0;font-size:12px;display:flex;align-items:center;gap:4px;cursor:pointer}
-.btn-share{padding:7px 14px;border-radius:7px;background:#7C3AED;color:#fff;border:none;font-size:13px;font-weight:500;display:flex;align-items:center;gap:5px;cursor:pointer}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:10px 18px;border-radius:8px;font-size:13px;font-weight:500;z-index:999;display:flex;align-items:center;gap:7px;box-shadow:0 4px 12px rgba(0,0,0,.15)}
-.toast.ok{background:#059669;color:#fff}
-.toast.err{background:#DC2626;color:#fff}
-.day-pill{flex:1;border-radius:8px;padding:9px 6px;text-align:center;cursor:pointer;border:1px solid transparent}
-.day-pill.today-pill{background:#EFF6FF;border-color:#BFDBFE}
-.day-pill:not(.today-pill){background:#F8FAFC}
-.kpt-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:9px}
-.kpt-card{border-radius:8px;padding:10px 12px}
-.kpt-card.keep{background:#F0FDF4;border:1px solid #BBF7D0}
-.kpt-card.problem{background:#FFF1F2;border:1px solid #FECDD3}
-.kpt-card.try{background:#FFFBEB;border:1px solid #FDE68A}
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px}
-.modal{background:#fff;border-radius:14px;padding:24px;width:100%;max-width:480px}
-.loading{display:flex;align-items:center;justify-content:center;padding:40px;color:#94A3B8;font-size:13px;gap:8px}
-textarea{width:100%;border:1px solid #E2E8F0;border-radius:8px;padding:10px 12px;font-size:13px;line-height:1.6;resize:vertical;background:#F8FAFC;color:#334155;outline:none}
-input[type=date],input[type=password]{border:1px solid #E2E8F0;border-radius:6px;padding:6px 10px;font-size:13px;color:#334155;outline:none;background:#fff}
-.report-header{background:linear-gradient(135deg,#1E3A5F,#2563EB);padding:24px 28px;color:#fff;border-radius:12px 12px 0 0}
+.topbar{background:#fff;border-bottom:1px solid #E2E8F0;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.topbar-title{font-size:15px;font-weight:700;color:#1A202C;letter-spacing:-.3px}
+.topbar-sub{font-size:11px;color:#A0AEC0;margin-top:1px;font-weight:400}
+.content{padding:22px 24px;max-width:780px}
+.card{background:#fff;border:1px solid #E2E8F0;border-radius:14px;padding:16px 18px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.card.today{border-color:#C3DAFE;box-shadow:0 0 0 3px rgba(99,102,241,.08)}
+.tag{display:inline-block;padding:2px 8px;border-radius:6px;font-size:10.5px;font-weight:600;white-space:nowrap;letter-spacing:.2px}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:18px}
+.stat-card{background:#fff;border-radius:12px;padding:14px 16px;border:1px solid #E2E8F0;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.btn-primary{padding:8px 16px;border-radius:8px;background:#4F63D2;color:#fff;border:none;font-size:13px;font-weight:600;display:flex;align-items:center;gap:5px;cursor:pointer;transition:all .15s}
+.btn-primary:hover{background:#4254C0}
+.btn-primary:disabled{background:#CBD5E0;cursor:not-allowed}
+.btn-outline{padding:5px 12px;border-radius:8px;background:#fff;color:#4A5568;border:1px solid #E2E8F0;font-size:12px;font-weight:500;display:flex;align-items:center;gap:4px;cursor:pointer;transition:all .15s}
+.btn-outline:hover{background:#F7FAFC;border-color:#CBD5E0}
+.btn-share{padding:8px 16px;border-radius:8px;background:#6B46C1;color:#fff;border:none;font-size:13px;font-weight:600;display:flex;align-items:center;gap:5px;cursor:pointer}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:10px 20px;border-radius:10px;font-size:13px;font-weight:500;z-index:999;display:flex;align-items:center;gap:7px;box-shadow:0 4px 16px rgba(0,0,0,.15)}
+.toast.ok{background:#276749;color:#fff}
+.toast.err{background:#C53030;color:#fff}
+.day-pill{flex:1;border-radius:10px;padding:10px 6px;text-align:center;cursor:pointer;transition:all .15s;border:1px solid transparent}
+.day-pill.today-pill{background:#EBF4FF;border-color:#BEE3F8}
+.day-pill:not(.today-pill){background:#F7FAFC}
+.day-pill:hover{background:#EBF8FF}
+.kpt-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:10px}
+.kpt-card{border-radius:10px;padding:12px 14px}
+.kpt-card.keep{background:#F0FFF4;border:1px solid #C6F6D5}
+.kpt-card.problem{background:#FFF5F5;border:1px solid #FED7D7}
+.kpt-card.try{background:#FFFFF0;border:1px solid #FEFCBF}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal{background:#fff;border-radius:16px;padding:26px;width:100%;max-width:490px;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.loading{display:flex;align-items:center;justify-content:center;padding:48px;color:#A0AEC0;font-size:13px;gap:8px}
+textarea{width:100%;border:1px solid #E2E8F0;border-radius:10px;padding:10px 13px;font-size:13px;line-height:1.7;resize:vertical;background:#F7FAFC;color:#2D3748;outline:none;font-family:'Noto Sans KR',sans-serif}
+textarea:focus{border-color:#BEE3F8;background:#fff;box-shadow:0 0 0 3px rgba(99,162,241,.1)}
+input[type=date],input[type=password],input[type=text]{border:1px solid #E2E8F0;border-radius:8px;padding:7px 12px;font-size:13px;color:#2D3748;outline:none;background:#fff;font-family:'Noto Sans KR',sans-serif}
+input:focus{border-color:#BEE3F8;box-shadow:0 0 0 3px rgba(99,162,241,.1)}
+.task-wrap{border-radius:8px;margin-bottom:3px;padding:5px 8px;transition:background .1s}
+.task-wrap:hover{background:#F7FAFC}
 </style>
 </head>
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const {useState,useEffect,useCallback} = React
+const {useState, useEffect, useCallback} = React
 
 const SB_URL = 'https://zxfytktctzgkssxbqbyj.supabase.co'
 const SB_KEY = 'sb_publishable_815pQE6fA0sXIBS3RcmDAA_6FptB6NS'
 
+const DEFAULT_TAGS = ['물류','마케팅','광고','CS','리서치','시딩','브로드캐스팅','KPI','캠페인','가격정책','브랜드관리','기타']
+
 const TAG_COLORS = {
-  '물류':    {bg:'#DBEAFE',c:'#1E40AF'},
-  '마케팅':  {bg:'#EDE9FE',c:'#5B21B6'},
-  '광고':    {bg:'#FFE4E6',c:'#9F1239'},
-  'CS':      {bg:'#FEF3C7',c:'#92400E'},
-  '리서치':  {bg:'#D1FAE5',c:'#064E3B'},
-  '시딩':    {bg:'#F3E8FF',c:'#6B21A8'},
-  '브로드캐스팅':{bg:'#F5F3FF',c:'#7C3AED'},
-  'KPI':     {bg:'#F1F5F9',c:'#334155'},
-  '캠페인':  {bg:'#FEF9C3',c:'#854D0E'},
-  '가격정책':{bg:'#E0F2FE',c:'#075985'},
-  '기타':    {bg:'#F3F4F6',c:'#374151'},
+  '물류':      {bg:'#DBEAFE',c:'#1E40AF'},
+  '마케팅':    {bg:'#EDE9FE',c:'#5B21B6'},
+  '광고':      {bg:'#FCE7F3',c:'#9D174D'},
+  'CS':        {bg:'#FEF3C7',c:'#78350F'},
+  '리서치':    {bg:'#D1FAE5',c:'#064E3B'},
+  '시딩':      {bg:'#F3E8FF',c:'#6B21A8'},
+  '브로드캐스팅':{bg:'#F5F3FF',c:'#5B21B6'},
+  'KPI':       {bg:'#E2E8F0',c:'#2D3748'},
+  '캠페인':    {bg:'#FEF9C3',c:'#713F12'},
+  '가격정책':  {bg:'#E0F2FE',c:'#075985'},
+  '브랜드관리':{bg:'#FCE7F3',c:'#831843'},
+  '기타':      {bg:'#F1F5F9',c:'#475569'},
+}
+
+const ROW_COLORS = {
+  red:    '#FFF5F5',
+  yellow: '#FFFFF0',
+  green:  '#F0FFF4',
+  blue:   '#EBF8FF',
+  purple: '#FAF5FF',
 }
 
 const DAYS_KO = ['일','월','화','수','목','금','토']
 const DAYS_EN = ['SUN','MON','TUE','WED','THU','FRI','SAT']
 
-function toDate(d = new Date()) { return d.toISOString().split('T')[0] }
-function weekStart(d = new Date()) {
-  const dt = new Date(d), day = dt.getDay()
-  dt.setDate(dt.getDate() - day + (day === 0 ? -6 : 1))
-  return toDate(dt)
-}
-function weekDays(ws) {
-  return Array.from({length:5}, (_,i) => {
-    const d = new Date(ws); d.setDate(d.getDate()+i); return toDate(d)
-  })
-}
-function fmtDate(s) {
-  const d = new Date(s)
-  return `${d.getMonth()+1}/${d.getDate()} (${DAYS_KO[d.getDay()]})`
-}
-function fmtWeek(ws) {
-  const d = new Date(ws)
-  return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${Math.ceil(d.getDate()/7)}주차`
+function toDate(d=new Date()){return d.toISOString().split('T')[0]}
+function weekStart(d=new Date()){const dt=new Date(d),day=dt.getDay();dt.setDate(dt.getDate()-day+(day===0?-6:1));return toDate(dt)}
+function weekDays(ws){return Array.from({length:5},(_,i)=>{const d=new Date(ws);d.setDate(d.getDate()+i);return toDate(d)})}
+function fmtDate(s){const d=new Date(s);return `${d.getMonth()+1}/${d.getDate()} (${DAYS_KO[d.getDay()]})`}
+function fmtWeek(ws){const d=new Date(ws);return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${Math.ceil(d.getDate()/7)}주차`}
+
+async function dbLoad(weekKey){
+  const r=await fetch(`${SB_URL}/rest/v1/worklog?week_key=eq.${weekKey}&select=*`,{headers:{'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`}})
+  const data=await r.json()
+  return Array.isArray(data)?data:[]
 }
 
-async function dbLoad(weekKey) {
-  const r = await fetch(`${SB_URL}/rest/v1/worklog?week_key=eq.${weekKey}&select=*`, {
-    headers: {'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`}
-  })
-  const data = await r.json()
-  return Array.isArray(data) ? data : []
-}
-
-async function dbSave(row) {
-  const r = await fetch(`${SB_URL}/rest/v1/worklog?on_conflict=week_key,date_key`, {
-    method: 'POST',
-    headers: {
-      'apikey': SB_KEY,
-      'Authorization': `Bearer ${SB_KEY}`,
-      'Content-Type': 'application/json',
-      'Prefer': 'resolution=merge-duplicates,return=minimal'
-    },
-    body: JSON.stringify(row)
+async function dbSave(row){
+  const r=await fetch(`${SB_URL}/rest/v1/worklog?on_conflict=week_key,date_key`,{
+    method:'POST',
+    headers:{'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=minimal'},
+    body:JSON.stringify(row)
   })
   return r.ok
 }
 
-async function dbRemove(weekKey, dateKey) {
-  await fetch(`${SB_URL}/rest/v1/worklog?week_key=eq.${weekKey}&date_key=eq.${dateKey}`, {
-    method: 'DELETE',
-    headers: {'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`}
+async function dbRemove(weekKey,dateKey){
+  await fetch(`${SB_URL}/rest/v1/worklog?week_key=eq.${weekKey}&date_key=eq.${dateKey}`,{
+    method:'DELETE',
+    headers:{'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`}
   })
 }
 
-function Tag({t}) {
-  const c = TAG_COLORS[t] || TAG_COLORS['기타']
+function Tag({t}){
+  const c=TAG_COLORS[t]||{bg:'#F1F5F9',c:'#475569'}
   return <span className="tag" style={{background:c.bg,color:c.c}}>{t}</span>
 }
 
-function TaskItem({task, onToggle, onEdit, onDelete}) {
-  const [editingText, setEditingText] = useState(false)
-  const [editingMemo, setEditingMemo] = useState(false)
-  const [val, setVal] = useState(task.text)
-  const [memo, setMemo] = useState(task.memo || '')
+function TaskItem({task, onToggle, onUpdate, onDelete, readOnly, allTags}){
+  const [editingText, setEditingText]=useState(false)
+  const [editingMemo, setEditingMemo]=useState(false)
+  const [textVal, setTextVal]=useState(task.text)
+  const [memoVal, setMemoVal]=useState(task.memo||'')
 
-  function saveText() {
+  const saveText=()=>{
     setEditingText(false)
-    const trimmed = val.trim()
-    if (trimmed && trimmed !== task.text) onEdit({...task, text: trimmed})
-    else setVal(task.text)
+    const t=textVal.trim()
+    if(t&&t!==task.text) onUpdate({...task,text:t})
+    else setTextVal(task.text)
   }
 
-  function saveMemo() {
+  const saveMemo=()=>{
     setEditingMemo(false)
-    if (memo !== (task.memo || '')) onEdit({...task, memo})
+    if(memoVal!==(task.memo||'')) onUpdate({...task,memo:memoVal})
   }
 
-  function toggleBold() {
-    onEdit({...task, bold: !task.bold})
-  }
+  const rowBg=ROW_COLORS[task.color]||'transparent'
 
-  function setColor(color) {
-    onEdit({...task, color})
-  }
-
-  const COLORS = [
-    {val:'default', bg:'transparent', label:'기본'},
-    {val:'red',     bg:'#FEE2E2',    label:'빨강'},
-    {val:'yellow',  bg:'#FEF9C3',    label:'노랑'},
-    {val:'green',   bg:'#DCFCE7',    label:'초록'},
-    {val:'blue',    bg:'#DBEAFE',    label:'파랑'},
-  ]
-
-  const rowBg = task.color === 'red' ? '#FEF2F2'
-    : task.color === 'yellow' ? '#FEFCE8'
-    : task.color === 'green'  ? '#F0FDF4'
-    : task.color === 'blue'   ? '#EFF6FF'
-    : 'transparent'
-
-  return (
-    <div style={{borderRadius:6,background:rowBg,marginBottom:2,padding:'4px 8px'}}>
+  return(
+    <div className="task-wrap" style={{background:rowBg}}>
       <div style={{display:'flex',alignItems:'flex-start',gap:8}}>
-        <div
-          onClick={onToggle}
-          style={{width:15,height:15,borderRadius:3,flexShrink:0,marginTop:3,border:task.done?'none':'1.5px solid #CBD5E1',background:task.done?'#2563EB':'transparent',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer'}}
-        >
-          {task.done && <i className="ti ti-check" style={{fontSize:9,color:'#fff'}} />}
+        <div onClick={onToggle} style={{width:16,height:16,borderRadius:4,flexShrink:0,marginTop:2,border:task.done?'none':'1.5px solid #CBD5E0',background:task.done?'#4F63D2':'transparent',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',transition:'all .15s'}}>
+          {task.done&&<i className="ti ti-check" style={{fontSize:10,color:'#fff'}}/>}
         </div>
 
-        {editingText ? (
-          <input autoFocus value={val} onChange={e=>setVal(e.target.value)}
+        {editingText?(
+          <input autoFocus value={textVal} onChange={e=>setTextVal(e.target.value)}
             onBlur={saveText}
-            onKeyDown={e=>{if(e.key==='Enter'){e.preventDefault();saveText()}if(e.key==='Escape'){setVal(task.text);setEditingText(false)}}}
-            style={{flex:1,fontSize:13,border:'2px solid #2563EB',borderRadius:5,padding:'2px 8px',outline:'none',background:'#EFF6FF'}}
+            onKeyDown={e=>{if(e.key==='Enter'){e.preventDefault();saveText()}if(e.key==='Escape'){setTextVal(task.text);setEditingText(false)}}}
+            style={{flex:1,fontSize:13,fontWeight:task.bold?700:400,border:'2px solid #4F63D2',borderRadius:6,padding:'2px 9px',outline:'none',background:'#EBF4FF'}}
           />
-        ) : (
-          <span style={{
-            flex:1,fontSize:13,lineHeight:1.55,
-            fontWeight: task.bold ? 700 : 400,
-            color: task.done ? '#94A3B8' : '#334155',
-            textDecoration: task.done ? 'line-through' : 'none'
-          }}>
+        ):(
+          <span style={{flex:1,fontSize:13,lineHeight:1.6,fontWeight:task.bold?700:500,color:task.done?'#A0AEC0':'#2D3748',textDecoration:task.done?'line-through':'none',letterSpacing:'-.1px'}}>
             {task.text}
           </span>
         )}
 
-        <Tag t={task.tag} />
+        <Tag t={task.tag}/>
 
-        {!editingText && (
+        {!readOnly&&!editingText&&(
           <div style={{display:'flex',gap:2,flexShrink:0,alignItems:'center'}}>
-            <button onClick={toggleBold} title="굵게" style={{border:'none',background:task.bold?'#E0E7FF':'transparent',color:task.bold?'#4F46E5':'#CBD5E1',cursor:'pointer',padding:'1px 4px',borderRadius:3,fontSize:12,fontWeight:700}}>B</button>
-            {COLORS.map(c=>(
-              <div key={c.val} onClick={()=>setColor(task.color===c.val?'default':c.val)}
-                title={c.label}
-                style={{width:12,height:12,borderRadius:50,background:c.val==='default'?'#E5E7EB':c.bg,cursor:'pointer',border:task.color===c.val?'2px solid #2563EB':'1px solid #CBD5E1',flexShrink:0}}
-              />
+            <button onClick={()=>onUpdate({...task,bold:!task.bold})} title="굵게"
+              style={{border:'none',background:task.bold?'#E9D8FD':'transparent',color:task.bold?'#6B46C1':'#CBD5E0',cursor:'pointer',padding:'2px 5px',borderRadius:4,fontSize:11,fontWeight:700,lineHeight:1}}>B</button>
+            {Object.entries({red:'#FC8181',yellow:'#F6E05E',green:'#68D391',blue:'#63B3ED',purple:'#B794F4'}).map(([k,clr])=>(
+              <div key={k} onClick={()=>onUpdate({...task,color:task.color===k?null:k})}
+                style={{width:11,height:11,borderRadius:'50%',background:clr,cursor:'pointer',border:task.color===k?'2px solid #2D3748':'1.5px solid transparent',flexShrink:0,transition:'all .15s'}}
+                title={k}/>
             ))}
-            <button onClick={()=>{setVal(task.text);setEditingText(true)}} title="수정" style={{border:'none',background:'transparent',color:'#CBD5E1',cursor:'pointer',padding:'1px 3px',fontSize:13}}><i className="ti ti-pencil" /></button>
-            <button onClick={e=>{e.stopPropagation();onDelete()}} title="삭제" style={{border:'none',background:'transparent',color:'#FCA5A5',cursor:'pointer',padding:'1px 3px',fontSize:13}}><i className="ti ti-trash" /></button>
+            <button onClick={()=>{setTextVal(task.text);setEditingText(true)}} title="수정"
+              style={{border:'none',background:'transparent',color:'#CBD5E0',cursor:'pointer',padding:'1px 3px',fontSize:13}}>
+              <i className="ti ti-pencil"/>
+            </button>
+            <button onClick={e=>{e.stopPropagation();onDelete()}} title="삭제"
+              style={{border:'none',background:'transparent',color:'#FC8181',cursor:'pointer',padding:'1px 3px',fontSize:13}}>
+              <i className="ti ti-trash"/>
+            </button>
           </div>
         )}
       </div>
 
-      {/* 비고 */}
-      <div style={{marginLeft:23,marginTop:2}}>
-        {editingMemo ? (
-          <input autoFocus value={memo} onChange={e=>setMemo(e.target.value)}
+      <div style={{marginLeft:24,marginTop:3}}>
+        {editingMemo?(
+          <input autoFocus value={memoVal} onChange={e=>setMemoVal(e.target.value)}
             onBlur={saveMemo}
-            onKeyDown={e=>{if(e.key==='Enter'){e.preventDefault();saveMemo()}if(e.key==='Escape'){setMemo(task.memo||'');setEditingMemo(false)}}}
-            placeholder="비고 입력..."
-            style={{width:'100%',fontSize:11,border:'1px solid #93C5FD',borderRadius:4,padding:'2px 7px',outline:'none',background:'#F0F9FF',color:'#334155'}}
+            onKeyDown={e=>{if(e.key==='Enter'){e.preventDefault();saveMemo()}if(e.key==='Escape'){setMemoVal(task.memo||'');setEditingMemo(false)}}}
+            placeholder="비고 입력 (Enter 저장)"
+            style={{width:'100%',fontSize:11.5,border:'1px solid #BEE3F8',borderRadius:5,padding:'2px 8px',outline:'none',background:'#EBF8FF',color:'#2D3748'}}
           />
-        ) : task.memo ? (
-          <span onClick={()=>setEditingMemo(true)} style={{fontSize:11,color:'#64748B',cursor:'text',fontStyle:'italic'}}>
-            📝 {task.memo}
+        ):task.memo?(
+          <span onClick={()=>!readOnly&&setEditingMemo(true)}
+            style={{fontSize:11.5,color:'#718096',cursor:readOnly?'default':'text',fontStyle:'italic',display:'flex',alignItems:'center',gap:4}}>
+            <i className="ti ti-notes" style={{fontSize:11,color:'#A0AEC0'}}/>
+            {task.memo}
           </span>
-        ) : (
-          <span onClick={()=>setEditingMemo(true)} style={{fontSize:10,color:'#CBD5E1',cursor:'pointer'}}>+ 비고</span>
-        )}
-      </div>
-    </div>
-  )
-}
-  const [editing, setEditing] = useState(false)
-  const [val, setVal] = useState(task.text)
-
-  function startEdit(e) {
-    e.stopPropagation()
-    setVal(task.text)
-    setEditing(true)
-  }
-
-  function save() {
-    setEditing(false)
-    const trimmed = val.trim()
-    if (trimmed && trimmed !== task.text) {
-      onEdit(trimmed)
-    }
-  }
-
-  function handleKey(e) {
-    if (e.key === 'Enter') { e.preventDefault(); save() }
-    if (e.key === 'Escape') { setEditing(false); setVal(task.text) }
-  }
-
-  return (
-    <div style={{display:'flex',alignItems:'flex-start',gap:8,padding:'6px 8px',borderRadius:6,background:editing?'#F0F9FF':'transparent'}}>
-      <div
-        onClick={onToggle}
-        style={{
-          width:15,height:15,borderRadius:3,flexShrink:0,marginTop:2,
-          border:task.done?'none':'1.5px solid #CBD5E1',
-          background:task.done?'#2563EB':'transparent',
-          display:'flex',alignItems:'center',justifyContent:'center',
-          cursor:'pointer'
-        }}
-      >
-        {task.done && <i className="ti ti-check" style={{fontSize:9,color:'#fff'}} />}
-      </div>
-
-      {editing ? (
-        <input
-          autoFocus
-          value={val}
-          onChange={e => setVal(e.target.value)}
-          onKeyDown={handleKey}
-          onBlur={save}
-          style={{
-            flex:1,fontSize:13,
-            border:'2px solid #2563EB',borderRadius:5,
-            padding:'3px 8px',outline:'none',
-            background:'#EFF6FF',color:'#1E293B'
-          }}
-        />
-      ) : (
-        <span style={{
-          flex:1,fontSize:13,lineHeight:1.55,
-          color:task.done?'#94A3B8':'#334155',
-          textDecoration:task.done?'line-through':'none'
-        }}>
-          {task.text}
-        </span>
-      )}
-
-      <Tag t={task.tag} />
-
-      {editing ? (
-        <button
-          onClick={save}
-          style={{
-            border:'none',background:'#2563EB',color:'#fff',
-            cursor:'pointer',padding:'3px 10px',borderRadius:5,
-            fontSize:11,fontWeight:600,flexShrink:0
-          }}
-        >저장</button>
-      ) : (
-        <div style={{display:'flex',gap:2,flexShrink:0}}>
-          <button
-            onClick={startEdit}
-            style={{border:'none',background:'transparent',color:'#CBD5E1',cursor:'pointer',padding:'1px 3px',fontSize:13}}
-            title="수정"
-          ><i className="ti ti-pencil" /></button>
-          <button
-            onClick={e=>{e.stopPropagation();onDelete()}}
-            style={{border:'none',background:'transparent',color:'#FCA5A5',cursor:'pointer',padding:'1px 3px',fontSize:13}}
-            title="삭제"
-          ><i className="ti ti-trash" /></button>
-        </div>
-      )}
-    </div>
-  )
-}
-
-function ReadOnlyView({data, weekKey}) {
-  const days = weekDays(weekKey)
-  const rows = data.filter(r => !r.date_key.startsWith('__'))
-  const kptRow = data.find(r => r.date_key === '__kpt')
-  return (
-    <div style={{minHeight:'100vh',background:'#F1F5F9',padding:20}}>
-      <div className="report-header" style={{maxWidth:760,margin:'0 auto 16px'}}>
-        <div style={{fontSize:12,opacity:.7,marginBottom:4}}>D2C팀 업무일지 · 보기 전용</div>
-        <div style={{fontSize:24,fontWeight:700}}>{fmtWeek(weekKey)}</div>
-      </div>
-      <div style={{maxWidth:760,margin:'0 auto'}}>
-        {days.map(d => {
-          const row = rows.find(r => r.date_key === d)
-          if (!row || !row.tasks?.length) return null
-          const done = row.tasks.filter(t => t.done).length
-          return (
-            <div key={d} className="card" style={{marginBottom:12}}>
-              <div style={{display:'flex',justifyContent:'space-between',marginBottom:10,paddingBottom:8,borderBottom:'1px solid #F1F5F9'}}>
-                <span style={{fontWeight:600,fontSize:13}}>{fmtDate(d)}</span>
-                <span style={{fontSize:11,color:'#64748B'}}>{done}/{row.tasks.length}</span>
-              </div>
-              {row.tasks.map((t,i) => (
-                <div key={i} style={{display:'flex',gap:8,padding:'4px 0'}}>
-                  <span style={{color:t.done?'#059669':'#CBD5E1',fontSize:14}}>{t.done?'✓':'○'}</span>
-                  <span style={{flex:1,fontSize:13,color:t.done?'#64748B':'#334155',textDecoration:t.done?'line-through':'none'}}>{t.text}</span>
-                  <Tag t={t.tag} />
-                </div>
-              ))}
-            </div>
-          )
-        })}
+        ):(!readOnly&&(
+          <span onClick={()=>setEditingMemo(true)}
+            style={{fontSize:11,color:'#CBD5E0',cursor:'pointer',display:'flex',alignItems:'center',gap:3}}>
+            <i className="ti ti-plus" style={{fontSize:10}}/> 비고 추가
+          </span>
+        ))}
       </div>
     </div>
   )
 }
 
-function ManualInput({onSave}) {
-  const DEFAULT_TAGS = ['물류','마케팅','광고','CS','리서치','시딩','브로드캐스팅','KPI','캠페인','가격정책','기타','브랜드관리']
-  const [text, setText] = useState('')
-  const [tag, setTag] = useState('기타')
-  const [customTags, setCustomTags] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('d2c:tags') || '[]') } catch(e) { return [] }
-  })
-  const [newTag, setNewTag] = useState('')
-  const [showAddTag, setShowAddTag] = useState(false)
-  const allTags = [...DEFAULT_TAGS, ...customTags]
+function ManualInput({onSave, allTags, onAddTag}){
+  const [text, setText]=useState('')
+  const [tag, setTag]=useState('기타')
+  const [newTag, setNewTag]=useState('')
+  const [showAddTag, setShowAddTag]=useState(false)
 
-  function addCustomTag() {
-    if (!newTag.trim() || allTags.includes(newTag.trim())) return
-    const updated = [...customTags, newTag.trim()]
-    setCustomTags(updated)
-    localStorage.setItem('d2c:tags', JSON.stringify(updated))
+  function addTag(){
+    if(!newTag.trim()||allTags.includes(newTag.trim()))return
+    onAddTag(newTag.trim())
     setTag(newTag.trim())
     setNewTag('')
     setShowAddTag(false)
   }
 
-  function save() {
-    if (!text.trim()) return
-    onSave({text: text.trim(), tag, done: false})
+  function save(){
+    if(!text.trim())return
+    onSave({text:text.trim(),tag,done:false})
     setText('')
-    setTag('기타')
   }
 
-  return (
+  return(
     <div className="card">
-      <div style={{fontSize:11,fontWeight:600,color:'#64748B',marginBottom:8}}>업무 직접 추가</div>
-      <input
-        type="text"
-        value={text}
-        onChange={e=>setText(e.target.value)}
+      <div style={{fontSize:11,fontWeight:700,color:'#718096',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:10}}>업무 직접 추가</div>
+      <input type="text" value={text} onChange={e=>setText(e.target.value)}
         onKeyDown={e=>{if(e.key==='Enter')save()}}
         placeholder="업무 내용 입력 후 Enter 또는 추가 버튼"
-        style={{width:'100%',border:'1px solid #E2E8F0',borderRadius:7,padding:'8px 12px',fontSize:13,outline:'none',marginBottom:8,boxSizing:'border-box'}}
+        style={{width:'100%',marginBottom:10}}
       />
-      <div style={{marginBottom:8}}>
-        <div style={{fontSize:10,color:'#94A3B8',marginBottom:5}}>카테고리 선택</div>
-        <div style={{display:'flex',gap:6,alignItems:'center',flexWrap:'wrap'}}>
+      <div style={{marginBottom:10}}>
+        <div style={{fontSize:10.5,color:'#A0AEC0',marginBottom:6,fontWeight:500}}>카테고리</div>
+        <div style={{display:'flex',gap:5,flexWrap:'wrap',alignItems:'center'}}>
           {allTags.map(t=>(
-            <button key={t} onClick={()=>setTag(t)} style={{
-              padding:'3px 10px',borderRadius:20,fontSize:11,fontWeight:500,cursor:'pointer',border:'none',
-              background:tag===t?'#2563EB':'#F1F5F9',
-              color:tag===t?'#fff':'#475569'
-            }}>{t}</button>
+            <button key={t} onClick={()=>setTag(t)} style={{padding:'3px 10px',borderRadius:20,fontSize:11,fontWeight:600,cursor:'pointer',border:'none',background:tag===t?'#4F63D2':'#EDF2F7',color:tag===t?'#fff':'#4A5568',transition:'all .15s'}}>
+              {t}
+            </button>
           ))}
-          <button onClick={()=>setShowAddTag(!showAddTag)} style={{
-            padding:'3px 10px',borderRadius:20,fontSize:11,cursor:'pointer',
-            border:'1px dashed #CBD5E1',background:'transparent',color:'#94A3B8',
-            display:'flex',alignItems:'center',gap:3
-          }}>
-            <i className="ti ti-plus" style={{fontSize:11}} />새 분류
+          <button onClick={()=>setShowAddTag(!showAddTag)} style={{padding:'3px 10px',borderRadius:20,fontSize:11,cursor:'pointer',border:'1px dashed #CBD5E0',background:'transparent',color:'#A0AEC0',display:'flex',alignItems:'center',gap:3}}>
+            <i className="ti ti-plus" style={{fontSize:10}}/>새 분류
           </button>
         </div>
-        {showAddTag && (
+        {showAddTag&&(
           <div style={{display:'flex',gap:6,marginTop:8,alignItems:'center'}}>
-            <input
-              type="text"
-              value={newTag}
-              onChange={e=>setNewTag(e.target.value)}
-              onKeyDown={e=>{if(e.key==='Enter')addCustomTag()}}
-              placeholder="새 분류명 입력"
-              style={{flex:1,border:'1px solid #93C5FD',borderRadius:6,padding:'5px 10px',fontSize:12,outline:'none'}}
+            <input type="text" value={newTag} onChange={e=>setNewTag(e.target.value)}
+              onKeyDown={e=>{if(e.key==='Enter')addTag()}}
+              placeholder="새 분류명"
+              style={{flex:1,fontSize:12}}
             />
-            <button onClick={addCustomTag} disabled={!newTag.trim()} style={{padding:'5px 12px',borderRadius:6,background:'#2563EB',color:'#fff',border:'none',fontSize:12,cursor:'pointer'}}>추가</button>
-            <button onClick={()=>setShowAddTag(false)} style={{padding:'5px 10px',borderRadius:6,background:'#F1F5F9',color:'#475569',border:'none',fontSize:12,cursor:'pointer'}}>취소</button>
+            <button onClick={addTag} disabled={!newTag.trim()} style={{padding:'6px 12px',borderRadius:7,background:'#4F63D2',color:'#fff',border:'none',fontSize:12,fontWeight:500,cursor:'pointer'}}>추가</button>
+            <button onClick={()=>setShowAddTag(false)} style={{padding:'6px 10px',borderRadius:7,background:'#EDF2F7',color:'#4A5568',border:'none',fontSize:12,cursor:'pointer'}}>취소</button>
           </div>
         )}
       </div>
-      <button
-        onClick={save}
-        disabled={!text.trim()}
-        style={{padding:'7px 16px',borderRadius:7,background:text.trim()?'#2563EB':'#CBD5E1',color:'#fff',border:'none',fontSize:13,fontWeight:500,cursor:text.trim()?'pointer':'not-allowed',display:'flex',alignItems:'center',gap:5}}
-      >
-        <i className="ti ti-plus" style={{fontSize:13}} />추가
+      <button onClick={save} disabled={!text.trim()} style={{padding:'8px 18px',borderRadius:8,background:text.trim()?'#4F63D2':'#CBD5E0',color:'#fff',border:'none',fontSize:13,fontWeight:600,cursor:text.trim()?'pointer':'not-allowed',display:'flex',alignItems:'center',gap:5}}>
+        <i className="ti ti-plus" style={{fontSize:13}}/>추가
       </button>
     </div>
   )
 }
 
+function App(){
+  const params=new URLSearchParams(window.location.search)
+  const isReadOnly=params.get('readonly')==='1'
+  const roWeek=params.get('week')||weekStart()
 
-function App() {
-  const [view, setView] = useState('weekly')
-  const [rows, setRows] = useState([])
-  const [curWeek, setCurWeek] = useState(weekStart())
-  const [selDate, setSelDate] = useState(toDate())
-  const [raw, setRaw] = useState('')
-  const [busy, setBusy] = useState(false)
-  const [kptBusy, setKptBusy] = useState(false)
-  const [loading, setLoading] = useState(true)
-  const [toast, setToast] = useState(null)
-  const [apiKey, setApiKey] = useState('')
-  const [apiInput, setApiInput] = useState('')
-  const [showApi, setShowApi] = useState(false)
-  const [showShare, setShowShare] = useState(false)
+  const [view, setView]=useState('weekly')
+  const [rows, setRows]=useState([])
+  const [curWeek, setCurWeek]=useState(isReadOnly?roWeek:weekStart())
+  const [selDate, setSelDate]=useState(toDate())
+  const [raw, setRaw]=useState('')
+  const [busy, setBusy]=useState(false)
+  const [kptBusy, setKptBusy]=useState(false)
+  const [loading, setLoading]=useState(true)
+  const [toast, setToast]=useState(null)
+  const [apiKey, setApiKey]=useState('')
+  const [apiInput, setApiInput]=useState('')
+  const [showApi, setShowApi]=useState(false)
+  const [showShare, setShowShare]=useState(false)
+  const [customTags, setCustomTags]=useState(()=>{try{return JSON.parse(localStorage.getItem('d2c:tags')||'[]')}catch(e){return[]}})
 
-  const params = new URLSearchParams(window.location.search)
-  const isReadOnly = params.get('readonly') === '1'
-  const roWeek = params.get('week') || weekStart()
+  const allTags=[...DEFAULT_TAGS,...customTags]
 
-  const load = useCallback(async (wk) => {
+  const load=useCallback(async(wk)=>{
     setLoading(true)
-    try {
-      const data = await dbLoad(wk)
-      setRows(data)
-    } catch(e) {
-      setRows([])
-    } finally {
-      setLoading(false)
-    }
-  }, [])
+    try{const data=await dbLoad(wk);setRows(data)}
+    catch(e){setRows([])}
+    finally{setLoading(false)}
+  },[])
 
-  useEffect(() => {
-    if (isReadOnly) { load(roWeek); return }
+  useEffect(()=>{
     load(curWeek)
-    try { const k = localStorage.getItem('d2c:key'); if(k) setApiKey(k) } catch(e) {}
-  }, [curWeek, isReadOnly])
+    try{const k=localStorage.getItem('d2c:key');if(k)setApiKey(k)}catch(e){}
+  },[curWeek])
 
-  function notify(msg, type='ok') {
-    setToast({msg,type})
-    setTimeout(() => setToast(null), 3000)
+  function notify(msg,type='ok'){setToast({msg,type});setTimeout(()=>setToast(null),3000)}
+
+  function addCustomTag(tag){
+    const updated=[...customTags,tag]
+    setCustomTags(updated)
+    localStorage.setItem('d2c:tags',JSON.stringify(updated))
   }
 
-  function getRow(dk) { return rows.find(r => r.date_key === dk) }
-  const kptRow = rows.find(r => r.date_key === '__kpt')
-  const safeRows = Array.isArray(rows) ? rows : []
+  const getRow=(dk)=>rows.find(r=>r.date_key===dk)
+  const kptRow=rows.find(r=>r.date_key==='__kpt')
+  const safeRows=Array.isArray(rows)?rows:[]
 
-  async function upsert(dateKey, tasks, notes) {
-    const ok = await dbSave({week_key:curWeek, date_key:dateKey, tasks, notes, updated_at:new Date().toISOString()})
-    if (ok) await load(curWeek)
-    else notify('저장 실패', 'err')
+  async function upsert(dateKey,tasks,notes){
+    const ok=await dbSave({week_key:curWeek,date_key:dateKey,tasks,notes,updated_at:new Date().toISOString()})
+    if(ok) await load(curWeek)
+    else notify('저장 실패','err')
   }
 
-  async function toggleTask(dateKey, idx) {
-    const row = getRow(dateKey)
-    if (!row) return
-    const tasks = row.tasks.map((t,i) => i===idx ? {...t, done:!t.done} : t)
-    await upsert(dateKey, tasks, row.notes || '')
+  async function toggleTask(dateKey,idx){
+    const row=getRow(dateKey);if(!row)return
+    const tasks=row.tasks.map((t,i)=>i===idx?{...t,done:!t.done}:t)
+    await upsert(dateKey,tasks,row.notes||'')
   }
 
-  async function editTask(dateKey, idx, updatedTask) {
-    const row = getRow(dateKey)
-    if (!row) return
-    const tasks = row.tasks.map((t,i) => i===idx ? {...t, ...updatedTask} : t)
-    await upsert(dateKey, tasks, row.notes || '')
+  async function updateTask(dateKey,idx,updated){
+    const row=getRow(dateKey);if(!row)return
+    const tasks=row.tasks.map((t,i)=>i===idx?{...t,...updated}:t)
+    await upsert(dateKey,tasks,row.notes||'')
   }
 
-  async function deleteTask(dateKey, idx) {
-    const row = getRow(dateKey)
-    if (!row) return
-    const tasks = row.tasks.filter((_,i) => i !== idx)
-    await upsert(dateKey, tasks, row.notes || '')
+  async function deleteTask(dateKey,idx){
+    const row=getRow(dateKey);if(!row)return
+    const tasks=row.tasks.filter((_,i)=>i!==idx)
+    await upsert(dateKey,tasks,row.notes||'')
     notify('삭제됐습니다.')
   }
 
-  async function deleteDay(dateKey) {
-    await dbRemove(curWeek, dateKey)
+  async function addTask(dateKey,task){
+    const row=getRow(dateKey)
+    const tasks=row?[...row.tasks,task]:[task]
+    await upsert(dateKey,tasks,row?.notes||'')
+    setView('weekly')
+    notify('추가됐습니다!')
+  }
+
+  async function deleteDay(dateKey){
+    await dbRemove(curWeek,dateKey)
     await load(curWeek)
     notify('삭제됐습니다.')
   }
 
-  async function callClaude(prompt) {
-    if (!apiKey) { setShowApi(true); throw new Error('no key') }
-    const r = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01'},
-      body: JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,messages:[{role:'user',content:prompt}]})
+  async function callClaude(prompt){
+    if(!apiKey){setShowApi(true);throw new Error('no key')}
+    const r=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01'},
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,messages:[{role:'user',content:prompt}]})
     })
-    const d = await r.json()
-    if (d.error) throw new Error(d.error.message)
-    const txt = d.content?.map(c => c.text||'').join('') || ''
+    const d=await r.json()
+    if(d.error)throw new Error(d.error.message)
+    const txt=d.content?.map(c=>c.text||'').join('')||''
     return JSON.parse(txt.replace(/```json|```/g,'').trim())
   }
 
-  async function processInput() {
-    if (!raw.trim()) return
-    setBusy(true)
-    try {
-      const parsed = await callClaude(
-        `다음 업무 내용을 JSON으로 구조화. JSON만 출력:\n\n${raw}\n\n형식:\n{"tasks":[{"text":"업무내용(간결)","tag":"물류|마케팅|광고|CS|리서치|시딩|브로드캐스팅|KPI|캠페인|가격정책|기타","done":true}],"notes":"상세메모(없으면 빈문자열)"}`
-      )
-      await upsert(selDate, parsed.tasks||[], parsed.notes||'')
-      setRaw(''); setCurWeek(weekStart(new Date(selDate))); setView('weekly')
-      notify('저장 완료!')
-    } catch(e) {
-      if (e.message !== 'no key') notify('처리 실패. API 키 확인해주세요.', 'err')
-    } finally {
-      setBusy(false)
-    }
+  async function processInput(){
+    if(!raw.trim())return;setBusy(true)
+    try{
+      const parsed=await callClaude(`다음 업무 내용을 JSON으로 구조화. JSON만 출력:\n\n${raw}\n\n형식:\n{"tasks":[{"text":"업무내용(간결)","tag":"${allTags.join('|')}","done":true}],"notes":"상세메모(없으면 빈문자열)"}`)
+      await upsert(selDate,parsed.tasks||[],parsed.notes||'')
+      setRaw('');setCurWeek(weekStart(new Date(selDate)));setView('weekly');notify('저장 완료!')
+    }catch(e){if(e.message!=='no key')notify('처리 실패. API 키 확인해주세요.','err')}
+    finally{setBusy(false)}
   }
 
-  async function genKpt() {
-    const all = safeRows.filter(r => r.tasks?.length).flatMap(r => r.tasks)
-    if (!all.length) { notify('업무 데이터가 없습니다', 'err'); return }
+  async function genKpt(){
+    const all=safeRows.filter(r=>r.tasks?.length).flatMap(r=>r.tasks)
+    if(!all.length){notify('업무 데이터가 없습니다','err');return}
     setKptBusy(true)
-    try {
-      const kpt = await callClaude(
-        `이번 주 업무를 보고 KPT 회고를 JSON으로. JSON만 출력:\n\n${all.map(t=>`[${t.done?'완료':'미완'}] ${t.text}`).join('\n')}\n\n형식:\n{"keep":["..."],"problem":["..."],"try":["..."]}`
-      )
-      await dbSave({week_key:curWeek, date_key:'__kpt', tasks:[], notes:'', kpt, updated_at:new Date().toISOString()})
-      await load(curWeek)
-      notify('KPT 생성 완료!')
-    } catch(e) {
-      if (e.message !== 'no key') notify('KPT 생성 실패', 'err')
-    } finally {
-      setKptBusy(false)
-    }
+    try{
+      const kpt=await callClaude(`이번 주 업무를 보고 KPT 회고를 JSON으로. JSON만 출력:\n\n${all.map(t=>`[${t.done?'완료':'미완'}] ${t.text}`).join('\n')}\n\n형식:\n{"keep":["..."],"problem":["..."],"try":["..."]}`)
+      await dbSave({week_key:curWeek,date_key:'__kpt',tasks:[],notes:'',kpt,updated_at:new Date().toISOString()})
+      await load(curWeek);notify('KPT 생성 완료!')
+    }catch(e){if(e.message!=='no key')notify('KPT 생성 실패','err')}
+    finally{setKptBusy(false)}
   }
 
-  if (isReadOnly && !loading) return <ReadOnlyView data={rows} weekKey={roWeek} />
-  if (isReadOnly && loading) return <div className="loading"><i className="ti ti-loader" />불러오는 중...</div>
+  const shareUrl=`${window.location.origin}${window.location.pathname}?readonly=1&week=${curWeek}`
+  const days=weekDays(curWeek),today=toDate()
+  const allTasks=safeRows.filter(r=>r.tasks?.length&&!r.date_key.startsWith('__')).flatMap(r=>r.tasks)
 
-  const days = weekDays(curWeek)
-  const today = toDate()
-  const allTasks = safeRows.filter(r => r.tasks?.length && !r.date_key.startsWith('__')).flatMap(r => r.tasks)
-  const shareUrl = `${window.location.origin}${window.location.pathname}?readonly=1&week=${curWeek}`
-
-  const NAV = [
-    {id:'dashboard', icon:'ti-home', lbl:'홈'},
-    {id:'input',     icon:'ti-edit', lbl:'입력'},
-    {id:'weekly',    icon:'ti-calendar', lbl:'주간'},
+  const NAV=isReadOnly?[
+    {id:'weekly',icon:'ti-calendar',lbl:'주간'},
+  ]:[
+    {id:'dashboard',icon:'ti-home',lbl:'홈'},
+    {id:'input',icon:'ti-edit',lbl:'입력'},
+    {id:'weekly',icon:'ti-calendar',lbl:'주간'},
   ]
 
-  return (
+  return(
     <div className="app">
       <div className="sidebar">
-        <div className="sb-logo"><i className="ti ti-notebook" /></div>
-        {NAV.map(n => (
-          <button key={n.id} className={`sb-btn${view===n.id?' active':''}`} onClick={() => setView(n.id)} title={n.lbl}>
-            <i className={`ti ${n.icon}`} />
+        <div className="sb-logo"><i className="ti ti-notebook"/></div>
+        {NAV.map(n=>(
+          <button key={n.id} className={`sb-btn${view===n.id?' active':''}`} onClick={()=>setView(n.id)} title={n.lbl}>
+            <i className={`ti ${n.icon}`}/>
           </button>
         ))}
-        <div style={{flex:1}} />
-        <button className="sb-btn" title="API 키" onClick={() => setShowApi(true)}>
-          <i className="ti ti-settings" style={{fontSize:16}} />
-        </button>
+        <div style={{flex:1}}/>
+        {!isReadOnly&&(
+          <button className="sb-btn" title="설정" onClick={()=>setShowApi(true)}>
+            <i className="ti ti-settings" style={{fontSize:16}}/>
+          </button>
+        )}
       </div>
 
       <div className="main">
         <div className="topbar">
           <div>
-            <div style={{fontSize:14,fontWeight:600,color:'#1E293B'}}>{NAV.find(n=>n.id===view)?.lbl}</div>
-            <div style={{fontSize:11,color:'#94A3B8'}}>D2C팀 · {fmtWeek(curWeek)}</div>
+            <div className="topbar-title">
+              {isReadOnly?'업무일지 보기':NAV.find(n=>n.id===view)?.lbl}
+              {isReadOnly&&<span style={{marginLeft:8,fontSize:11,padding:'2px 8px',borderRadius:10,background:'#EBF8FF',color:'#2B6CB0',fontWeight:500}}>읽기 전용</span>}
+            </div>
+            <div className="topbar-sub">D2C팀 · {fmtWeek(curWeek)}</div>
           </div>
           <div style={{display:'flex',gap:8}}>
-            {(view==='weekly'||view==='dashboard') && (
-              <button className="btn-share" onClick={() => setShowShare(true)}>
-                <i className="ti ti-share" style={{fontSize:13}} />대표님 공유
+            {!isReadOnly&&(view==='weekly'||view==='dashboard')&&(
+              <button className="btn-share" onClick={()=>setShowShare(true)}>
+                <i className="ti ti-share" style={{fontSize:13}}/>대표님 공유
               </button>
             )}
-            {view==='input' && (
+            {view==='input'&&!isReadOnly&&(
               <button className="btn-primary" onClick={processInput} disabled={busy||!raw.trim()}>
-                <i className="ti ti-sparkles" style={{fontSize:13}} />
-                {busy ? '처리 중...' : 'Claude에게 정리 요청'}
+                <i className="ti ti-sparkles" style={{fontSize:13}}/>{busy?'처리 중...':'Claude 자동 정리'}
               </button>
             )}
           </div>
         </div>
 
         <div className="content">
-          {loading && <div className="loading"><i className="ti ti-loader" />불러오는 중...</div>}
+          {loading&&<div className="loading"><i className="ti ti-loader"/>불러오는 중...</div>}
 
-          {!loading && view==='dashboard' && (
+          {!loading&&view==='dashboard'&&!isReadOnly&&(
             <div>
               <div className="stat-grid">
                 {[
-                  {lbl:'이번 주 완료', val: allTasks.filter(t=>t.done).length},
-                  {lbl:'전체 업무',    val: allTasks.length},
-                  {lbl:'기록된 날',   val: safeRows.filter(r=>!r.date_key.startsWith('__')&&r.tasks?.length>0).length},
-                ].map((s,i) => (
+                  {lbl:'이번 주 완료',val:allTasks.filter(t=>t.done).length},
+                  {lbl:'전체 업무',val:allTasks.length},
+                  {lbl:'기록된 날',val:safeRows.filter(r=>!r.date_key.startsWith('__')&&r.tasks?.length>0).length},
+                ].map((s,i)=>(
                   <div key={i} className="stat-card">
-                    <div style={{fontSize:11,color:'#64748B',marginBottom:3}}>{s.lbl}</div>
-                    <div style={{fontSize:22,fontWeight:600,color:'#1E293B'}}>{s.val}</div>
+                    <div style={{fontSize:11,color:'#718096',marginBottom:4,fontWeight:500}}>{s.lbl}</div>
+                    <div style={{fontSize:24,fontWeight:700,color:'#1A202C'}}>{s.val}</div>
                   </div>
                 ))}
               </div>
               <div className="card">
-                <div style={{fontSize:11,fontWeight:600,color:'#64748B',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:10}}>이번 주 현황</div>
-                <div style={{display:'flex',gap:7}}>
-                  {days.map(d => {
-                    const row = getRow(d), isT = d===today, dt = new Date(d)
-                    const done = (row?.tasks||[]).filter(t=>t.done).length
-                    const total = (row?.tasks||[]).length
-                    return (
-                      <div key={d} className={`day-pill${isT?' today-pill':''}`} onClick={() => setView('weekly')}>
-                        <div style={{fontSize:9,color:isT?'#2563EB':'#94A3B8',fontWeight:600}}>{DAYS_EN[dt.getDay()]}</div>
-                        <div style={{fontSize:14,fontWeight:600,color:isT?'#2563EB':'#1E293B',margin:'2px 0'}}>{dt.getDate()}</div>
-                        <div style={{fontSize:9,color:isT?'#3B82F6':'#94A3B8'}}>{total>0?`${done}/${total}`:'—'}</div>
+                <div style={{fontSize:11,fontWeight:700,color:'#718096',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:10}}>이번 주 현황</div>
+                <div style={{display:'flex',gap:8}}>
+                  {days.map(d=>{
+                    const row=getRow(d),isT=d===today,dt=new Date(d)
+                    const done=(row?.tasks||[]).filter(t=>t.done).length,total=(row?.tasks||[]).length
+                    return(
+                      <div key={d} className={`day-pill${isT?' today-pill':''}`} onClick={()=>setView('weekly')}>
+                        <div style={{fontSize:9,color:isT?'#2B6CB0':'#A0AEC0',fontWeight:700}}>{DAYS_EN[dt.getDay()]}</div>
+                        <div style={{fontSize:15,fontWeight:700,color:isT?'#2B6CB0':'#1A202C',margin:'3px 0'}}>{dt.getDate()}</div>
+                        <div style={{fontSize:9,color:isT?'#4299E1':'#A0AEC0'}}>{total>0?`${done}/${total}`:'—'}</div>
                       </div>
                     )
                   })}
                 </div>
               </div>
-              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:9}}>
+              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
                 {[
-                  {lbl:'오늘 업무 입력',sub:'Claude가 자동 정리',icon:'ti-plus',c:'#2563EB',act:()=>setView('input')},
-                  {lbl:'주간 일지 보기',sub:'이번 주 전체 현황',icon:'ti-calendar-week',c:'#059669',act:()=>setView('weekly')},
-                ].map((a,i) => (
-                  <div key={i} className="card" style={{cursor:'pointer',display:'flex',alignItems:'center',gap:10}} onClick={a.act}>
-                    <i className={`ti ${a.icon}`} style={{fontSize:20,color:a.c}} />
+                  {lbl:'오늘 업무 입력',sub:'직접 또는 Claude 자동 정리',icon:'ti-plus',c:'#4F63D2',act:()=>setView('input')},
+                  {lbl:'주간 일지 보기',sub:'이번 주 전체 현황',icon:'ti-calendar-week',c:'#38A169',act:()=>setView('weekly')},
+                ].map((a,i)=>(
+                  <div key={i} className="card" style={{cursor:'pointer',display:'flex',alignItems:'center',gap:12}} onClick={a.act}>
+                    <div style={{width:36,height:36,borderRadius:10,background:a.c+'18',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                      <i className={`ti ${a.icon}`} style={{fontSize:18,color:a.c}}/>
+                    </div>
                     <div>
-                      <div style={{fontSize:12,fontWeight:600,color:'#1E293B'}}>{a.lbl}</div>
-                      <div style={{fontSize:10,color:'#94A3B8',marginTop:1}}>{a.sub}</div>
+                      <div style={{fontSize:13,fontWeight:600,color:'#1A202C'}}>{a.lbl}</div>
+                      <div style={{fontSize:11,color:'#A0AEC0',marginTop:2}}>{a.sub}</div>
                     </div>
                   </div>
                 ))}
@@ -670,120 +498,119 @@ function App() {
             </div>
           )}
 
-          {!loading && view==='input' && (
+          {!loading&&view==='input'&&!isReadOnly&&(
             <div>
               <div className="card">
-                <div style={{fontSize:11,fontWeight:600,color:'#64748B',marginBottom:8}}>날짜 선택</div>
-                <input type="date" value={selDate} onChange={e=>setSelDate(e.target.value)} style={{width:160}} />
+                <div style={{fontSize:11,fontWeight:700,color:'#718096',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:10}}>날짜 선택</div>
+                <input type="date" value={selDate} onChange={e=>setSelDate(e.target.value)} style={{width:170}}/>
               </div>
               <ManualInput
-                onSave={async(task)=>{
-                  const row = rows.find(r=>r.date_key===selDate)
-                  const tasks = row ? [...row.tasks, task] : [task]
-                  await upsert(selDate, tasks, row?.notes||'')
-                  setView('weekly')
-                  notify('저장 완료!')
-                }}
+                allTags={allTags}
+                onAddTag={addCustomTag}
+                onSave={(task)=>addTask(selDate,task)}
               />
-              {apiKey && (
-                <div className="card" style={{marginTop:0}}>
-                  <div style={{fontSize:11,fontWeight:600,color:'#64748B',marginBottom:8}}>
-                    Claude 자동 정리 <span style={{fontSize:10,color:'#94A3B8',fontWeight:400,marginLeft:4}}>날것 그대로 입력 → 자동 분류</span>
+              {apiKey&&(
+                <div className="card">
+                  <div style={{fontSize:11,fontWeight:700,color:'#718096',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:8}}>
+                    Claude 자동 정리
+                    <span style={{fontSize:10,color:'#A0AEC0',fontWeight:400,textTransform:'none',marginLeft:6}}>날것 그대로 → 자동 분류</span>
                   </div>
-                  <textarea value={raw} onChange={e=>setRaw(e.target.value)} rows={5}
-                    placeholder={"예시:\n1. FBS 패킹 완료\n2. CS 처리\n3. 광고 분석"} />
-                  <button className="btn-primary" onClick={processInput} disabled={busy||!raw.trim()} style={{marginTop:8}}>
-                    <i className="ti ti-sparkles" style={{fontSize:13}} />
-                    {busy ? '처리 중...' : 'Claude에게 정리 요청'}
+                  <textarea value={raw} onChange={e=>setRaw(e.target.value)} rows={6} placeholder={"오늘 업무를 자유롭게 적어주세요.\n\n예시:\n1. FBS 패킹 완료\n2. CS 처리\n3. 광고 분석"}/>
+                  <button className="btn-primary" onClick={processInput} disabled={busy||!raw.trim()} style={{marginTop:10}}>
+                    <i className="ti ti-sparkles" style={{fontSize:13}}/>{busy?'처리 중...':'Claude에게 정리 요청'}
                   </button>
                 </div>
               )}
             </div>
           )}
 
-          {!loading && view==='weekly' && (
+          {!loading&&view==='weekly'&&(
             <div>
-              <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:14}}>
-                <button className="btn-outline" style={{width:30,height:30,padding:0,justifyContent:'center'}}
-                  onClick={() => { const d=new Date(curWeek); d.setDate(d.getDate()-7); setCurWeek(weekStart(d)) }}>
-                  <i className="ti ti-chevron-left" style={{fontSize:13}} />
+              <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:16}}>
+                <button className="btn-outline" style={{width:32,height:32,padding:0,justifyContent:'center'}}
+                  onClick={()=>{const d=new Date(curWeek);d.setDate(d.getDate()-7);setCurWeek(weekStart(d))}}>
+                  <i className="ti ti-chevron-left" style={{fontSize:13}}/>
                 </button>
-                <span style={{flex:1,textAlign:'center',fontSize:13,fontWeight:600,color:'#1E293B'}}>{fmtWeek(curWeek)}</span>
-                <button className="btn-outline" style={{width:30,height:30,padding:0,justifyContent:'center'}}
-                  onClick={() => { const d=new Date(curWeek); d.setDate(d.getDate()+7); setCurWeek(weekStart(d)) }}>
-                  <i className="ti ti-chevron-right" style={{fontSize:13}} />
+                <span style={{flex:1,textAlign:'center',fontSize:14,fontWeight:700,color:'#1A202C'}}>{fmtWeek(curWeek)}</span>
+                <button className="btn-outline" style={{width:32,height:32,padding:0,justifyContent:'center'}}
+                  onClick={()=>{const d=new Date(curWeek);d.setDate(d.getDate()+7);setCurWeek(weekStart(d))}}>
+                  <i className="ti ti-chevron-right" style={{fontSize:13}}/>
                 </button>
               </div>
 
-              {days.map(d => {
-                const row = getRow(d), isT = d===today
-                const done = (row?.tasks||[]).filter(t=>t.done).length
-                const total = (row?.tasks||[]).length
-                return (
+              {days.map(d=>{
+                const row=getRow(d),isT=d===today
+                const done=(row?.tasks||[]).filter(t=>t.done).length,total=(row?.tasks||[]).length
+                return(
                   <div key={d} className={`card${isT?' today':''}`}>
-                    <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:row?8:0,paddingBottom:row?8:0,borderBottom:row?'1px solid #F1F5F9':'none'}}>
-                      <div style={{display:'flex',alignItems:'center',gap:7}}>
-                        <span style={{fontSize:12,fontWeight:600,color:isT?'#2563EB':'#1E293B'}}>{fmtDate(d)}</span>
-                        {isT && <span style={{fontSize:9,padding:'2px 6px',borderRadius:10,background:'#2563EB',color:'#fff',fontWeight:600}}>TODAY</span>}
+                    <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:row?10:0,paddingBottom:row?10:0,borderBottom:row?'1px solid #EDF2F7':'none'}}>
+                      <div style={{display:'flex',alignItems:'center',gap:8}}>
+                        <span style={{fontSize:13,fontWeight:700,color:isT?'#4F63D2':'#1A202C'}}>{fmtDate(d)}</span>
+                        {isT&&<span style={{fontSize:10,padding:'2px 8px',borderRadius:10,background:'#4F63D2',color:'#fff',fontWeight:600}}>TODAY</span>}
                       </div>
                       <div style={{display:'flex',alignItems:'center',gap:6}}>
-                        {total>0 && <span style={{fontSize:10,color:'#64748B'}}>{done}/{total}</span>}
-                        <button className="btn-outline" style={{padding:'2px 7px',fontSize:10}} onClick={() => { setSelDate(d); setView('input') }}>
-                          <i className="ti ti-plus" style={{fontSize:10}} />{row?'추가':'입력'}
-                        </button>
-                        {row && (
-                          <button onClick={() => deleteDay(d)} style={{width:22,height:22,border:'none',background:'transparent',cursor:'pointer',color:'#CBD5E1',borderRadius:4,display:'flex',alignItems:'center',justifyContent:'center'}}>
-                            <i className="ti ti-trash" style={{fontSize:12}} />
+                        {total>0&&<span style={{fontSize:11,color:'#A0AEC0',fontWeight:500}}>{done}/{total}</span>}
+                        {!isReadOnly&&(
+                          <button className="btn-outline" style={{padding:'3px 9px',fontSize:11}} onClick={()=>{setSelDate(d);setView('input')}}>
+                            <i className="ti ti-plus" style={{fontSize:11}}/>{row?'추가':'입력'}
+                          </button>
+                        )}
+                        {!isReadOnly&&row&&(
+                          <button onClick={()=>deleteDay(d)} style={{width:24,height:24,border:'none',background:'transparent',cursor:'pointer',color:'#CBD5E0',borderRadius:5,display:'flex',alignItems:'center',justifyContent:'center'}}>
+                            <i className="ti ti-trash" style={{fontSize:12}}/>
                           </button>
                         )}
                       </div>
                     </div>
-                    {row ? (
-                      <div>
-                        {row.tasks?.map((t,i) => (
+                    {row?(
+                      <div style={{padding:'0 2px'}}>
+                        {row.tasks?.map((t,i)=>(
                           <TaskItem
-                            key={i}
-                            task={t}
-                            onToggle={() => toggleTask(d, i)}
-                            onEdit={(updatedTask) => editTask(d, i, updatedTask)}
-                            onDelete={() => deleteTask(d, i)}
+                            key={i} task={t}
+                            readOnly={isReadOnly}
+                            allTags={allTags}
+                            onToggle={()=>!isReadOnly&&toggleTask(d,i)}
+                            onUpdate={(updated)=>updateTask(d,i,updated)}
+                            onDelete={()=>deleteTask(d,i)}
                           />
                         ))}
-                        {row.notes && (
-                          <div style={{margin:'6px 6px 2px',padding:'7px 9px',background:'#F8FAFC',borderRadius:6,fontSize:11.5,color:'#64748B',lineHeight:1.6}}>
+                        {row.notes&&(
+                          <div style={{margin:'8px 6px 2px',padding:'8px 11px',background:'#F7FAFC',borderRadius:8,fontSize:12,color:'#718096',lineHeight:1.7,borderLeft:'3px solid #E2E8F0'}}>
                             {row.notes}
                           </div>
                         )}
                       </div>
-                    ) : (
-                      <div style={{textAlign:'center',padding:'12px',fontSize:11,color:'#94A3B8',fontStyle:'italic'}}>업무 기록 없음</div>
+                    ):(
+                      <div style={{textAlign:'center',padding:'14px',fontSize:12,color:'#CBD5E0',fontStyle:'italic'}}>업무 기록 없음</div>
                     )}
                   </div>
                 )
               })}
 
               <div className="card">
-                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:10}}>
-                  <span style={{fontSize:12,fontWeight:600,color:'#1E293B'}}>KPT 주간 회고</span>
-                  <button className="btn-outline" style={{background:'#EFF6FF',borderColor:'#BFDBFE',color:'#2563EB'}} onClick={genKpt} disabled={kptBusy}>
-                    <i className="ti ti-sparkles" style={{fontSize:11}} />{kptBusy?'생성 중...':'Claude로 자동 생성'}
-                  </button>
+                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:12}}>
+                  <span style={{fontSize:13,fontWeight:700,color:'#1A202C'}}>KPT 주간 회고</span>
+                  {!isReadOnly&&(
+                    <button className="btn-outline" style={{background:'#EBF4FF',borderColor:'#BEE3F8',color:'#2B6CB0'}} onClick={genKpt} disabled={kptBusy}>
+                      <i className="ti ti-sparkles" style={{fontSize:11}}/>{kptBusy?'생성 중...':'Claude로 자동 생성'}
+                    </button>
+                  )}
                 </div>
-                {kptRow?.kpt ? (
+                {kptRow?.kpt?(
                   <div className="kpt-grid">
-                    {[{k:'keep',lbl:'KEEP',cls:'keep',c:'#15803D'},{k:'problem',lbl:'PROBLEM',cls:'problem',c:'#BE123C'},{k:'try',lbl:'TRY',cls:'try',c:'#B45309'}].map(({k,lbl,cls,c}) => (
+                    {[{k:'keep',lbl:'KEEP',cls:'keep',c:'#276749'},{k:'problem',lbl:'PROBLEM',cls:'problem',c:'#9B2C2C'},{k:'try',lbl:'TRY',cls:'try',c:'#744210'}].map(({k,lbl,cls,c})=>(
                       <div key={k} className={`kpt-card ${cls}`}>
-                        <div style={{fontSize:10,fontWeight:700,color:c,marginBottom:6}}>{lbl}</div>
-                        {(kptRow.kpt[k]||[]).map((item,i) => (
-                          <div key={i} style={{fontSize:11.5,color:'#374151',lineHeight:1.5,paddingLeft:9,position:'relative',marginBottom:2}}>
-                            <span style={{position:'absolute',left:0,color:c}}>·</span>{item}
+                        <div style={{fontSize:11,fontWeight:700,color:c,marginBottom:8,letterSpacing:'.5px'}}>{lbl}</div>
+                        {(kptRow.kpt[k]||[]).map((item,i)=>(
+                          <div key={i} style={{fontSize:12,color:'#2D3748',lineHeight:1.6,paddingLeft:10,position:'relative',marginBottom:4}}>
+                            <span style={{position:'absolute',left:0,color:c,fontWeight:700}}>·</span>{item}
                           </div>
                         ))}
                       </div>
                     ))}
                   </div>
-                ) : (
-                  <div style={{textAlign:'center',padding:'14px',fontSize:11,color:'#94A3B8'}}>업무 입력 후 버튼을 눌러 KPT 자동 생성</div>
+                ):(
+                  <div style={{textAlign:'center',padding:'16px',fontSize:12,color:'#CBD5E0'}}>업무 입력 후 버튼을 눌러 KPT 자동 생성</div>
                 )}
               </div>
             </div>
@@ -791,43 +618,51 @@ function App() {
         </div>
       </div>
 
-      {showApi && (
-        <div className="modal-bg" onClick={() => setShowApi(false)}>
-          <div className="modal" onClick={e => e.stopPropagation()}>
-            <div style={{fontSize:15,fontWeight:700,color:'#1E293B',marginBottom:6}}>API 키 설정</div>
-            <div style={{fontSize:12,color:'#64748B',marginBottom:14,lineHeight:1.6}}>
-              <a href="https://console.anthropic.com" target="_blank" style={{color:'#2563EB'}}>console.anthropic.com</a>에서 발급
+      {showApi&&(
+        <div className="modal-bg" onClick={()=>setShowApi(false)}>
+          <div className="modal" onClick={e=>e.stopPropagation()}>
+            <div style={{fontSize:15,fontWeight:700,color:'#1A202C',marginBottom:6}}>
+              <i className="ti ti-key" style={{marginRight:7,color:'#4F63D2'}}/>API 키 설정
             </div>
-            <input type="password" value={apiInput} onChange={e=>setApiInput(e.target.value)} placeholder="sk-ant-api03-..." style={{width:'100%',marginBottom:12}} />
+            <div style={{fontSize:12,color:'#718096',lineHeight:1.7,marginBottom:14}}>
+              Claude 자동 정리 기능에 필요합니다.<br/>
+              <a href="https://console.anthropic.com" target="_blank" style={{color:'#4F63D2'}}>console.anthropic.com</a>에서 발급
+            </div>
+            <input type="password" value={apiInput} onChange={e=>setApiInput(e.target.value)} placeholder="sk-ant-api03-..." style={{width:'100%',marginBottom:12}}/>
             <div style={{display:'flex',gap:8,justifyContent:'flex-end'}}>
-              <button className="btn-outline" onClick={() => setShowApi(false)}>취소</button>
-              <button className="btn-primary" onClick={() => { localStorage.setItem('d2c:key',apiInput); setApiKey(apiInput); setShowApi(false); notify('저장됐습니다.') }} disabled={!apiInput.trim()}>저장</button>
+              <button className="btn-outline" onClick={()=>setShowApi(false)}>취소</button>
+              <button className="btn-primary" onClick={()=>{localStorage.setItem('d2c:key',apiInput);setApiKey(apiInput);setShowApi(false);notify('저장됐습니다.')}} disabled={!apiInput.trim()}>저장</button>
             </div>
           </div>
         </div>
       )}
 
-      {showShare && (
-        <div className="modal-bg" onClick={() => setShowShare(false)}>
-          <div className="modal" onClick={e => e.stopPropagation()}>
-            <div style={{fontSize:15,fontWeight:700,color:'#1E293B',marginBottom:6}}>대표님 공유 링크</div>
-            <div style={{fontSize:12,color:'#64748B',marginBottom:12,lineHeight:1.6}}>읽기 전용 · 로그인 불필요</div>
-            <div style={{background:'#F8FAFC',border:'1px solid #E2E8F0',borderRadius:8,padding:'10px 12px',fontSize:11,color:'#475569',wordBreak:'break-all',marginBottom:12}}>
+      {showShare&&(
+        <div className="modal-bg" onClick={()=>setShowShare(false)}>
+          <div className="modal" onClick={e=>e.stopPropagation()}>
+            <div style={{fontSize:15,fontWeight:700,color:'#1A202C',marginBottom:6}}>
+              <i className="ti ti-share" style={{marginRight:7,color:'#6B46C1'}}/>대표님 공유 링크
+            </div>
+            <div style={{fontSize:12,color:'#718096',lineHeight:1.7,marginBottom:12}}>
+              아래 링크를 전달하시면 이번 주 업무 보고서를 보실 수 있습니다.<br/>
+              <strong>읽기 전용</strong> · 로그인 불필요
+            </div>
+            <div style={{background:'#F7FAFC',border:'1px solid #E2E8F0',borderRadius:8,padding:'10px 13px',fontSize:11.5,color:'#4A5568',wordBreak:'break-all',lineHeight:1.6,marginBottom:14}}>
               {shareUrl}
             </div>
             <div style={{display:'flex',gap:8,justifyContent:'flex-end'}}>
-              <button className="btn-outline" onClick={() => setShowShare(false)}>닫기</button>
-              <button className="btn-share" onClick={() => { navigator.clipboard.writeText(shareUrl).then(() => notify('링크 복사됐습니다!')) }}>
-                <i className="ti ti-copy" style={{fontSize:13}} />링크 복사
+              <button className="btn-outline" onClick={()=>setShowShare(false)}>닫기</button>
+              <button className="btn-share" onClick={()=>navigator.clipboard.writeText(shareUrl).then(()=>notify('링크 복사됐습니다!'))}>
+                <i className="ti ti-copy" style={{fontSize:13}}/>링크 복사
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {toast && (
+      {toast&&(
         <div className={`toast ${toast.type}`}>
-          <i className={`ti ${toast.type==='ok'?'ti-circle-check':'ti-alert-circle'}`} />
+          <i className={`ti ${toast.type==='ok'?'ti-circle-check':'ti-alert-circle'}`}/>
           {toast.msg}
         </div>
       )}
@@ -835,7 +670,7 @@ function App() {
   )
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(<App />)
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>)
 </script>
 </body>
 </html>
