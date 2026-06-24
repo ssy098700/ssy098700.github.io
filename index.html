@@ -215,8 +215,8 @@ function App(){
 
   const loadWeek=useCallback(async(wk)=>{
     setLoading(true)
-    try{const rows=await dbGet(wk);setDbData(rows||[])}
-    catch(e){}
+    try{const rows=await dbGet(wk);setDbData(Array.isArray(rows)?rows:[])}
+    catch(e){setDbData([])}
     finally{setLoading(false)}
   },[])
 
