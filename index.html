@@ -121,13 +121,33 @@ function fmtWeek(ws){const d=new Date(ws);return `${d.getFullYear()}년 ${d.getM
 
 function Tag({t}){const c=TAG_COLORS[t]||TAG_COLORS['기타'];return <span className="tag" style={{background:c.bg,color:c.c}}>{t}</span>}
 
-function TaskRow({task,onToggle}){
+function TaskRow({task,onToggle,onEdit}){
+  const [editing,setEditing]=React.useState(false)
+  const [val,setVal]=React.useState(task.text)
+  const save=()=>{setEditing(false);if(val.trim()&&val.trim()!==task.text)onEdit(val.trim())}
   return(
-    <div className="task-row" onClick={onToggle}>
-      <div className={`check-box${task.done?' done':''}`}>
+    <div className="task-row" onClick={editing?null:onToggle}>
+      <div className={`check-box${task.done?' done':''}`} onClick={e=>{if(editing){e.stopPropagation()}else{onToggle()}}}>
         {task.done&&<i className="ti ti-check" style={{fontSize:9,color:'#fff'}}/>}
       </div>
-      <span className={`task-text${task.done?' done':''}`}>{task.text}</span>
+      {editing?(
+        <input
+          autoFocus
+          value={val}
+          onChange={e=>setVal(e.target.value)}
+          onBlur={save}
+          onKeyDown={e=>{if(e.key==='Enter')save();if(e.key==='Escape'){setVal(task.text);setEditing(false)}}}
+          onClick={e=>e.stopPropagation()}
+          style={{flex:1,fontSize:13,border:'1px solid #93C5FD',borderRadius:5,padding:'2px 8px',outline:'none',background:'#EFF6FF'}}
+        />
+      ):(
+        <span
+          className={`task-text${task.done?" done":""}`}
+          onClick={e=>{e.stopPropagation();setEditing(true)}}
+          title="클릭해서 수정"
+          style={{cursor:'text'}}
+        >{task.text}</span>
+      )}
       <Tag t={task.tag}/>
     </div>
   )
@@ -438,7 +458,7 @@ function App(){
                     </div>
                     {row?(
                       <div style={{padding:'0 2px'}}>
-                        {row.tasks?.map((t,i)=><TaskRow key={i} task={t} onToggle={()=>toggleTask(d,i)}/>)}
+                        {row.tasks?.map((t,i)=><TaskRow key={i} task={t} onToggle={()=>toggleTask(d,i)} onEdit={async(newText)=>{const tasks=[...row.tasks];tasks[i]={...tasks[i],text:newText};await upsertDay(d,tasks,row.notes||'')}}/>)}
                         {row.notes&&<div style={{margin:'6px 6px 2px',padding:'7px 9px',background:'#F8FAFC',borderRadius:6,fontSize:11.5,color:'#64748B',lineHeight:1.6}}>{row.notes}</div>}
                       </div>
                     ):(
