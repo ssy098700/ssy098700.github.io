@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -31,11 +32,11 @@ button{cursor:pointer}
 .stat-label{font-size:11px;color:#64748B;margin-bottom:3px}
 .stat-val{font-size:22px;font-weight:600;color:#1E293B}
 .tag{display:inline-block;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:500;white-space:nowrap;flex-shrink:0}
-.task-row{display:flex;align-items:flex-start;gap:8px;padding:5px 8px;border-radius:6px;cursor:pointer;transition:background .1s}
+.task-row{display:flex;align-items:flex-start;gap:8px;padding:5px 8px;border-radius:6px;transition:background .1s}
 .task-row:hover{background:#F8FAFC}
-.check-box{width:15px;height:15px;border-radius:3px;flex-shrink:0;margin-top:2px;border:1.5px solid #CBD5E1;background:transparent;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.check-box{width:15px;height:15px;border-radius:3px;flex-shrink:0;margin-top:2px;border:1.5px solid #CBD5E1;background:transparent;display:flex;align-items:center;justify-content:center;transition:all .15s;cursor:pointer}
 .check-box.done{background:#2563EB;border-color:#2563EB}
-.task-text{flex:1;font-size:13px;line-height:1.5;color:#334155}
+.task-text{flex:1;font-size:13px;line-height:1.5;color:#334155;cursor:text}
 .task-text.done{color:#94A3B8;text-decoration:line-through}
 .sec-label{font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
 .btn-primary{padding:7px 14px;border-radius:7px;background:#2563EB;color:#fff;border:none;font-size:13px;font-weight:500;display:flex;align-items:center;gap:5px}
@@ -69,14 +70,13 @@ input:focus{border-color:#93C5FD}
 <script type="text/babel">
 const {useState,useEffect,useCallback}=React
 
-// ── Supabase 설정 ──
 const SUPABASE_URL='https://zxfytktctzgkssxbqbyj.supabase.co'
-const SUPABASE_KEY='sb_secret_exVGa0Fzrty28gHjhgP15Q_mpxGrM2X'
+const SUPABASE_ANON='sb_publishable_815pQE6fA0sXIBS3RcmDAA_6FptB6NS'
 const SUPABASE_SECRET='sb_secret_exVGa0Fzrty28gHjhgP15Q_mpxGrM2X'
 
 async function dbGet(weekKey){
   const r=await fetch(`${SUPABASE_URL}/rest/v1/worklog?week_key=eq.${weekKey}&select=*`,{
-    headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`}
+    headers:{'apikey':SUPABASE_ANON,'Authorization':`Bearer ${SUPABASE_ANON}`}
   })
   return await r.json()
 }
@@ -85,8 +85,8 @@ async function dbUpsert(row){
   const r=await fetch(`${SUPABASE_URL}/rest/v1/worklog`,{
     method:'POST',
     headers:{
-      'apikey':SUPABASE_SECRET,
-      'Authorization':`Bearer ${SUPABASE_SECRET}`,
+      'apikey':SUPABASE_ANON,
+      'Authorization':`Bearer ${SUPABASE_ANON}`,
       'Content-Type':'application/json',
       'Prefer':'resolution=merge-duplicates'
     },
@@ -98,7 +98,7 @@ async function dbUpsert(row){
 async function dbDelete(weekKey,dateKey){
   await fetch(`${SUPABASE_URL}/rest/v1/worklog?week_key=eq.${weekKey}&date_key=eq.${dateKey}`,{
     method:'DELETE',
-    headers:{'apikey':SUPABASE_SECRET,'Authorization':`Bearer ${SUPABASE_SECRET}`}
+    headers:{'apikey':SUPABASE_ANON,'Authorization':`Bearer ${SUPABASE_ANON}`}
   })
 }
 
@@ -109,6 +109,7 @@ const TAG_COLORS={
   '광고':{bg:'#FFE4E6',c:'#9F1239'},'CS':{bg:'#FEF3C7',c:'#92400E'},
   '리서치':{bg:'#D1FAE5',c:'#064E3B'},'시딩':{bg:'#F3E8FF',c:'#6B21A8'},
   '브로드캐스팅':{bg:'#F5F3FF',c:'#7C3AED'},'KPI':{bg:'#F1F5F9',c:'#334155'},
+  '캠페인':{bg:'#FEF9C3',c:'#854D0E'},'가격정책':{bg:'#E0F2FE',c:'#075985'},
   '기타':{bg:'#F3F4F6',c:'#374151'}
 }
 
@@ -125,27 +126,19 @@ function TaskRow({task,onToggle,onEdit}){
   const [val,setVal]=React.useState(task.text)
   const save=()=>{setEditing(false);if(val.trim()&&val.trim()!==task.text)onEdit(val.trim())}
   return(
-    <div className="task-row" onClick={editing?null:onToggle}>
-      <div className={`check-box${task.done?' done':''}`} onClick={e=>{if(editing){e.stopPropagation()}else{onToggle()}}}>
+    <div className="task-row">
+      <div className={`check-box${task.done?' done':''}`} onClick={onToggle}>
         {task.done&&<i className="ti ti-check" style={{fontSize:9,color:'#fff'}}/>}
       </div>
       {editing?(
-        <input
-          autoFocus
-          value={val}
+        <input autoFocus value={val}
           onChange={e=>setVal(e.target.value)}
           onBlur={save}
           onKeyDown={e=>{if(e.key==='Enter')save();if(e.key==='Escape'){setVal(task.text);setEditing(false)}}}
-          onClick={e=>e.stopPropagation()}
           style={{flex:1,fontSize:13,border:'1px solid #93C5FD',borderRadius:5,padding:'2px 8px',outline:'none',background:'#EFF6FF'}}
         />
       ):(
-        <span
-          className={`task-text${task.done?" done":""}`}
-          onClick={e=>{e.stopPropagation();setEditing(true)}}
-          title="클릭해서 수정"
-          style={{cursor:'text'}}
-        >{task.text}</span>
+        <span className={`task-text${task.done?' done':''}`} onClick={()=>setEditing(true)} title="클릭해서 수정">{task.text}</span>
       )}
       <Tag t={task.tag}/>
     </div>
@@ -155,6 +148,7 @@ function TaskRow({task,onToggle,onEdit}){
 function ReadOnlyReport({data,weekKey}){
   const days=wdays(weekKey)
   const rows=data.filter(r=>!r.date_key.startsWith('__'))
+  const kptRow=data.find(r=>r.date_key==='__kpt')
   return(
     <div style={{minHeight:'100vh',background:'#F1F5F9',padding:20}}>
       <div className="report-header" style={{maxWidth:760,margin:'0 auto 16px'}}>
@@ -184,14 +178,14 @@ function ReadOnlyReport({data,weekKey}){
             </div>
           )
         })}
-        {data.find(r=>r.date_key==='__kpt')?.kpt&&(
+        {kptRow?.kpt&&(
           <div className="card">
             <div style={{fontSize:12,fontWeight:600,color:'#64748B',marginBottom:10,textTransform:'uppercase',letterSpacing:'.5px'}}>KPT 주간 회고</div>
             <div className="kpt-grid">
               {[{k:'keep',lbl:'KEEP',cls:'keep',c:'#15803D'},{k:'problem',lbl:'PROBLEM',cls:'problem',c:'#BE123C'},{k:'try',lbl:'TRY',cls:'try',c:'#B45309'}].map(({k,lbl,cls,c})=>(
                 <div key={k} className={`kpt-card ${cls}`}>
                   <div style={{fontSize:11,fontWeight:700,color:c,marginBottom:6}}>{lbl}</div>
-                  {(data.find(r=>r.date_key==='__kpt')?.kpt[k]||[]).map((item,i)=><div key={i} style={{fontSize:11.5,color:'#374151',lineHeight:1.5,paddingLeft:10,position:'relative',marginBottom:2}}><span style={{position:'absolute',left:0,color:c}}>·</span>{item}</div>)}
+                  {(kptRow.kpt[k]||[]).map((item,i)=><div key={i} style={{fontSize:11.5,color:'#374151',lineHeight:1.5,paddingLeft:10,position:'relative',marginBottom:2}}><span style={{position:'absolute',left:0,color:c}}>·</span>{item}</div>)}
                 </div>
               ))}
             </div>
@@ -233,13 +227,7 @@ function App(){
   },[curWeek,isReadOnly])
 
   const notify=(msg,type='ok')=>{setToast({msg,type});setTimeout(()=>setToast(null),3000)}
-
-  const saveApiKey=()=>{
-    localStorage.setItem('d2c:apikey',apiKeyInput)
-    setApiKey(apiKeyInput);setShowApiSetup(false)
-    notify('API 키 저장됐습니다.')
-  }
-
+  const saveApiKey=()=>{localStorage.setItem('d2c:apikey',apiKeyInput);setApiKey(apiKeyInput);setShowApiSetup(false);notify('API 키 저장됐습니다.')}
   const getRow=(dateKey)=>dbData.find(r=>r.date_key===dateKey)
   const kptRow=dbData.find(r=>r.date_key==='__kpt')
 
@@ -249,17 +237,19 @@ function App(){
   }
 
   const toggleTask=async(dateKey,idx)=>{
-    const row=getRow(dateKey)
-    if(!row)return
-    const tasks=[...row.tasks]
-    tasks[idx]={...tasks[idx],done:!tasks[idx].done}
+    const row=getRow(dateKey);if(!row)return
+    const tasks=[...row.tasks];tasks[idx]={...tasks[idx],done:!tasks[idx].done}
+    await upsertDay(dateKey,tasks,row.notes||'')
+  }
+
+  const editTask=async(dateKey,idx,newText)=>{
+    const row=getRow(dateKey);if(!row)return
+    const tasks=[...row.tasks];tasks[idx]={...tasks[idx],text:newText}
     await upsertDay(dateKey,tasks,row.notes||'')
   }
 
   const delDay=async(dateKey)=>{
-    await dbDelete(curWeek,dateKey)
-    await loadWeek(curWeek)
-    notify('삭제됐습니다.')
+    await dbDelete(curWeek,dateKey);await loadWeek(curWeek);notify('삭제됐습니다.')
   }
 
   const callClaude=async(prompt)=>{
@@ -276,13 +266,11 @@ function App(){
   }
 
   const processInput=async()=>{
-    if(!raw.trim())return
-    setBusy(true)
+    if(!raw.trim())return;setBusy(true)
     try{
-      const parsed=await callClaude(`다음 업무 내용을 JSON으로 구조화. JSON만 출력:\n\n${raw}\n\n형식:\n{"tasks":[{"text":"업무내용(간결)","tag":"물류|마케팅|광고|CS|리서치|시딩|브로드캐스팅|KPI|기타","done":true}],"notes":"상세메모(없으면 빈문자열)"}`)
+      const parsed=await callClaude(`다음 업무 내용을 JSON으로 구조화. JSON만 출력:\n\n${raw}\n\n형식:\n{"tasks":[{"text":"업무내용(간결)","tag":"물류|마케팅|광고|CS|리서치|시딩|브로드캐스팅|KPI|캠페인|가격정책|기타","done":true}],"notes":"상세메모(없으면 빈문자열)"}`)
       await upsertDay(selDate,parsed.tasks||[],parsed.notes||'')
-      setRaw('');setCurWeek(wstart(new Date(selDate)));setView('weekly')
-      notify('저장 완료!')
+      setRaw('');setCurWeek(wstart(new Date(selDate)));setView('weekly');notify('저장 완료!')
     }catch(e){if(e.message!=='no key')notify('처리 실패. API 키 확인해주세요.','err')}
     finally{setBusy(false)}
   }
@@ -294,31 +282,20 @@ function App(){
     try{
       const kpt=await callClaude(`이번 주 업무를 보고 KPT 회고를 JSON으로. JSON만 출력:\n\n${allTasks.map(t=>`[${t.done?'완료':'미완'}] ${t.text}`).join('\n')}\n\n형식:\n{"keep":["..."],"problem":["..."],"try":["..."]}`)
       await dbUpsert({week_key:curWeek,date_key:'__kpt',tasks:[],notes:'',kpt,updated_at:new Date().toISOString()})
-      await loadWeek(curWeek)
-      notify('KPT 생성 완료!')
+      await loadWeek(curWeek);notify('KPT 생성 완료!')
     }catch(e){if(e.message!=='no key')notify('KPT 생성 실패','err')}
     finally{setKptBusy(false)}
   }
 
   const shareUrl=`${window.location.origin}${window.location.pathname}?readonly=1&week=${curWeek}`
-
-  const copyShare=()=>{
-    navigator.clipboard.writeText(shareUrl).then(()=>notify('링크 복사됐습니다! 대표님께 전달하세요.'))
-  }
+  const copyShare=()=>{navigator.clipboard.writeText(shareUrl).then(()=>notify('링크 복사됐습니다! 대표님께 전달하세요.'))}
 
   if(isReadOnly&&!loading)return <ReadOnlyReport data={dbData} weekKey={readOnlyWeek}/>
   if(isReadOnly&&loading)return <div className="loading"><i className="ti ti-loader" style={{fontSize:20}}/>불러오는 중...</div>
 
-  const days=wdays(curWeek)
-  const today=dk()
+  const days=wdays(curWeek),today=dk()
   const allTasks=dbData.filter(r=>r.tasks?.length&&!r.date_key.startsWith('__')).flatMap(r=>r.tasks)
-
-  const NAV=[
-    {id:'dashboard',icon:'ti-home',lbl:'홈'},
-    {id:'input',icon:'ti-edit',lbl:'입력'},
-    {id:'weekly',icon:'ti-calendar',lbl:'주간'},
-    {id:'history',icon:'ti-clock',lbl:'기록'},
-  ]
+  const NAV=[{id:'dashboard',icon:'ti-home',lbl:'홈'},{id:'input',icon:'ti-edit',lbl:'입력'},{id:'weekly',icon:'ti-calendar',lbl:'주간'},{id:'history',icon:'ti-clock',lbl:'기록'}]
 
   return(
     <div className="app">
@@ -349,8 +326,7 @@ function App(){
             )}
             {view==='input'&&(
               <button className="btn-primary" onClick={processInput} disabled={busy||!raw.trim()}>
-                <i className="ti ti-sparkles" style={{fontSize:13}}/>
-                {busy?'처리 중...':'Claude에게 정리 요청'}
+                <i className="ti ti-sparkles" style={{fontSize:13}}/>{busy?'처리 중...':'Claude에게 정리 요청'}
               </button>
             )}
           </div>
@@ -362,15 +338,8 @@ function App(){
           {!loading&&view==='dashboard'&&(
             <div>
               <div className="stat-grid">
-                {[
-                  {lbl:'이번 주 완료',val:allTasks.filter(t=>t.done).length},
-                  {lbl:'전체 업무',val:allTasks.length},
-                  {lbl:'기록된 날',val:dbData.filter(r=>!r.date_key.startsWith('__')&&r.tasks?.length>0).length},
-                ].map((s,i)=>(
-                  <div key={i} className="stat-card">
-                    <div className="stat-label">{s.lbl}</div>
-                    <div className="stat-val">{s.val}</div>
-                  </div>
+                {[{lbl:'이번 주 완료',val:allTasks.filter(t=>t.done).length},{lbl:'전체 업무',val:allTasks.length},{lbl:'기록된 날',val:dbData.filter(r=>!r.date_key.startsWith('__')&&r.tasks?.length>0).length}].map((s,i)=>(
+                  <div key={i} className="stat-card"><div className="stat-label">{s.lbl}</div><div className="stat-val">{s.val}</div></div>
                 ))}
               </div>
               <div className="card">
@@ -390,16 +359,10 @@ function App(){
                 </div>
               </div>
               <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:9}}>
-                {[
-                  {lbl:'오늘 업무 입력',sub:'Claude가 자동 정리',icon:'ti-plus',c:'#2563EB',act:()=>setView('input')},
-                  {lbl:'주간 일지 보기',sub:'이번 주 전체 현황',icon:'ti-calendar-week',c:'#059669',act:()=>setView('weekly')},
-                ].map((a,i)=>(
+                {[{lbl:'오늘 업무 입력',sub:'Claude가 자동 정리',icon:'ti-plus',c:'#2563EB',act:()=>setView('input')},{lbl:'주간 일지 보기',sub:'이번 주 전체 현황',icon:'ti-calendar-week',c:'#059669',act:()=>setView('weekly')}].map((a,i)=>(
                   <div key={i} className="card" style={{cursor:'pointer',display:'flex',alignItems:'center',gap:10}} onClick={a.act}>
                     <i className={`ti ${a.icon}`} style={{fontSize:20,color:a.c}}/>
-                    <div>
-                      <div style={{fontSize:12,fontWeight:600,color:'#1E293B'}}>{a.lbl}</div>
-                      <div style={{fontSize:10,color:'#94A3B8',marginTop:1}}>{a.sub}</div>
-                    </div>
+                    <div><div style={{fontSize:12,fontWeight:600,color:'#1E293B'}}>{a.lbl}</div><div style={{fontSize:10,color:'#94A3B8',marginTop:1}}>{a.sub}</div></div>
                   </div>
                 ))}
               </div>
@@ -414,8 +377,7 @@ function App(){
               </div>
               <div className="card">
                 <div className="sec-label">업무 내용 입력 <span style={{fontSize:10,color:'#94A3B8',textTransform:'none',marginLeft:6}}>날것 그대로 → Claude가 정리</span></div>
-                <textarea value={raw} onChange={e=>setRaw(e.target.value)} rows={8}
-                  placeholder={"오늘 업무를 자유롭게 적어주세요.\n\n예시:\n1. 쇼피 FBS 패킹 완료\n2. 인플루언서 콘텐츠 확인\n3. 광고 분석 완료"}/>
+                <textarea value={raw} onChange={e=>setRaw(e.target.value)} rows={8} placeholder={"오늘 업무를 자유롭게 적어주세요.\n\n예시:\n1. 쇼피 FBS 패킹 완료\n2. 인플루언서 콘텐츠 확인\n3. 광고 분석 완료"}/>
               </div>
               {!apiKey&&<div style={{padding:'9px 12px',borderRadius:8,background:'#FFF7ED',border:'1px solid #FED7AA',fontSize:12,color:'#92400E'}}>
                 <i className="ti ti-key" style={{marginRight:5}}/>API 키 미설정 —
@@ -457,7 +419,7 @@ function App(){
                     </div>
                     {row?(
                       <div style={{padding:'0 2px'}}>
-                        {row.tasks?.map((t,i)=><TaskRow key={i} task={t} onToggle={()=>toggleTask(d,i)} onEdit={async(newText)=>{const tasks=[...row.tasks];tasks[i]={...tasks[i],text:newText};await upsertDay(d,tasks,row.notes||'')}}/>)}
+                        {row.tasks?.map((t,i)=><TaskRow key={i} task={t} onToggle={()=>toggleTask(d,i)} onEdit={(newText)=>editTask(d,i,newText)}/>)}
                         {row.notes&&<div style={{margin:'6px 6px 2px',padding:'7px 9px',background:'#F8FAFC',borderRadius:6,fontSize:11.5,color:'#64748B',lineHeight:1.6}}>{row.notes}</div>}
                       </div>
                     ):(
@@ -508,7 +470,7 @@ function App(){
             <div style={{fontSize:15,fontWeight:700,color:'#1E293B',marginBottom:6}}><i className="ti ti-key" style={{marginRight:6,color:'#2563EB'}}/>Anthropic API 키 설정</div>
             <div style={{fontSize:12,color:'#64748B',lineHeight:1.6,marginBottom:14}}>
               Claude 자동 정리 기능에 필요합니다.<br/>
-              <a href="https://console.anthropic.com/api-keys" target="_blank" style={{color:'#2563EB'}}>console.anthropic.com</a>에서 발급
+              <a href="https://console.anthropic.com" target="_blank" style={{color:'#2563EB'}}>console.anthropic.com</a>에서 발급
             </div>
             <input type="password" value={apiKeyInput} onChange={e=>setApiKeyInput(e.target.value)} placeholder="sk-ant-api03-..." style={{width:'100%',marginBottom:12}}/>
             <div style={{display:'flex',gap:8,justifyContent:'flex-end'}}>
@@ -526,9 +488,7 @@ function App(){
             <div style={{fontSize:12,color:'#64748B',lineHeight:1.6,marginBottom:12}}>
               아래 링크를 대표님께 전달하시면 이번 주 업무 보고서를 보실 수 있습니다.<br/>읽기 전용 · 로그인 불필요
             </div>
-            <div style={{background:'#F8FAFC',border:'1px solid #E2E8F0',borderRadius:8,padding:'10px 12px',fontSize:11,color:'#475569',wordBreak:'break-all',lineHeight:1.5,marginBottom:12}}>
-              {shareUrl}
-            </div>
+            <div style={{background:'#F8FAFC',border:'1px solid #E2E8F0',borderRadius:8,padding:'10px 12px',fontSize:11,color:'#475569',wordBreak:'break-all',lineHeight:1.5,marginBottom:12}}>{shareUrl}</div>
             <div style={{display:'flex',gap:8,justifyContent:'flex-end'}}>
               <button className="btn-outline" onClick={()=>setShowShare(false)}>닫기</button>
               <button className="btn-share" onClick={copyShare}><i className="ti ti-copy" style={{fontSize:13}}/>링크 복사</button>
