@@ -132,7 +132,7 @@ function TaskItem({task, onToggle, onUpdate, onDelete, readOnly, allTags}){
   const [editingText, setEditingText]=useState(false)
   const [editingMemo, setEditingMemo]=useState(false)
   const [textVal, setTextVal]=useState(task.text)
-  const [memoVal, setMemoVal]=useState(task.memo||'')
+  const [memoVal, setMemoVal]=useState('')
 
   const saveText=()=>{
     setEditingText(false)
@@ -199,7 +199,7 @@ function TaskItem({task, onToggle, onUpdate, onDelete, readOnly, allTags}){
             style={{width:'100%',fontSize:11.5,border:'1px solid #BEE3F8',borderRadius:5,padding:'2px 8px',outline:'none',background:'#EBF8FF',color:'#2D3748'}}
           />
         ):task.memo?(
-          <span onClick={()=>!readOnly&&setEditingMemo(true)}
+          <span onClick={()=>{if(!readOnly){setMemoVal(task.memo||'');setEditingMemo(true)}}}
             style={{fontSize:11.5,color:'#718096',cursor:readOnly?'default':'text',fontStyle:'italic',display:'flex',alignItems:'center',gap:4}}>
             <i className="ti ti-notes" style={{fontSize:11,color:'#A0AEC0'}}/>
             {task.memo}
