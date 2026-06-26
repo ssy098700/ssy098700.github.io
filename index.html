@@ -388,6 +388,36 @@ function MiniCalendar({taskDates, onDateClick}){
   )
 }
 
+/* 빠른 메모 */
+function QuickMemo(){
+  const [memo,setMemo]=useState(()=>{try{return localStorage.getItem('d2c:quickmemo')||''}catch(e){return ''}})
+  const [saved,setSaved]=useState(false)
+  const timerRef=useRef()
+
+  function handleChange(e){
+    setMemo(e.target.value)
+    clearTimeout(timerRef.current)
+    timerRef.current=setTimeout(()=>{
+      localStorage.setItem('d2c:quickmemo',e.target.value)
+      setSaved(true)
+      setTimeout(()=>setSaved(false),1500)
+    },800)
+  }
+
+  return(
+    <div style={{borderTop:'1px solid #EDF2F7',paddingTop:14,marginTop:14}}>
+      <div className="side-panel-title" style={{justifyContent:'space-between'}}>
+        <span style={{display:'flex',alignItems:'center',gap:5}}><i className="ti ti-pencil" style={{fontSize:13}}/>빠른 메모</span>
+        {saved&&<span style={{fontSize:10,color:'#38A169',fontWeight:500}}>저장됨 ✓</span>}
+      </div>
+      <textarea value={memo} onChange={handleChange} rows={4}
+        placeholder="자유롭게 메모하세요&#10;(자동 저장)"
+        style={{fontSize:12,lineHeight:1.6,resize:'none',background:'#FAFBFF',border:'1px solid #E8ECFF',borderRadius:8,padding:'8px 10px'}}
+      />
+    </div>
+  )
+}
+
 /* 색상 라벨 인라인 수정 */
 function ColorLabelEdit({color, label, onSave}){
   const [editing,setEditing]=useState(false)
@@ -483,6 +513,74 @@ function SidePanel({rows, onToggleTask, onDateClick}){
           })
         )}
       </div>
+
+      {/* 이번 주 진행률 */}
+      <div style={{borderTop:'1px solid #EDF2F7',paddingTop:14,marginTop:2}}>
+        <div className="side-panel-title"><i className="ti ti-chart-bar" style={{fontSize:13}}/>이번 주 진행률</div>
+        {(()=>{
+          const allT=rows.filter(r=>r.tasks?.length&&!r.date_key.startsWith('__')).flatMap(r=>r.tasks)
+          const total=allT.length,done=allT.filter(t=>t.done).length
+          const pct=total?Math.round(done/total*100):0
+          const barColor=pct>=80?'#68D391':pct>=50?'#F6AD55':'#FC8181'
+          return(
+            <div>
+              <div style={{display:'flex',justifyContent:'space-between',marginBottom:5}}>
+                <span style={{fontSize:11,color:'#718096'}}>완료 {done} / 전체 {total}</span>
+                <span style={{fontSize:12,fontWeight:700,color:barColor}}>{pct}%</span>
+              </div>
+              <div style={{background:'#EDF2F7',borderRadius:99,height:7,overflow:'hidden'}}>
+                <div style={{width:`${pct}%`,height:'100%',background:barColor,borderRadius:99,transition:'width .4s'}}/>
+              </div>
+              <div style={{display:'flex',gap:6,marginTop:10,flexWrap:'wrap'}}>
+                {['월','화','수','목','금'].map((day,i)=>{
+                  const wdays=weekDays(rows[0]?.week_key||weekStart())
+                  const row=rows.find(r=>r.date_key===wdays[i])
+                  const d=(row?.tasks||[]).filter(t=>t.done).length
+                  const tot=(row?.tasks||[]).length
+                  return(
+                    <div key={day} style={{flex:1,textAlign:'center',background:'#F7FAFC',borderRadius:8,padding:'6px 4px'}}>
+                      <div style={{fontSize:9,color:'#A0AEC0',fontWeight:600}}>{day}</div>
+                      <div style={{fontSize:13,fontWeight:700,color:tot>0&&d===tot?'#38A169':'#1A202C',marginTop:2}}>{tot>0?`${d}/${tot}`:'—'}</div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )
+        })()}
+      </div>
+
+      {/* 태그별 분포 */}
+      {(()=>{
+        const allT=rows.filter(r=>r.tasks?.length&&!r.date_key.startsWith('__')).flatMap(r=>r.tasks)
+        if(!allT.length)return null
+        const tagCount={}
+        allT.forEach(t=>{tagCount[t.tag]=(tagCount[t.tag]||0)+1})
+        const sorted=Object.entries(tagCount).sort((a,b)=>b[1]-a[1]).slice(0,5)
+        const max=sorted[0]?.[1]||1
+        return(
+          <div style={{borderTop:'1px solid #EDF2F7',paddingTop:14,marginTop:14}}>
+            <div className="side-panel-title"><i className="ti ti-tag" style={{fontSize:13}}/>태그별 업무</div>
+            {sorted.map(([tag,cnt])=>{
+              const c=TAG_COLORS[tag]||{bg:'#F1F5F9',c:'#475569'}
+              return(
+                <div key={tag} style={{marginBottom:6}}>
+                  <div style={{display:'flex',justifyContent:'space-between',marginBottom:3}}>
+                    <span style={{fontSize:11,fontWeight:600,color:c.c}}>{tag}</span>
+                    <span style={{fontSize:10,color:'#A0AEC0'}}>{cnt}건</span>
+                  </div>
+                  <div style={{background:'#EDF2F7',borderRadius:99,height:5}}>
+                    <div style={{width:`${cnt/max*100}%`,height:'100%',background:c.c,borderRadius:99,opacity:.7}}/>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )
+      })()}
+
+      {/* 빠른 메모 */}
+      <QuickMemo/>
     </div>
   )
 }
@@ -500,6 +598,7 @@ function App(){
   const [busy,setBusy]=useState(false)
   const [kptBusy,setKptBusy]=useState(false)
   const [loading,setLoading]=useState(true)
+  const [pendingScrollDate,setPendingScrollDate]=useState(null)
   const [toast,setToast]=useState(null)
   const [apiKey,setApiKey]=useState('')
   const [apiInput,setApiInput]=useState('')
@@ -526,14 +625,25 @@ function App(){
 
   function notify(msg,type='ok'){setToast({msg,type});setTimeout(()=>setToast(null),3000)}
 
+  // 주가 바뀐 뒤 로딩 완료되면 스크롤
+  useEffect(()=>{
+    if(!loading&&pendingScrollDate){
+      setTimeout(()=>{
+        const el=document.getElementById('day-'+pendingScrollDate)
+        if(el&&contentRef.current){
+          contentRef.current.scrollTo({top:el.offsetTop-contentRef.current.offsetTop-16,behavior:'smooth'})
+        }
+        setPendingScrollDate(null)
+      },100)
+    }
+  },[loading,pendingScrollDate])
+
   function scrollToDate(dateKey){
     setView('weekly')
     setTimeout(()=>{
       const el=document.getElementById('day-'+dateKey)
       if(el&&contentRef.current){
-        const container=contentRef.current
-        const elTop=el.offsetTop-container.offsetTop
-        container.scrollTo({top:elTop-16,behavior:'smooth'})
+        contentRef.current.scrollTo({top:el.offsetTop-contentRef.current.offsetTop-16,behavior:'smooth'})
       }
     },100)
   }
@@ -858,8 +968,13 @@ function App(){
               onToggleTask={toggleTask}
               onDateClick={(dateKey)=>{
                 const dWeek=weekStart(new Date(dateKey))
-                if(dWeek!==curWeek)setCurWeek(dWeek)
-                scrollToDate(dateKey)
+                if(dWeek!==curWeek){
+                  setCurWeek(dWeek)
+                  setPendingScrollDate(dateKey)
+                  setView('weekly')
+                }else{
+                  scrollToDate(dateKey)
+                }
               }}
             />
           )}
