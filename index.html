@@ -25,11 +25,19 @@ input,textarea,select,button{font-family:inherit}
 .topbar-title{font-size:15px;font-weight:700;color:#1A202C;letter-spacing:-.3px}
 .topbar-sub{font-size:11px;color:#A0AEC0;margin-top:1px;font-weight:400}
 .body-wrap{display:flex;flex:1;overflow:hidden;height:calc(100vh - 53px)}
-.content-area{flex:1;overflow-y:auto;padding:22px 24px}
-.content{max-width:680px}
+.content-area{flex:1;overflow-y:auto;padding:22px 28px;min-width:0}
+.content{max-width:900px;width:100%}
+
+/* 중간 위젯 패널 */
+.mid-panel{width:260px;flex-shrink:0;background:#F7FAFC;border-left:1px solid #E2E8F0;border-right:1px solid #E2E8F0;overflow-y:auto;padding:16px}
+.mid-panel-title{font-size:11px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;display:flex;align-items:center;gap:5px}
+.focus-item{display:flex;align-items:flex-start;gap:8px;padding:7px 10px;border-radius:8px;margin-bottom:4px;background:#fff;border:1px solid #EDF2F7;cursor:pointer;transition:all .1s}
+.focus-item:hover{border-color:#BEE3F8;background:#EBF8FF}
+.focus-check{width:15px;height:15px;border-radius:4px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;border:1.5px solid #CBD5E0;cursor:pointer;transition:all .15s}
+.focus-check.done{background:#4F63D2;border:none}
 
 /* 사이드패널 */
-.side-panel{width:300px;flex-shrink:0;background:#fff;border-left:1px solid #E2E8F0;overflow-y:auto;padding:16px}
+.side-panel{width:290px;flex-shrink:0;background:#fff;border-left:1px solid #E2E8F0;overflow-y:auto;padding:16px}
 .side-panel-title{font-size:11px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;display:flex;align-items:center;gap:5px}
 .color-section{margin-bottom:16px}
 .color-header{display:flex;align-items:center;gap:7px;margin-bottom:8px;padding:5px 8px;border-radius:8px}
@@ -210,7 +218,7 @@ function Tag({t, onChangeTag, allTags, readOnly}){
   )
 }
 
-function TaskItem({task, onToggle, onUpdate, onDelete, readOnly, allTags}){
+function TaskItem({task, onToggle, onUpdate, onDelete, readOnly, allTags, onDragStart, onDragOver, onDrop, isDragging}){
   const [editingText,setEditingText]=useState(false)
   const [editingMemo,setEditingMemo]=useState(false)
   const [textVal,setTextVal]=useState(task.text)
@@ -230,19 +238,29 @@ function TaskItem({task, onToggle, onUpdate, onDelete, readOnly, allTags}){
   const rowBg=ROW_COLORS[task.color]||'transparent'
 
   return(
-    <div className="task-wrap" style={{background:rowBg}}>
+    <div className="task-wrap"
+      draggable={!readOnly}
+      onDragStart={onDragStart}
+      onDragOver={e=>{e.preventDefault();onDragOver&&onDragOver(e)}}
+      onDrop={onDrop}
+      style={{background:rowBg,opacity:isDragging?0.4:1,cursor:readOnly?'default':'grab'}}>
       <div style={{display:'flex',alignItems:'flex-start',gap:8}}>
-        <div onClick={onToggle} style={{width:16,height:16,borderRadius:4,flexShrink:0,marginTop:2,border:task.done?'none':'1.5px solid #CBD5E0',background:task.done?'#4F63D2':'transparent',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',transition:'all .15s'}}>
+        {!readOnly&&(
+          <div style={{color:'#CBD5E0',fontSize:12,cursor:'grab',paddingTop:3,flexShrink:0}} title="드래그해서 순서 변경">
+            <i className="ti ti-grip-vertical"/>
+          </div>
+        )}
+        <div onClick={onToggle} style={{width:17,height:17,borderRadius:4,flexShrink:0,marginTop:2,border:task.done?'none':'1.5px solid #CBD5E0',background:task.done?'#4F63D2':'transparent',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',transition:'all .15s'}}>
           {task.done&&<i className="ti ti-check" style={{fontSize:10,color:'#fff'}}/>}
         </div>
         {editingText?(
           <input autoFocus value={textVal} onChange={e=>setTextVal(e.target.value)}
             onBlur={saveText}
             onKeyDown={e=>{if(e.key==='Enter'){e.preventDefault();saveText()}if(e.key==='Escape'){setTextVal(task.text);setEditingText(false)}}}
-            style={{flex:1,fontSize:13,fontWeight:task.bold?700:400,border:'2px solid #4F63D2',borderRadius:6,padding:'2px 9px',outline:'none',background:'#EBF4FF'}}
+            style={{flex:1,fontSize:13.5,fontWeight:task.bold?700:500,border:'2px solid #4F63D2',borderRadius:6,padding:'2px 9px',outline:'none',background:'#EBF4FF'}}
           />
         ):(
-          <span style={{flex:1,fontSize:13,lineHeight:1.6,fontWeight:task.bold?700:500,color:task.done?'#A0AEC0':'#2D3748',textDecoration:task.done?'line-through':'none',letterSpacing:'-.1px'}}>
+          <span style={{flex:1,fontSize:13.5,lineHeight:1.65,fontWeight:task.bold?700:500,color:task.done?'#A0AEC0':'#1A202C',textDecoration:task.done?'line-through':'none',letterSpacing:'-.2px',wordBreak:'break-all'}}>
             {task.text}
           </span>
         )}
@@ -267,21 +285,22 @@ function TaskItem({task, onToggle, onUpdate, onDelete, readOnly, allTags}){
           </div>
         )}
       </div>
-      <div style={{marginLeft:24,marginTop:3}}>
+      <div style={{marginLeft:readOnly?24:44,marginTop:4}}>
         {editingMemo?(
-          <input autoFocus value={memoVal} onChange={e=>setMemoVal(e.target.value)}
+          <textarea autoFocus value={memoVal} onChange={e=>setMemoVal(e.target.value)}
             onBlur={saveMemo}
-            onKeyDown={e=>{if(e.key==='Enter'){e.preventDefault();saveMemo()}if(e.key==='Escape'){setMemoVal(task.memo||'');setEditingMemo(false)}}}
-            placeholder="비고 입력 (Enter 저장)"
-            style={{width:'100%',fontSize:11.5,border:'1px solid #BEE3F8',borderRadius:5,padding:'2px 8px',outline:'none',background:'#EBF8FF',color:'#2D3748'}}
+            onKeyDown={e=>{if(e.key==='Escape'){setMemoVal(task.memo||'');setEditingMemo(false)}}}
+            placeholder="비고 입력 (Ctrl+Enter 저장)"
+            rows={3}
+            style={{width:'100%',fontSize:12,border:'1px solid #BEE3F8',borderRadius:7,padding:'6px 10px',outline:'none',background:'#EBF8FF',color:'#2D3748',resize:'vertical',lineHeight:1.6}}
           />
         ):task.memo?(
-          <span onClick={()=>{if(!readOnly){setMemoVal(task.memo||'');setEditingMemo(true)}}}
-            style={{fontSize:11.5,color:'#718096',cursor:readOnly?'default':'text',fontStyle:'italic',display:'flex',alignItems:'center',gap:4}}>
-            <i className="ti ti-notes" style={{fontSize:11,color:'#A0AEC0'}}/>{task.memo}
-          </span>
+          <div onClick={()=>{if(!readOnly){setMemoVal(task.memo||'');setEditingMemo(true)}}}
+            style={{fontSize:12,color:'#4A5568',cursor:readOnly?'default':'text',background:'rgba(0,0,0,.03)',borderRadius:6,padding:'5px 9px',lineHeight:1.65,borderLeft:'2px solid #CBD5E0',whiteSpace:'pre-wrap',wordBreak:'break-all'}}>
+            <i className="ti ti-notes" style={{fontSize:11,color:'#A0AEC0',marginRight:5}}/>{task.memo}
+          </div>
         ):(!readOnly&&(
-          <span onClick={()=>setEditingMemo(true)}
+          <span onClick={()=>{setMemoVal('');setEditingMemo(true)}}
             style={{fontSize:11,color:'#CBD5E0',cursor:'pointer',display:'flex',alignItems:'center',gap:3}}>
             <i className="ti ti-plus" style={{fontSize:10}}/> 비고 추가
           </span>
@@ -414,6 +433,106 @@ function QuickMemo(){
         placeholder="자유롭게 메모하세요&#10;(자동 저장)"
         style={{fontSize:12,lineHeight:1.6,resize:'none',background:'#FAFBFF',border:'1px solid #E8ECFF',borderRadius:8,padding:'8px 10px'}}
       />
+    </div>
+  )
+}
+
+/* 중간 위젯 패널 */
+function MidPanel({rows, onToggleTask, onDateClick}){
+  const today=toDate()
+  const todayRow=rows.find(r=>r.date_key===today)
+  const todayTasks=todayRow?.tasks||[]
+  const todayDone=todayTasks.filter(t=>t.done).length
+  const allTasks=rows.filter(r=>r.tasks?.length&&!r.date_key.startsWith('__')).flatMap(r=>r.tasks)
+  const totalDone=allTasks.filter(t=>t.done).length
+  const totalAll=allTasks.length
+  const boldTasks=rows.filter(r=>r.tasks?.length&&!r.date_key.startsWith('__'))
+    .flatMap(r=>r.tasks.map(t=>({...t,dateKey:r.date_key})))
+    .filter(t=>t.bold&&!t.done)
+  const pendingByTag={}
+  allTasks.filter(t=>!t.done).forEach(t=>{pendingByTag[t.tag]=(pendingByTag[t.tag]||0)+1})
+  const topPending=Object.entries(pendingByTag).sort((a,b)=>b[1]-a[1]).slice(0,4)
+
+  return(
+    <div className="mid-panel">
+      <div style={{marginBottom:16}}>
+        <div className="mid-panel-title">
+          <i className="ti ti-bolt" style={{fontSize:13,color:'#F6AD55'}}/>오늘 집중 업무
+          <span style={{marginLeft:'auto',fontSize:10,color:'#A0AEC0',fontWeight:400,textTransform:'none'}}>{todayDone}/{todayTasks.length}</span>
+        </div>
+        {todayTasks.length===0?(
+          <div style={{textAlign:'center',padding:'16px 0',fontSize:11.5,color:'#CBD5E0',fontStyle:'italic'}}>오늘 업무 없음</div>
+        ):(
+          todayTasks.map((task,i)=>(
+            <div key={i} className="focus-item" onClick={()=>onDateClick(today)}>
+              <div className={`focus-check${task.done?' done':''}`}
+                onClick={e=>{e.stopPropagation();onToggleTask(today,i)}}>
+                {task.done&&<i className="ti ti-check" style={{fontSize:9,color:'#fff'}}/>}
+              </div>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontSize:12,color:task.done?'#A0AEC0':'#2D3748',textDecoration:task.done?'line-through':'none',fontWeight:task.bold?700:400,lineHeight:1.4,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{task.text}</div>
+                {(()=>{const c=TAG_COLORS[task.tag]||{bg:'#F1F5F9',c:'#475569'};return <span style={{fontSize:9,padding:'1px 5px',borderRadius:4,background:c.bg,color:c.c,fontWeight:600,marginTop:2,display:'inline-block'}}>{task.tag}</span>})()}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {boldTasks.length>0&&(
+        <div style={{marginBottom:16,borderTop:'1px solid #EDF2F7',paddingTop:14}}>
+          <div className="mid-panel-title"><i className="ti ti-star" style={{fontSize:13,color:'#E53E3E'}}/>놓치면 안 되는 업무</div>
+          {boldTasks.slice(0,5).map((task,i)=>(
+            <div key={i} className="focus-item" onClick={()=>onDateClick(task.dateKey)}>
+              <div style={{width:6,height:6,borderRadius:'50%',background:'#FC8181',flexShrink:0,marginTop:5}}/>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontSize:12,color:'#2D3748',fontWeight:700,lineHeight:1.4,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{task.text}</div>
+                <div style={{fontSize:10,color:'#A0AEC0',marginTop:1}}>{fmtDate(task.dateKey)}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div style={{borderTop:'1px solid #EDF2F7',paddingTop:14,marginBottom:16}}>
+        <div className="mid-panel-title"><i className="ti ti-chart-donut" style={{fontSize:13,color:'#4F63D2'}}/>이번 주 요약</div>
+        <div style={{display:'flex',alignItems:'center',gap:12}}>
+          <div style={{position:'relative',width:64,height:64,flexShrink:0}}>
+            <svg width="64" height="64" viewBox="0 0 64 64">
+              <circle cx="32" cy="32" r="26" fill="none" stroke="#EDF2F7" strokeWidth="8"/>
+              <circle cx="32" cy="32" r="26" fill="none" stroke="#4F63D2" strokeWidth="8"
+                strokeDasharray={`${totalAll?totalDone/totalAll*163:0} 163`}
+                strokeLinecap="round" transform="rotate(-90 32 32)"
+                style={{transition:'stroke-dasharray .5s'}}/>
+            </svg>
+            <div style={{position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,fontWeight:700,color:'#2D3748'}}>
+              {totalAll?Math.round(totalDone/totalAll*100):0}%
+            </div>
+          </div>
+          <div style={{flex:1}}>
+            <div style={{fontSize:12,color:'#718096',marginBottom:4}}>완료 <strong style={{color:'#276749'}}>{totalDone}</strong>건</div>
+            <div style={{fontSize:12,color:'#718096',marginBottom:4}}>미완료 <strong style={{color:'#C53030'}}>{totalAll-totalDone}</strong>건</div>
+            <div style={{fontSize:12,color:'#718096'}}>전체 <strong style={{color:'#2D3748'}}>{totalAll}</strong>건</div>
+          </div>
+        </div>
+      </div>
+
+      {topPending.length>0&&(
+        <div style={{borderTop:'1px solid #EDF2F7',paddingTop:14}}>
+          <div className="mid-panel-title"><i className="ti ti-alert-circle" style={{fontSize:13,color:'#E53E3E'}}/>미완료 TOP</div>
+          {topPending.map(([tag,cnt])=>{
+            const c=TAG_COLORS[tag]||{bg:'#F1F5F9',c:'#475569'}
+            return(
+              <div key={tag} style={{display:'flex',alignItems:'center',gap:8,marginBottom:7,padding:'6px 10px',borderRadius:8,background:'#fff',border:'1px solid #EDF2F7'}}>
+                <span style={{fontSize:10,fontWeight:600,padding:'2px 6px',borderRadius:5,background:c.bg,color:c.c,flexShrink:0}}>{tag}</span>
+                <div style={{flex:1,height:4,borderRadius:99,background:'#EDF2F7',overflow:'hidden'}}>
+                  <div style={{width:`${cnt/topPending[0][1]*100}%`,height:'100%',background:c.c,opacity:.6,borderRadius:99}}/>
+                </div>
+                <span style={{fontSize:11,fontWeight:700,color:'#C53030',flexShrink:0}}>{cnt}</span>
+              </div>
+            )
+          })}
+        </div>
+      )}
     </div>
   )
 }
@@ -599,6 +718,8 @@ function App(){
   const [kptBusy,setKptBusy]=useState(false)
   const [loading,setLoading]=useState(true)
   const [pendingScrollDate,setPendingScrollDate]=useState(null)
+  const [dragState,setDragState]=useState(null)
+  const [dragOver,setDragOver]=useState(null)
   const [toast,setToast]=useState(null)
   const [apiKey,setApiKey]=useState('')
   const [apiInput,setApiInput]=useState('')
@@ -889,14 +1010,15 @@ function App(){
                     const row=getRow(d),isT=d===today
                     const done=(row?.tasks||[]).filter(t=>t.done).length,total=(row?.tasks||[]).length
                     return(
-                      <div key={d} id={'day-'+d} className={`card${isT?' today':''}`}>
-                        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:row?10:0,paddingBottom:row?10:0,borderBottom:row?'1px solid #EDF2F7':'none'}}>
+                      <div key={d} id={'day-'+d} className={`card${isT?' today':''}`}
+                        style={isT?{borderColor:'#4F63D2',boxShadow:'0 0 0 3px rgba(79,99,210,.12)',background:'#FAFBFF'}:{}}>
+                        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:row?12:0,paddingBottom:row?12:0,borderBottom:row?`1px solid ${isT?'#C3DAFE':'#EDF2F7'}`:'none'}}>
                           <div style={{display:'flex',alignItems:'center',gap:8}}>
-                            <span style={{fontSize:13,fontWeight:700,color:isT?'#4F63D2':'#1A202C'}}>{fmtDate(d)}</span>
-                            {isT&&<span style={{fontSize:10,padding:'2px 8px',borderRadius:10,background:'#4F63D2',color:'#fff',fontWeight:600}}>TODAY</span>}
+                            <span style={{fontSize:isT?16:13,fontWeight:700,color:isT?'#3B4FBF':'#1A202C',letterSpacing:isT?'-.3px':'-.1px'}}>{fmtDate(d)}</span>
+                            {isT&&<span style={{fontSize:11,padding:'3px 10px',borderRadius:10,background:'#4F63D2',color:'#fff',fontWeight:700,letterSpacing:'.3px'}}>TODAY</span>}
                           </div>
                           <div style={{display:'flex',alignItems:'center',gap:6}}>
-                            {total>0&&<span style={{fontSize:11,color:'#A0AEC0',fontWeight:500}}>{done}/{total}</span>}
+                            {total>0&&<span style={{fontSize:isT?13:11,color:isT?'#4F63D2':'#A0AEC0',fontWeight:isT?700:500}}>{done}/{total}</span>}
                             {!isReadOnly&&(
                               <button className="btn-outline" style={{padding:'3px 9px',fontSize:11}} onClick={()=>{setSelDate(d);setView('input')}}>
                                 <i className="ti ti-plus" style={{fontSize:11}}/>{row?'추가':'입력'}
@@ -913,19 +1035,36 @@ function App(){
                           <div style={{padding:'0 2px'}}>
                             {row.tasks?.map((t,i)=>(
                               <TaskItem key={i} task={t} readOnly={isReadOnly} allTags={allTags}
+                                isDragging={dragState?.dateKey===d&&dragState?.idx===i}
                                 onToggle={()=>!isReadOnly&&toggleTask(d,i)}
                                 onUpdate={(updated)=>updateTask(d,i,updated)}
                                 onDelete={()=>deleteTask(d,i)}
+                                onDragStart={()=>setDragState({dateKey:d,idx:i})}
+                                onDragOver={()=>setDragOver({dateKey:d,idx:i})}
+                                onDrop={()=>{
+                                  if(!dragState||!dragOver)return
+                                  if(dragState.dateKey===dragOver.dateKey){
+                                    const r=getRow(dragState.dateKey)
+                                    if(!r)return
+                                    const tasks=[...r.tasks]
+                                    const [moved]=tasks.splice(dragState.idx,1)
+                                    tasks.splice(dragOver.idx,0,moved)
+                                    upsert(dragState.dateKey,tasks,r.notes||'')
+                                  }
+                                  setDragState(null);setDragOver(null)
+                                }}
                               />
                             ))}
                             {row.notes&&(
-                              <div style={{margin:'8px 6px 2px',padding:'8px 11px',background:'#F7FAFC',borderRadius:8,fontSize:12,color:'#718096',lineHeight:1.7,borderLeft:'3px solid #E2E8F0'}}>
+                              <div style={{margin:'8px 6px 2px',padding:'8px 11px',background:'#F7FAFC',borderRadius:8,fontSize:12,color:'#4A5568',lineHeight:1.7,borderLeft:'3px solid #E2E8F0',whiteSpace:'pre-wrap'}}>
                                 {row.notes}
                               </div>
                             )}
                           </div>
                         ):(
-                          <div style={{textAlign:'center',padding:'14px',fontSize:12,color:'#CBD5E0',fontStyle:'italic'}}>업무 기록 없음</div>
+                          <div style={{textAlign:'center',padding:isT?'20px':'14px',fontSize:isT?13:12,color:'#CBD5E0',fontStyle:'italic'}}>
+                            {isT?'오늘 업무를 입력해주세요 ✍️':'업무 기록 없음'}
+                          </div>
                         )}
                       </div>
                     )
@@ -961,6 +1100,23 @@ function App(){
               )}
             </div>
           </div>
+
+          {showSidePanel&&(
+            <MidPanel
+              rows={safeRows}
+              onToggleTask={toggleTask}
+              onDateClick={(dateKey)=>{
+                const dWeek=weekStart(new Date(dateKey))
+                if(dWeek!==curWeek){
+                  setCurWeek(dWeek)
+                  setPendingScrollDate(dateKey)
+                  setView('weekly')
+                }else{
+                  scrollToDate(dateKey)
+                }
+              }}
+            />
+          )}
 
           {showSidePanel&&(
             <SidePanel
