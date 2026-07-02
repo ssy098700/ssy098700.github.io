@@ -313,8 +313,8 @@ function TaskItem({task, onToggle, onUpdate, onDelete, allTags, onDragStart, onD
     <div className={`task-wrap ${rowCls}`}
       draggable
       onDragStart={onDragStart}
-      onDragOver={e=>{e.preventDefault();onDragOver&&onDragOver(e)}}
-      onDrop={onDrop}
+      onDragOver={e=>{e.preventDefault();e.stopPropagation();onDragOver&&onDragOver(e)}}
+      onDrop={e=>{e.stopPropagation();onDrop&&onDrop(e)}}
       style={{opacity:isDragging?0.4:1,cursor:'grab'}}>
       <div style={{display:'flex',alignItems:'flex-start',gap:8,flexWrap:'wrap'}}>
         <div style={{color:'var(--text-faint)',fontSize:12,cursor:'grab',paddingTop:3,flexShrink:0}} title="드래그해서 순서 변경">
@@ -969,8 +969,36 @@ function App(){
                     {days.map(d=>{
                       const row=getRow(d),isT=d===today
                       const done=(row?.tasks||[]).filter(t=>t.done).length,total=(row?.tasks||[]).length
+                      const handleDrop=async()=>{
+                        if(!dragState||!dragOver){setDragState(null);setDragOver(null);return}
+                        if(dragState.dateKey===dragOver.dateKey){
+                          const r=getRow(dragState.dateKey)
+                          if(r){
+                            const tasks=[...r.tasks]
+                            const [moved]=tasks.splice(dragState.idx,1)
+                            tasks.splice(Math.min(dragOver.idx,tasks.length),0,moved)
+                            await upsert(dragState.dateKey,tasks,r.notes||'')
+                          }
+                        }else{
+                          const srcRow=getRow(dragState.dateKey)
+                          if(srcRow){
+                            const srcTasks=[...srcRow.tasks]
+                            const [moved]=srcTasks.splice(dragState.idx,1)
+                            await upsert(dragState.dateKey,srcTasks,srcRow.notes||'')
+                            const destRow=getRow(dragOver.dateKey)
+                            const destTasks=destRow?[...destRow.tasks]:[]
+                            destTasks.splice(Math.min(dragOver.idx,destTasks.length),0,moved)
+                            await upsert(dragOver.dateKey,destTasks,destRow?.notes||'',!destRow)
+                            if(!destRow)await load(curWeek)
+                            notify('다른 날짜로 이동했습니다!')
+                          }
+                        }
+                        setDragState(null);setDragOver(null)
+                      }
                       return(
-                        <div key={d} className={`day-col${isT?' today':''}`}>
+                        <div key={d} className={`day-col${isT?' today':''}`}
+                          onDragOver={e=>{e.preventDefault();if(dragState)setDragOver({dateKey:d,idx:(row?.tasks?.length||0)})}}
+                          onDrop={handleDrop}>
                           <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:10,paddingBottom:10,borderBottom:'1px solid var(--border-soft)'}}>
                             <div>
                               <div style={{fontSize:isT?14:13,fontWeight:700,color:isT?'var(--accent)':'var(--text)'}}>{fmtDate(d)}</div>
@@ -994,18 +1022,7 @@ function App(){
                                 onDelete={()=>deleteTask(d,i)}
                                 onDragStart={()=>setDragState({dateKey:d,idx:i})}
                                 onDragOver={()=>setDragOver({dateKey:d,idx:i})}
-                                onDrop={()=>{
-                                  if(!dragState||!dragOver)return
-                                  if(dragState.dateKey===dragOver.dateKey){
-                                    const r=getRow(dragState.dateKey)
-                                    if(!r)return
-                                    const tasks=[...r.tasks]
-                                    const [moved]=tasks.splice(dragState.idx,1)
-                                    tasks.splice(dragOver.idx,0,moved)
-                                    upsert(dragState.dateKey,tasks,r.notes||'')
-                                  }
-                                  setDragState(null);setDragOver(null)
-                                }}
+                                onDrop={handleDrop}
                               />
                             ))}
                             {row?.notes&&(
