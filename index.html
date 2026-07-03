@@ -146,15 +146,15 @@ const DAYS_KO = ['일','월','화','수','목','금','토']
 const WEEKDAY_KEYS = ['sun','mon','tue','wed','thu','fri','sat']
 const ROUTINE_DEFAULT = {
   daily: [
-    {text:'쇼피 필리핀 CS 처리'},
-    {text:'일본 송장 출력 및 운송장 전달'},
-    {text:'SNS 컨텐츠 업로드 확인 및 다운로드'},
+    {text:'쇼피 필리핀 CS 처리',tag:'CS'},
+    {text:'일본 송장 출력 및 운송장 전달',tag:'물류'},
+    {text:'SNS 컨텐츠 업로드 확인 및 다운로드',tag:'마케팅'},
   ],
   monToWed: [
-    {text:'인플루언서 시딩'},
+    {text:'인플루언서 시딩',tag:'시딩'},
   ],
   thuFri: [
-    {text:'인플루언서 제품 협찬 출고 (전과정)'},
+    {text:'인플루언서 제품 협찬 출고 (전과정)',tag:'시딩'},
   ],
 }
 function toDate(d=new Date()){
@@ -669,7 +669,7 @@ function SidePanel({rows, onToggleTask, onDateClick}){
   )
 }
 /* 매일 반복되는 고정 업무 — 오늘 것만, 그룹 라벨로 한눈에. 요일이 바뀌면 자동으로 새로고침되고 체크는 그날 하루만 유지됨(기록 남기지 않음) */
-function RoutineTab(){
+function RoutineTab({onSync}){
   const [now,setNow]=useState(new Date())
   useEffect(()=>{
     const t=setInterval(()=>setNow(new Date()),30000)
@@ -693,6 +693,8 @@ function RoutineTab(){
     const updated={...checked,[i]:!checked[i]}
     setChecked(updated)
     localStorage.setItem('d2c:routineCheck:'+dateStr,JSON.stringify(updated))
+    const item=tasks[i]
+    if(item&&onSync)onSync(item.text,item.tag||'기타',updated[i])
   }
   function saveTemplate(next){
     setTemplate(next)
@@ -703,7 +705,7 @@ function RoutineTab(){
     saveTemplate(next)
   }
   function addGroupItem(group){
-    const next={...template,[group]:[...(template[group]||[]),{text:''}]}
+    const next={...template,[group]:[...(template[group]||[]),{text:'',tag:'기타'}]}
     saveTemplate(next)
   }
   function removeGroupItem(group,idx){
@@ -849,6 +851,26 @@ function App(){
     await load(curWeek)
     notify('삭제됐습니다.')
   }
+  async function syncRoutineTask(text,tag,checked){
+    const wk=weekStart()
+    const today=toDate()
+    let row
+    try{
+      const data=await dbLoad(wk)
+      row=data.find(r=>r.date_key===today)
+    }catch(e){row=null}
+    let tasks=row?[...row.tasks]:[]
+    if(checked){
+      if(!tasks.some(t=>t.fromRoutine&&t.text===text)){
+        tasks.push({text,tag,done:false,fromRoutine:true})
+      }
+    }else{
+      tasks=tasks.filter(t=>!(t.fromRoutine&&t.text===text))
+    }
+    await dbSave({week_key:wk,date_key:today,tasks,notes:row?.notes||'',updated_at:new Date().toISOString()})
+    if(wk===curWeek)await load(curWeek)
+    notify(checked?'업무일지에 추가했어요!':'업무일지에서 제거했어요.')
+  }
   async function sendToNotion(dateKey,tasks){
     if(!notionWebhook)return
     try{
@@ -908,7 +930,7 @@ function App(){
             <div className="content" style={view==='weekly'?{maxWidth:'100%'}:{}}>
               {loading&&<div className="loading"><i className="ti ti-loader"/>불러오는 중...</div>}
               {!loading&&view==='routine'&&(
-                <RoutineTab/>
+                <RoutineTab onSync={syncRoutineTask}/>
               )}
               {!loading&&view==='dashboard'&&(
                 <div>
