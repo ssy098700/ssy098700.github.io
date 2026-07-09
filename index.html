@@ -9,6 +9,7 @@
 <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
 <script src="https://unpkg.com/@babel/standalone@7.23.0/babel.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <style>
 :root{
@@ -115,6 +116,26 @@ input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);b
 .routine-check.done{background:var(--success);border-color:var(--success)}
 .routine-group-label{font-size:11px;font-weight:700;color:var(--text-faint);text-transform:uppercase;letter-spacing:.5px;margin:16px 4px 8px}
 .routine-group-label:first-child{margin-top:2px}
+/* 주간 리포트 탭 */
+.report-tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.report-tab{padding:9px 15px;border-radius:11px;border:1.5px solid var(--border);background:var(--bg-elev);color:var(--text-dim);font-size:12.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .15s}
+.report-tab:hover{background:var(--bg-elev-2)}
+.report-tab.active{font-weight:700;box-shadow:var(--shadow)}
+.report-meta-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px}
+.report-summary-box{background:var(--bg-elev-2);border-left:3px solid var(--accent);border-radius:10px;padding:14px 16px;margin-bottom:14px}
+.report-content{font-size:13px;line-height:1.9;color:var(--text-dim)}
+.report-content h1,.report-content h2,.report-content h3{color:var(--text);margin:16px 0 8px;font-weight:700;letter-spacing:-.2px}
+.report-content h1:first-child,.report-content h2:first-child,.report-content h3:first-child{margin-top:0}
+.report-content h1{font-size:16px}
+.report-content h2{font-size:14.5px}
+.report-content h3{font-size:13.5px}
+.report-content p{margin-bottom:10px}
+.report-content ul,.report-content ol{margin:0 0 12px 20px}
+.report-content li{margin-bottom:5px}
+.report-content strong{color:var(--text);font-weight:700}
+.report-content code{background:var(--bg-elev-2);padding:1px 5px;border-radius:4px;font-size:12px}
+.report-content hr{border:none;border-top:1px solid var(--border-soft);margin:16px 0}
+.report-content blockquote{border-left:3px solid var(--border);padding-left:12px;color:var(--text-faint);margin:10px 0}
 </style>
 </head>
 <body>
@@ -211,6 +232,30 @@ async function dbSave(row){
 async function dbRemove(weekKey,dateKey){
   await fetch(`${SB_URL}/rest/v1/worklog?week_key=eq.${weekKey}&date_key=eq.${dateKey}`,{
     method:'DELETE',headers:{'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`}
+  })
+}
+const REPORT_META = {
+  promo_calendar: {label:'프로모션 캘린더', icon:'ti-calendar-event', c:'#35608C'},
+  cs_summary: {label:'리뷰/CS 요약', icon:'ti-message-circle', c:'#A83E71'},
+  competitor_monitoring: {label:'경쟁사 모니터링', icon:'ti-telescope', c:'#7C3FA8'},
+}
+async function loadWeeklyReports(){
+  const r=await fetch(`${SB_URL}/rest/v1/d2c_weekly_reports?select=*&order=week_start.desc`,{
+    headers:{'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`}
+  })
+  const data=await r.json()
+  return Array.isArray(data)?data:[]
+}
+async function dbDeleteReport(id){
+  await fetch(`${SB_URL}/rest/v1/d2c_weekly_reports?id=eq.${id}`,{
+    method:'DELETE',headers:{'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`}
+  })
+}
+async function dbSaveReportNotes(id,notes){
+  await fetch(`${SB_URL}/rest/v1/d2c_weekly_reports?id=eq.${id}`,{
+    method:'PATCH',
+    headers:{'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`,'Content-Type':'application/json','Prefer':'return=minimal'},
+    body:JSON.stringify({my_notes:notes})
   })
 }
 function Tag({t, onChangeTag, allTags}){
@@ -782,6 +827,142 @@ function RoutineTab({onSync}){
     </div>
   )
 }
+function WeeklyReports(){
+  const [reportsByType,setReportsByType]=useState({})
+  const [loading,setLoading]=useState(true)
+  const [activeType,setActiveType]=useState('promo_calendar')
+  const [weekIdx,setWeekIdx]=useState({})
+  const [notesDraft,setNotesDraft]=useState({})
+  const [savedFlag,setSavedFlag]=useState({})
+  const [confirmDeleteId,setConfirmDeleteId]=useState(null)
+  const notesTimer=useRef({})
+  const refresh=useCallback(async()=>{
+    setLoading(true)
+    try{
+      const data=await loadWeeklyReports()
+      const grouped={}
+      for(const row of data){
+        if(!grouped[row.report_type])grouped[row.report_type]=[]
+        grouped[row.report_type].push(row)
+      }
+      setReportsByType(grouped)
+    }catch(e){console.log('weekly reports load error',e)}
+    finally{setLoading(false)}
+  },[])
+  useEffect(()=>{ refresh() },[refresh])
+  function selectWeek(type,i){
+    setWeekIdx(prev=>({...prev,[type]:i}))
+  }
+  function handleNotesChange(id,val){
+    setNotesDraft(prev=>({...prev,[id]:val}))
+    clearTimeout(notesTimer.current[id])
+    notesTimer.current[id]=setTimeout(async()=>{
+      await dbSaveReportNotes(id,val)
+      setSavedFlag(prev=>({...prev,[id]:true}))
+      setTimeout(()=>setSavedFlag(prev=>({...prev,[id]:false})),1500)
+    },800)
+  }
+  async function handleDelete(id,type){
+    await dbDeleteReport(id)
+    setConfirmDeleteId(null)
+    setWeekIdx(prev=>({...prev,[type]:0}))
+    await refresh()
+  }
+  if(loading)return <div className="loading"><i className="ti ti-loader"/>불러오는 중...</div>
+  const list=reportsByType[activeType]||[]
+  const idx=Math.min(weekIdx[activeType]||0,Math.max(list.length-1,0))
+  const r=list[idx]
+  const meta=REPORT_META[activeType]
+  const renderedHtml=r&&r.content&&window.marked?window.marked.parse(r.content):(r?.content||'')
+  return(
+    <div>
+      <div className="report-tabs">
+        {Object.entries(REPORT_META).map(([type,m])=>{
+          const active=activeType===type
+          const has=(reportsByType[type]||[]).length>0
+          return(
+            <button key={type} className={`report-tab${active?' active':''}`}
+              style={active?{borderColor:m.c,color:m.c,background:m.c+'14'}:{}}
+              onClick={()=>setActiveType(type)}>
+              <i className={`ti ${m.icon}`}/>{m.label}
+              {!has&&<span style={{width:5,height:5,borderRadius:'50%',background:'var(--text-faint)',display:'inline-block',marginLeft:2}}/>}
+            </button>
+          )
+        })}
+      </div>
+      {!list.length?(
+        <div className="card" style={{textAlign:'center',padding:'44px 0',color:'var(--text-faint)'}}>
+          <i className="ti ti-inbox" style={{fontSize:26,display:'block',marginBottom:8}}/>
+          아직 저장된 리포트가 없습니다
+        </div>
+      ):(
+        <div>
+          {list.length>1&&(
+            <div style={{display:'flex',gap:6,marginBottom:12,flexWrap:'wrap'}}>
+              {list.map((row,i)=>(
+                <button key={row.id} className="btn-outline"
+                  style={i===idx?{background:'var(--accent-soft)',borderColor:'var(--accent)',color:'var(--accent)'}:{}}
+                  onClick={()=>selectWeek(activeType,i)}>
+                  {row.week_start} ~ {row.week_end}
+                </button>
+              ))}
+            </div>
+          )}
+          <div className="card" style={{marginBottom:14}}>
+            <div className="report-meta-row">
+              <div style={{display:'flex',alignItems:'center',gap:8}}>
+                <i className={`ti ${meta.icon}`} style={{fontSize:18,color:meta.c}}/>
+                <span style={{fontSize:15,fontWeight:700,color:'var(--text)'}}>{meta.label}</span>
+              </div>
+              <div style={{display:'flex',alignItems:'center',gap:10}}>
+                <span style={{fontSize:11,color:'var(--text-faint)'}}>{r.week_start} ~ {r.week_end}</span>
+                {confirmDeleteId===r.id?(
+                  <span style={{display:'flex',gap:4}}>
+                    <button onClick={()=>handleDelete(r.id,activeType)}
+                      style={{border:'none',background:'var(--danger)',color:'#fff',fontSize:11,fontWeight:700,padding:'4px 10px',borderRadius:7,cursor:'pointer'}}>
+                      삭제 확정
+                    </button>
+                    <button onClick={()=>setConfirmDeleteId(null)}
+                      style={{border:'none',background:'var(--bg-elev-2)',color:'var(--text-dim)',fontSize:11,padding:'4px 10px',borderRadius:7,cursor:'pointer'}}>
+                      취소
+                    </button>
+                  </span>
+                ):(
+                  <button onClick={()=>setConfirmDeleteId(r.id)} title="이 리포트 삭제"
+                    style={{border:'none',background:'transparent',color:'var(--text-faint)',cursor:'pointer',padding:'2px 4px',fontSize:14}}>
+                    <i className="ti ti-trash"/>
+                  </button>
+                )}
+              </div>
+            </div>
+            <div style={{fontSize:13,fontWeight:600,color:'var(--text-dim)',marginTop:8}}>{r.title}</div>
+          </div>
+          {r.summary&&(
+            <div className="report-summary-box" style={{borderLeftColor:meta.c}}>
+              <div style={{fontSize:11,fontWeight:700,color:meta.c,marginBottom:6,display:'flex',alignItems:'center',gap:5,textTransform:'uppercase',letterSpacing:'.3px'}}>
+                <i className="ti ti-sparkles"/>핵심 요약
+              </div>
+              <div style={{fontSize:13,color:'var(--text)',lineHeight:1.8,whiteSpace:'pre-wrap'}}>{r.summary}</div>
+            </div>
+          )}
+          <div className="card report-content" dangerouslySetInnerHTML={{__html:renderedHtml}}/>
+          <div className="card" style={{marginTop:14}}>
+            <div style={{fontSize:11,fontWeight:700,color:'var(--text-dim)',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:8,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+              <span style={{display:'flex',alignItems:'center',gap:5}}><i className="ti ti-notes" style={{fontSize:13}}/>내 메모 (액션 아이템 / 중요 포인트)</span>
+              {savedFlag[r.id]&&<span style={{fontSize:10,color:'var(--success)',fontWeight:500}}>저장됨 ✓</span>}
+            </div>
+            <textarea rows={5}
+              value={notesDraft[r.id]!==undefined?notesDraft[r.id]:(r.my_notes||'')}
+              onChange={e=>handleNotesChange(r.id,e.target.value)}
+              placeholder="이 리포트를 보고 취할 액션, 중요 포인트를 자유롭게 적어두세요 (자동 저장)"
+              style={{fontSize:12.5,lineHeight:1.7}}
+            />
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
 function App(){
   const [view,setView]=useState('weekly')
   const [rows,setRows]=useState([])
@@ -901,6 +1082,7 @@ function App(){
     {id:'routine',icon:'ti-list-check',lbl:'루틴'},
     {id:'input',icon:'ti-edit',lbl:'입력'},
     {id:'weekly',icon:'ti-calendar',lbl:'주간'},
+    {id:'reports',icon:'ti-report-analytics',lbl:'리포트'},
   ]
   const showSidePanel=(view==='weekly'||view==='dashboard')
   return(
@@ -1066,6 +1248,9 @@ function App(){
                     })}
                   </div>
                 </div>
+              )}
+              {!loading&&view==='reports'&&(
+                <WeeklyReports/>
               )}
             </div>
           </div>
