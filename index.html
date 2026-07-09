@@ -136,6 +136,26 @@ input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);b
 .report-content code{background:var(--bg-elev-2);padding:1px 5px;border-radius:4px;font-size:12px}
 .report-content hr{border:none;border-top:1px solid var(--border-soft);margin:16px 0}
 .report-content blockquote{border-left:3px solid var(--border);padding-left:12px;color:var(--text-faint);margin:10px 0}
+/* 리포트 2단 레이아웃 */
+.report-layout{display:grid;grid-template-columns:1fr 380px;gap:18px;align-items:start}
+.report-scroll{max-height:calc(100vh - 300px);min-height:300px;overflow-y:auto;padding-right:6px}
+.report-scroll::-webkit-scrollbar{width:8px}
+.report-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:8px}
+.report-scroll::-webkit-scrollbar-track{background:transparent}
+.report-nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;position:sticky;top:0;background:var(--bg);padding:6px 0 10px;z-index:5}
+.report-nav-pill{border:1px solid var(--border);background:var(--bg-elev);border-radius:20px;padding:6px 12px;font-size:11.5px;font-weight:600;color:var(--text-dim);cursor:pointer;white-space:nowrap;transition:all .15s}
+.report-nav-pill:hover{background:var(--bg-elev-2);border-color:var(--text-faint)}
+.sticky-panel{position:sticky;top:8px}
+.sticky-board{position:relative;min-height:560px;border:1.5px dashed var(--border);border-radius:16px;background:
+  repeating-linear-gradient(0deg, transparent, transparent 27px, var(--border-soft) 27px, var(--border-soft) 28px),
+  var(--bg-elev);overflow:hidden}
+.sticky-note{position:absolute;width:190px;border-radius:9px;box-shadow:0 6px 18px rgba(43,42,37,.15);transition:box-shadow .15s}
+.sticky-note:hover{box-shadow:0 8px 24px rgba(43,42,37,.2)}
+.sticky-note-head{cursor:grab;padding:6px 8px;display:flex;align-items:center;justify-content:space-between;border-top-left-radius:9px;border-top-right-radius:9px}
+.sticky-note-head:active{cursor:grabbing}
+.sticky-dot{width:11px;height:11px;border-radius:50%;cursor:pointer}
+.sticky-note textarea{width:100%;border:none;background:transparent;resize:vertical;outline:none;padding:8px 9px;font-family:'Noto Sans KR',sans-serif}
+@media (max-width:980px){.report-layout{grid-template-columns:1fr}.sticky-panel{position:static}}
 </style>
 </head>
 <body>
@@ -235,9 +255,9 @@ async function dbRemove(weekKey,dateKey){
   })
 }
 const REPORT_META = {
-  promo_calendar: {label:'프로모션 캘린더', icon:'ti-calendar-event', c:'#35608C'},
-  cs_summary: {label:'리뷰/CS 요약', icon:'ti-message-circle', c:'#A83E71'},
-  competitor_monitoring: {label:'경쟁사 모니터링', icon:'ti-telescope', c:'#7C3FA8'},
+  promo_calendar: {label:'🗓️ 프로모션 캘린더', icon:'ti-calendar-event', c:'#35608C'},
+  cs_summary: {label:'💬 리뷰 · CS 요약', icon:'ti-message-circle', c:'#A83E71'},
+  competitor_monitoring: {label:'🔍 경쟁사 모니터링', icon:'ti-telescope', c:'#7C3FA8'},
 }
 async function loadWeeklyReports(){
   const r=await fetch(`${SB_URL}/rest/v1/d2c_weekly_reports?select=*&order=week_start.desc`,{
@@ -257,6 +277,52 @@ async function dbSaveReportNotes(id,notes){
     headers:{'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`,'Content-Type':'application/json','Prefer':'return=minimal'},
     body:JSON.stringify({my_notes:notes})
   })
+}
+function splitReportSections(md){
+  if(!md)return []
+  const lines=md.split('\n')
+  const sections=[]
+  let current=null
+  for(const line of lines){
+    const h=line.match(/^(#{1,3})\s+(.*)/)
+    if(h){
+      if(current)sections.push(current)
+      current={title:h[2].replace(/[*_`]/g,'').trim(),lines:[line]}
+    }else{
+      if(!current)current={title:'',lines:[]}
+      current.lines.push(line)
+    }
+  }
+  if(current)sections.push(current)
+  return sections.filter(s=>s.lines.join('\n').trim().length>0)
+}
+function sectionEmoji(title){
+  const t=title||''
+  if(/일정|스케줄|calendar/i.test(t))return '📅'
+  if(/체크리스트|checklist/i.test(t))return '✅'
+  if(/기획|플랜|plan/i.test(t))return '💡'
+  if(/요약|summary/i.test(t))return '✨'
+  if(/타임라인|timeline/i.test(t))return '⏱️'
+  if(/목표|지표|kpi/i.test(t))return '🎯'
+  if(/리뷰|review|cs/i.test(t))return '💬'
+  if(/경쟁사|competitor/i.test(t))return '🔍'
+  if(/광고|ads|퍼포먼스/i.test(t))return '📢'
+  return '📌'
+}
+const STICKY_COLORS={
+  yellow:{bg:'#FBF3D9',border:'#D9A93E'},
+  red:{bg:'#FBEAE6',border:'#D9705C'},
+  green:{bg:'#E7F5EA',border:'#5FA97D'},
+  blue:{bg:'#E6EFFB',border:'#6C97CC'},
+  purple:{bg:'#F1E9FB',border:'#9C74C4'},
+}
+function parseNotes(raw){
+  if(!raw)return []
+  try{
+    const parsed=JSON.parse(raw)
+    if(Array.isArray(parsed))return parsed
+  }catch(e){}
+  return [{id:'legacy',text:raw,x:16,y:16,color:'yellow',bold:false}]
 }
 function Tag({t, onChangeTag, allTags}){
   const [open,setOpen]=useState(false)
@@ -827,15 +893,101 @@ function RoutineTab({onSync}){
     </div>
   )
 }
+function StickyNote({note, onChange, onDelete}){
+  function onDragStart(e){
+    e.preventDefault()
+    const startX=e.clientX,startY=e.clientY
+    const origX=note.x,origY=note.y
+    function onMove(ev){
+      onChange({...note,x:Math.max(0,origX+(ev.clientX-startX)),y:Math.max(0,origY+(ev.clientY-startY))})
+    }
+    function onUp(){
+      window.removeEventListener('mousemove',onMove)
+      window.removeEventListener('mouseup',onUp)
+    }
+    window.addEventListener('mousemove',onMove)
+    window.addEventListener('mouseup',onUp)
+  }
+  const c=STICKY_COLORS[note.color]||STICKY_COLORS.yellow
+  return(
+    <div className="sticky-note" style={{left:note.x,top:note.y,background:c.bg,border:`1px solid ${c.border}`}}>
+      <div className="sticky-note-head" onMouseDown={onDragStart} style={{background:c.border+'33'}}>
+        <div style={{display:'flex',gap:4}}>
+          {Object.entries(STICKY_COLORS).map(([k,cc])=>(
+            <div key={k} className="sticky-dot" onClick={()=>onChange({...note,color:k})}
+              style={{background:cc.border,border:note.color===k?'2px solid var(--text)':'2px solid transparent'}}/>
+          ))}
+        </div>
+        <div style={{display:'flex',gap:3,alignItems:'center'}}>
+          <button onClick={()=>onChange({...note,bold:!note.bold})} title="굵게"
+            style={{border:'none',background:note.bold?'rgba(0,0,0,.15)':'transparent',cursor:'pointer',fontSize:10,fontWeight:800,padding:'1px 6px',borderRadius:4,color:'var(--text)'}}>
+            B
+          </button>
+          <button onClick={onDelete} title="메모 삭제"
+            style={{border:'none',background:'transparent',cursor:'pointer',color:'var(--danger)',fontSize:13,padding:'1px 3px',lineHeight:1}}>
+            <i className="ti ti-x"/>
+          </button>
+        </div>
+      </div>
+      <textarea value={note.text} onChange={e=>onChange({...note,text:e.target.value})}
+        placeholder="메모 입력..." rows={4}
+        style={{fontSize:12.5,fontWeight:note.bold?700:400,color:'var(--text)'}}
+      />
+    </div>
+  )
+}
+function StickyBoard({reportId, initialRaw}){
+  const [notes,setNotes]=useState(()=>parseNotes(initialRaw))
+  const [saved,setSaved]=useState(false)
+  const timer=useRef(null)
+  useEffect(()=>{ setNotes(parseNotes(initialRaw)) },[reportId])
+  function persist(next){
+    setNotes(next)
+    clearTimeout(timer.current)
+    timer.current=setTimeout(async()=>{
+      await dbSaveReportNotes(reportId,JSON.stringify(next))
+      setSaved(true); setTimeout(()=>setSaved(false),1200)
+    },700)
+  }
+  function addNote(){
+    const palette=['yellow','blue','green','purple','red']
+    const n={id:'n_'+Date.now(),text:'',x:14+((notes.length*24)%160),y:14+((notes.length*24)%160),color:palette[notes.length%palette.length],bold:false}
+    persist([...notes,n])
+  }
+  return(
+    <div className="sticky-panel">
+      <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:8}}>
+        <div style={{fontSize:11,fontWeight:700,color:'var(--text-dim)',textTransform:'uppercase',letterSpacing:'.5px',display:'flex',alignItems:'center',gap:5}}>
+          📝 메모 보드
+        </div>
+        <div style={{display:'flex',alignItems:'center',gap:8}}>
+          {saved&&<span style={{fontSize:10,color:'var(--success)',fontWeight:500}}>저장됨 ✓</span>}
+          <button className="btn-outline" onClick={addNote}><i className="ti ti-plus" style={{fontSize:11}}/>메모 추가</button>
+        </div>
+      </div>
+      <div className="sticky-board">
+        {notes.length===0&&(
+          <div style={{position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center',color:'var(--text-faint)',fontSize:12,flexDirection:'column',gap:6,textAlign:'center',padding:20}}>
+            <span style={{fontSize:22}}>🗒️</span>
+            액션 아이템, 중요 포인트를<br/>메모로 자유롭게 붙여보세요
+          </div>
+        )}
+        {notes.map(n=>(
+          <StickyNote key={n.id} note={n}
+            onChange={u=>persist(notes.map(x=>x.id===n.id?u:x))}
+            onDelete={()=>persist(notes.filter(x=>x.id!==n.id))}
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
 function WeeklyReports(){
   const [reportsByType,setReportsByType]=useState({})
   const [loading,setLoading]=useState(true)
   const [activeType,setActiveType]=useState('promo_calendar')
   const [weekIdx,setWeekIdx]=useState({})
-  const [notesDraft,setNotesDraft]=useState({})
-  const [savedFlag,setSavedFlag]=useState({})
   const [confirmDeleteId,setConfirmDeleteId]=useState(null)
-  const notesTimer=useRef({})
   const refresh=useCallback(async()=>{
     setLoading(true)
     try{
@@ -853,15 +1005,6 @@ function WeeklyReports(){
   function selectWeek(type,i){
     setWeekIdx(prev=>({...prev,[type]:i}))
   }
-  function handleNotesChange(id,val){
-    setNotesDraft(prev=>({...prev,[id]:val}))
-    clearTimeout(notesTimer.current[id])
-    notesTimer.current[id]=setTimeout(async()=>{
-      await dbSaveReportNotes(id,val)
-      setSavedFlag(prev=>({...prev,[id]:true}))
-      setTimeout(()=>setSavedFlag(prev=>({...prev,[id]:false})),1500)
-    },800)
-  }
   async function handleDelete(id,type){
     await dbDeleteReport(id)
     setConfirmDeleteId(null)
@@ -873,7 +1016,7 @@ function WeeklyReports(){
   const idx=Math.min(weekIdx[activeType]||0,Math.max(list.length-1,0))
   const r=list[idx]
   const meta=REPORT_META[activeType]
-  const renderedHtml=r&&r.content&&window.marked?window.marked.parse(r.content):(r?.content||'')
+  const sections=r?splitReportSections(r.content):[]
   return(
     <div>
       <div className="report-tabs">
@@ -884,7 +1027,7 @@ function WeeklyReports(){
             <button key={type} className={`report-tab${active?' active':''}`}
               style={active?{borderColor:m.c,color:m.c,background:m.c+'14'}:{}}
               onClick={()=>setActiveType(type)}>
-              <i className={`ti ${m.icon}`}/>{m.label}
+              {m.label}
               {!has&&<span style={{width:5,height:5,borderRadius:'50%',background:'var(--text-faint)',display:'inline-block',marginLeft:2}}/>}
             </button>
           )
@@ -892,7 +1035,7 @@ function WeeklyReports(){
       </div>
       {!list.length?(
         <div className="card" style={{textAlign:'center',padding:'44px 0',color:'var(--text-faint)'}}>
-          <i className="ti ti-inbox" style={{fontSize:26,display:'block',marginBottom:8}}/>
+          <span style={{fontSize:26,display:'block',marginBottom:8}}>📭</span>
           아직 저장된 리포트가 없습니다
         </div>
       ):(
@@ -903,7 +1046,7 @@ function WeeklyReports(){
                 <button key={row.id} className="btn-outline"
                   style={i===idx?{background:'var(--accent-soft)',borderColor:'var(--accent)',color:'var(--accent)'}:{}}
                   onClick={()=>selectWeek(activeType,i)}>
-                  {row.week_start} ~ {row.week_end}
+                  🗓️ {row.week_start} ~ {row.week_end}
                 </button>
               ))}
             </div>
@@ -940,23 +1083,31 @@ function WeeklyReports(){
           {r.summary&&(
             <div className="report-summary-box" style={{borderLeftColor:meta.c}}>
               <div style={{fontSize:11,fontWeight:700,color:meta.c,marginBottom:6,display:'flex',alignItems:'center',gap:5,textTransform:'uppercase',letterSpacing:'.3px'}}>
-                <i className="ti ti-sparkles"/>핵심 요약
+                ✨ 핵심 요약
               </div>
               <div style={{fontSize:13,color:'var(--text)',lineHeight:1.8,whiteSpace:'pre-wrap'}}>{r.summary}</div>
             </div>
           )}
-          <div className="card report-content" dangerouslySetInnerHTML={{__html:renderedHtml}}/>
-          <div className="card" style={{marginTop:14}}>
-            <div style={{fontSize:11,fontWeight:700,color:'var(--text-dim)',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:8,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-              <span style={{display:'flex',alignItems:'center',gap:5}}><i className="ti ti-notes" style={{fontSize:13}}/>내 메모 (액션 아이템 / 중요 포인트)</span>
-              {savedFlag[r.id]&&<span style={{fontSize:10,color:'var(--success)',fontWeight:500}}>저장됨 ✓</span>}
+          <div className="report-layout">
+            <div>
+              {sections.length>1&&(
+                <div className="report-nav">
+                  {sections.map((s,i)=>(
+                    <span key={i} className="report-nav-pill"
+                      onClick={()=>document.getElementById(`sec-${activeType}-${idx}-${i}`)?.scrollIntoView({behavior:'smooth',block:'start'})}>
+                      {sectionEmoji(s.title)} {s.title||`섹션 ${i+1}`}
+                    </span>
+                  ))}
+                </div>
+              )}
+              <div className="report-scroll">
+                {sections.map((s,i)=>(
+                  <div key={i} id={`sec-${activeType}-${idx}-${i}`} className="card report-content" style={{marginBottom:12}}
+                    dangerouslySetInnerHTML={{__html: window.marked?window.marked.parse(s.lines.join('\n')):s.lines.join('\n')}}/>
+                ))}
+              </div>
             </div>
-            <textarea rows={5}
-              value={notesDraft[r.id]!==undefined?notesDraft[r.id]:(r.my_notes||'')}
-              onChange={e=>handleNotesChange(r.id,e.target.value)}
-              placeholder="이 리포트를 보고 취할 액션, 중요 포인트를 자유롭게 적어두세요 (자동 저장)"
-              style={{fontSize:12.5,lineHeight:1.7}}
-            />
+            <StickyBoard key={r.id} reportId={r.id} initialRaw={r.my_notes}/>
           </div>
         </div>
       )}
@@ -1109,7 +1260,7 @@ function App(){
         </div>
         <div className="body-wrap">
           <div className="content-area" ref={contentRef}>
-            <div className="content" style={view==='weekly'?{maxWidth:'100%'}:{}}>
+            <div className="content" style={(view==='weekly'||view==='reports')?{maxWidth:'100%'}:{}}>
               {loading&&<div className="loading"><i className="ti ti-loader"/>불러오는 중...</div>}
               {!loading&&view==='routine'&&(
                 <RoutineTab onSync={syncRoutineTask}/>
