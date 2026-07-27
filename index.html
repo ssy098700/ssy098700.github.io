@@ -43,6 +43,7 @@
   --nav-weekly:#7FB4E8;
   --nav-digest:#F0A0C4;
   --nav-reports:#F0C36B;
+  --nav-shopdora:#F29E5A;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Pretendard',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);height:100vh;overflow:hidden;color:var(--text);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
@@ -1178,6 +1179,69 @@ function DailyDigest({allRows, digestDate, setDigestDate, onSaveExtra, onToggleT
     </div>
   )
 }
+/* 샵도라 매장분석 바로가기 + 지시사항 + 메모 */
+const SHOPDORA_URL='https://www.shopdora.com/my/monitor/shop'
+function ShopdoraTab(){
+  const [instruction,setInstruction]=useState(()=>{try{return localStorage.getItem('d2c:shopdoraInstruction')||''}catch(e){return ''}})
+  const [memo,setMemo]=useState(()=>{try{return localStorage.getItem('d2c:shopdoraMemo')||''}catch(e){return ''}})
+  const [savedI,setSavedI]=useState(false)
+  const [savedM,setSavedM]=useState(false)
+  const tI=useRef(),tM=useRef()
+  function onInstruction(e){
+    setInstruction(e.target.value)
+    clearTimeout(tI.current)
+    tI.current=setTimeout(()=>{localStorage.setItem('d2c:shopdoraInstruction',e.target.value);setSavedI(true);setTimeout(()=>setSavedI(false),1200)},600)
+  }
+  function onMemo(e){
+    setMemo(e.target.value)
+    clearTimeout(tM.current)
+    tM.current=setTimeout(()=>{localStorage.setItem('d2c:shopdoraMemo',e.target.value);setSavedM(true);setTimeout(()=>setSavedM(false),1200)},600)
+  }
+  async function copyInstruction(){
+    try{ await navigator.clipboard.writeText(instruction) }catch(e){}
+  }
+  return(
+    <div>
+      <div className="card" style={{display:'flex',alignItems:'center',justifyContent:'space-between',flexWrap:'wrap',gap:10}}>
+        <div>
+          <div style={{fontSize:16,fontWeight:700,color:'var(--text)',display:'flex',alignItems:'center',gap:7}}>🛍️ 샵도라 매장분석</div>
+          <div style={{fontSize:12.5,color:'var(--text-faint)',marginTop:3}}>쇼피 필리핀 매장 분석 중심 · 잊지 않게 여기서 바로 이동</div>
+        </div>
+        <a href={SHOPDORA_URL} target="_blank" rel="noopener noreferrer" className="btn-primary" style={{textDecoration:'none'}}>
+          <i className="ti ti-external-link" style={{fontSize:14}}/>샵도라 매장분석 열기
+        </a>
+      </div>
+      <div className="card">
+        <div style={{fontSize:12,fontWeight:700,color:'var(--text-dim)',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:2}}>🗒️ 참고 링크</div>
+        <div style={{fontSize:12.5,color:'var(--text-faint)',marginBottom:8}}>클릭하면 새 탭에서 열립니다</div>
+        <div style={{fontSize:13,color:'var(--text-dim)',wordBreak:'break-all',background:'var(--bg-elev-2)',borderRadius:8,padding:'8px 11px'}}>
+          <a href={SHOPDORA_URL} target="_blank" rel="noopener noreferrer" style={{color:'var(--text)'}}>{SHOPDORA_URL}</a>
+        </div>
+      </div>
+      <div className="card">
+        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:8}}>
+          <span style={{fontSize:12,fontWeight:700,color:'var(--text-dim)',textTransform:'uppercase',letterSpacing:'.5px'}}>💬 Claude에게 전달할 지시사항</span>
+          <div style={{display:'flex',alignItems:'center',gap:8}}>
+            {savedI&&<span style={{fontSize:11,color:'var(--text)',fontWeight:600}}>저장됨 ✓</span>}
+            <button className="btn-outline" onClick={copyInstruction}><i className="ti ti-copy" style={{fontSize:12}}/>복사</button>
+          </div>
+        </div>
+        <div style={{fontSize:12,color:'var(--text-faint)',marginBottom:8,lineHeight:1.6}}>
+          샵도라에 로그인한 뒤, 이 내용을 그대로 붙여넣어 Claude에게 요청하면 됩니다. (예: "샵도라 들어가서 최근 7일 매출 추이 정리해줘")
+        </div>
+        <textarea rows={4} value={instruction} onChange={onInstruction}
+          placeholder={"예시:\n샵도라 매장분석 화면에서 최근 7일 매출/주문수 추이 정리해줘\n경쟁사 대비 순위 변동 확인해줘"}/>
+      </div>
+      <div className="card">
+        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:8}}>
+          <span style={{fontSize:12,fontWeight:700,color:'var(--text-dim)',textTransform:'uppercase',letterSpacing:'.5px'}}>📝 메모</span>
+          {savedM&&<span style={{fontSize:11,color:'var(--text)',fontWeight:600}}>저장됨 ✓</span>}
+        </div>
+        <textarea rows={5} value={memo} onChange={onMemo} placeholder="샵도라 분석하면서 발견한 포인트, 확인할 항목 등을 자유롭게 메모하세요 (자동 저장)"/>
+      </div>
+    </div>
+  )
+}
 function App(){
   const [view,setView]=useState('dashboard')
   const [allRows,setAllRows]=useState([])
@@ -1308,6 +1372,7 @@ function App(){
     {id:'weekly',icon:'ti-calendar',lbl:'주간',emoji:'📅',c:'var(--nav-weekly)'},
     {id:'digest',icon:'ti-clipboard-text',lbl:'일일요약',emoji:'💬',c:'var(--nav-digest)'},
     {id:'reports',icon:'ti-report-analytics',lbl:'리포트',emoji:'📊',c:'var(--nav-reports)'},
+    {id:'shopdora',icon:'ti-building-store',lbl:'샵도라',emoji:'🛍️',c:'var(--nav-shopdora)'},
   ]
   function handleCalendarDateClick(dateStr){
     setCurWeek(weekStart(new Date(dateStr+'T00:00:00')))
@@ -1376,7 +1441,7 @@ function App(){
                         {todayTasks.length===0?(
                           <div className="digest-placeholder">오늘 입력된 업무가 없습니다</div>
                         ):(
-                          todayTasks.map((t,i)=>(
+                          todayTasks.map((t,i)=>({t,i})).sort((a,b)=>(a.t.done===b.t.done?0:(a.t.done?1:-1))).map(({t,i})=>(
                             <div key={i} className="home-today-task" onClick={()=>toggleTask(today,i)}>
                               <div className={`routine-check${t.done?' done':''}`} style={{width:18,height:18,borderRadius:6}}>
                                 {t.done&&<i className="ti ti-check" style={{fontSize:12,color:'var(--on-accent)'}}/>}
@@ -1481,7 +1546,7 @@ function App(){
                             </div>
                           </div>
                           <div style={{flex:1,display:'flex',flexDirection:'column',gap:2}}>
-                            {row?.tasks?.map((t,i)=>(
+                            {(row?.tasks||[]).map((t,i)=>({t,i})).sort((a,b)=>(a.t.done===b.t.done?0:(a.t.done?1:-1))).map(({t,i})=>(
                               <TaskItem key={i} task={t} allTags={allTags} tagColors={tagColors} onChangeColor={changeTagColor}
                                 isDragging={dragState?.dateKey===d&&dragState?.idx===i}
                                 onToggle={()=>toggleTask(d,i)}
@@ -1515,6 +1580,9 @@ function App(){
               )}
               {!loading&&view==='reports'&&(
                 <WeeklyReports/>
+              )}
+              {!loading&&view==='shopdora'&&(
+                <ShopdoraTab/>
               )}
             </div>
           </div>
