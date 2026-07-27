@@ -1185,9 +1185,11 @@ const SHOPDORA_URL='https://www.shopdora.com/my/monitor/shop'
 function ShopdoraTab({onGoToReport}){
   const [instruction,setInstruction]=useState(()=>{try{return localStorage.getItem('d2c:shopdoraInstruction')||''}catch(e){return ''}})
   const [memo,setMemo]=useState(()=>{try{return localStorage.getItem('d2c:shopdoraMemo')||''}catch(e){return ''}})
+  const [shopsPH,setShopsPH]=useState(()=>{try{return localStorage.getItem('d2c:shopdoraShopsPH')||'경쟁사: OLENS Official Store\n자사: IM OLOLA'}catch(e){return ''}})
+  const [shopsMY,setShopsMY]=useState(()=>{try{return localStorage.getItem('d2c:shopdoraShopsMY')||''}catch(e){return ''}})
   const [savedI,setSavedI]=useState(false)
   const [savedM,setSavedM]=useState(false)
-  const tI=useRef(),tM=useRef()
+  const tI=useRef(),tM=useRef(),tPH=useRef(),tMY=useRef()
   function onInstruction(e){
     setInstruction(e.target.value)
     clearTimeout(tI.current)
@@ -1198,6 +1200,16 @@ function ShopdoraTab({onGoToReport}){
     clearTimeout(tM.current)
     tM.current=setTimeout(()=>{localStorage.setItem('d2c:shopdoraMemo',e.target.value);setSavedM(true);setTimeout(()=>setSavedM(false),1200)},600)
   }
+  function onShopsPH(e){
+    setShopsPH(e.target.value)
+    clearTimeout(tPH.current)
+    tPH.current=setTimeout(()=>localStorage.setItem('d2c:shopdoraShopsPH',e.target.value),600)
+  }
+  function onShopsMY(e){
+    setShopsMY(e.target.value)
+    clearTimeout(tMY.current)
+    tMY.current=setTimeout(()=>localStorage.setItem('d2c:shopdoraShopsMY',e.target.value),600)
+  }
   async function copyInstruction(){
     try{ await navigator.clipboard.writeText(instruction) }catch(e){}
   }
@@ -1206,7 +1218,7 @@ function ShopdoraTab({onGoToReport}){
       <div className="card" style={{display:'flex',alignItems:'center',justifyContent:'space-between',flexWrap:'wrap',gap:10}}>
         <div>
           <div style={{fontSize:16,fontWeight:700,color:'var(--text)',display:'flex',alignItems:'center',gap:7}}>🛍️ 샵도라 매장분석</div>
-          <div style={{fontSize:12.5,color:'var(--text-faint)',marginTop:3}}>쇼피 필리핀 매장 분석 중심 · 잊지 않게 여기서 바로 이동</div>
+          <div style={{fontSize:12.5,color:'var(--text-faint)',marginTop:3}}>쇼피 필리핀·말레이시아 컬러렌즈 시장 분석 · 잊지 않게 여기서 바로 이동</div>
         </div>
         <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
           <a href={SHOPDORA_URL} target="_blank" rel="noopener noreferrer" className="btn-primary" style={{textDecoration:'none'}}>
@@ -1215,6 +1227,20 @@ function ShopdoraTab({onGoToReport}){
           <button className="btn-outline" onClick={onGoToReport}>
             <i className="ti ti-report-analytics" style={{fontSize:14}}/>샵도라 리포트 보러가기
           </button>
+        </div>
+      </div>
+      <div className="card">
+        <div style={{fontSize:12,fontWeight:700,color:'var(--text-dim)',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:2}}>🌏 국가별 모니터링 대표 매장</div>
+        <div style={{fontSize:12.5,color:'var(--text-faint)',marginBottom:10}}>샵도라 상단 국가 드롭다운에서 전환 후 "쇼핑몰 추가"로 등록해두면 여기 기록만 관리하면 됩니다</div>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
+          <div>
+            <div style={{fontSize:12.5,fontWeight:700,color:'var(--text)',marginBottom:6}}>🇵🇭 필리핀</div>
+            <textarea rows={3} value={shopsPH} onChange={onShopsPH} placeholder={"경쟁사: OLENS Official Store\n자사: IM OLOLA"}/>
+          </div>
+          <div>
+            <div style={{fontSize:12.5,fontWeight:700,color:'var(--text)',marginBottom:6}}>🇲🇾 말레이시아</div>
+            <textarea rows={3} value={shopsMY} onChange={onShopsMY} placeholder={"경쟁사: (샵도라에서 말레이시아로 전환 후 등록)\n자사: (등록)"}/>
+          </div>
         </div>
       </div>
       <div className="card">
@@ -1233,10 +1259,10 @@ function ShopdoraTab({onGoToReport}){
           </div>
         </div>
         <div style={{fontSize:12,color:'var(--text-faint)',marginBottom:8,lineHeight:1.6}}>
-          간단하게만 지시해도 됩니다. 예: "오늘까지 데이터 분석해줘" / "최근 7일 데이터 분석해줘" — Claude가 매장 모니터·상품 리서치·키워드·리뷰 분석까지 알아서 종합해서 <b>리포트 탭 · 🛍️ 샵도라 리포트</b>에 정리해서 저장합니다.
+          간단하게만 지시해도 됩니다. 예: "필리핀 오늘까지 데이터 분석해줘" / "말레이시아 최근 7일 시장조사 해줘" — 국가를 지정하면 그 국가만, 안 하면 필리핀·말레이시아 전체를 Claude가 알아서 종합해서 <b>리포트 탭 · 🛍️ 샵도라 리포트</b>에 정리해서 저장합니다.
         </div>
         <textarea rows={4} value={instruction} onChange={onInstruction}
-          placeholder={"예시:\n오늘까지 데이터 분석해줘\n최근 7일 데이터 분석해줘 (OLENS, IMOLOLA 위주)"}/>
+          placeholder={"예시:\n필리핀 오늘까지 데이터 분석해줘\n말레이시아 컬러렌즈 시장조사 전체적으로 해줘 (대표 매장 + 시장 트렌드)"}/>
       </div>
       <div className="card">
         <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:8}}>
