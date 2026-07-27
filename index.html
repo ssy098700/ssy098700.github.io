@@ -364,6 +364,7 @@ const REPORT_META = {
   promo_calendar: {label:'🗓️ 프로모션 캘린더', icon:'ti-calendar-event'},
   cs_summary: {label:'💬 리뷰 · CS 요약', icon:'ti-message-circle'},
   competitor_monitoring: {label:'🔍 경쟁사 모니터링', icon:'ti-telescope'},
+  shopdora_analysis: {label:'🛍️ 샵도라 리포트', icon:'ti-building-store'},
 }
 async function loadWeeklyReports(){
   const r=await fetch(`${SB_URL}/rest/v1/d2c_weekly_reports?select=*&order=week_start.desc`,{
@@ -926,10 +927,10 @@ function StickyBoard({reportId, initialRaw}){
     </div>
   )
 }
-function WeeklyReports(){
+function WeeklyReports({initialType}){
   const [reportsByType,setReportsByType]=useState({})
   const [loading,setLoading]=useState(true)
-  const [activeType,setActiveType]=useState('promo_calendar')
+  const [activeType,setActiveType]=useState(initialType||'promo_calendar')
   const [weekIdx,setWeekIdx]=useState({})
   const [confirmDeleteId,setConfirmDeleteId]=useState(null)
   const refresh=useCallback(async()=>{
@@ -1181,7 +1182,7 @@ function DailyDigest({allRows, digestDate, setDigestDate, onSaveExtra, onToggleT
 }
 /* 샵도라 매장분석 바로가기 + 지시사항 + 메모 */
 const SHOPDORA_URL='https://www.shopdora.com/my/monitor/shop'
-function ShopdoraTab(){
+function ShopdoraTab({onGoToReport}){
   const [instruction,setInstruction]=useState(()=>{try{return localStorage.getItem('d2c:shopdoraInstruction')||''}catch(e){return ''}})
   const [memo,setMemo]=useState(()=>{try{return localStorage.getItem('d2c:shopdoraMemo')||''}catch(e){return ''}})
   const [savedI,setSavedI]=useState(false)
@@ -1207,9 +1208,14 @@ function ShopdoraTab(){
           <div style={{fontSize:16,fontWeight:700,color:'var(--text)',display:'flex',alignItems:'center',gap:7}}>🛍️ 샵도라 매장분석</div>
           <div style={{fontSize:12.5,color:'var(--text-faint)',marginTop:3}}>쇼피 필리핀 매장 분석 중심 · 잊지 않게 여기서 바로 이동</div>
         </div>
-        <a href={SHOPDORA_URL} target="_blank" rel="noopener noreferrer" className="btn-primary" style={{textDecoration:'none'}}>
-          <i className="ti ti-external-link" style={{fontSize:14}}/>샵도라 매장분석 열기
-        </a>
+        <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
+          <a href={SHOPDORA_URL} target="_blank" rel="noopener noreferrer" className="btn-primary" style={{textDecoration:'none'}}>
+            <i className="ti ti-external-link" style={{fontSize:14}}/>샵도라 매장분석 열기
+          </a>
+          <button className="btn-outline" onClick={onGoToReport}>
+            <i className="ti ti-report-analytics" style={{fontSize:14}}/>샵도라 리포트 보러가기
+          </button>
+        </div>
       </div>
       <div className="card">
         <div style={{fontSize:12,fontWeight:700,color:'var(--text-dim)',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:2}}>🗒️ 참고 링크</div>
@@ -1227,10 +1233,10 @@ function ShopdoraTab(){
           </div>
         </div>
         <div style={{fontSize:12,color:'var(--text-faint)',marginBottom:8,lineHeight:1.6}}>
-          샵도라에 로그인한 뒤, 이 내용을 그대로 붙여넣어 Claude에게 요청하면 됩니다. (예: "샵도라 들어가서 최근 7일 매출 추이 정리해줘")
+          간단하게만 지시해도 됩니다. 예: "오늘까지 데이터 분석해줘" / "최근 7일 데이터 분석해줘" — Claude가 매장 모니터·상품 리서치·키워드·리뷰 분석까지 알아서 종합해서 <b>리포트 탭 · 🛍️ 샵도라 리포트</b>에 정리해서 저장합니다.
         </div>
         <textarea rows={4} value={instruction} onChange={onInstruction}
-          placeholder={"예시:\n샵도라 매장분석 화면에서 최근 7일 매출/주문수 추이 정리해줘\n경쟁사 대비 순위 변동 확인해줘"}/>
+          placeholder={"예시:\n오늘까지 데이터 분석해줘\n최근 7일 데이터 분석해줘 (OLENS, IMOLOLA 위주)"}/>
       </div>
       <div className="card">
         <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:8}}>
@@ -1257,6 +1263,7 @@ function App(){
   const [notionInput,setNotionInput]=useState('')
   const [customTags,setCustomTags]=useState(()=>{try{return JSON.parse(localStorage.getItem('d2c:tags')||'[]')}catch(e){return[]}})
   const [tagColors,setTagColors]=useState(loadTagColors)
+  const [reportsInitialType,setReportsInitialType]=useState(null)
   const contentRef=useRef()
   const allTags=[...DEFAULT_TAGS,...customTags]
   const refresh=useCallback(async()=>{
@@ -1579,10 +1586,10 @@ function App(){
                   onSaveExtra={saveExtra} onToggleTask={toggleTask} notify={notify} tagColors={tagColors}/>
               )}
               {!loading&&view==='reports'&&(
-                <WeeklyReports/>
+                <WeeklyReports initialType={reportsInitialType}/>
               )}
               {!loading&&view==='shopdora'&&(
-                <ShopdoraTab/>
+                <ShopdoraTab onGoToReport={()=>{setReportsInitialType('shopdora_analysis');setView('reports')}}/>
               )}
             </div>
           </div>
