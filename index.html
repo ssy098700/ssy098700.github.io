@@ -15,35 +15,35 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <style>
 :root{
-  --bg:#18181B;
-  --bg-elev:#202024;
-  --bg-elev-2:#29292E;
-  --bg-focus:#323238;
-  --border:#3A393F;
-  --border-soft:#2C2C31;
-  --text:#F2F0EA;
-  --text-dim:#B4B1A8;
-  --text-faint:#7C7A73;
-  --accent:#F2F0EA;
-  --accent-strong:#F2F0EA;
-  --accent-strong-hover:#E2DFD4;
-  --on-accent:#131316;
-  --accent-soft:rgba(242,240,234,.08);
-  --danger:#E2685A;
-  --danger-soft:rgba(226,104,90,.14);
-  --danger-border:#5C3730;
-  --success:#F2F0EA;
-  --warning:#B4B1A8;
-  --sidebar-bg:#131315;
+  --bg:#F7F2E9;
+  --bg-elev:#FFFFFF;
+  --bg-elev-2:#F1E9D8;
+  --bg-focus:#FFFFFF;
+  --border:#E3D8C1;
+  --border-soft:#EDE4D2;
+  --text:#2E2A22;
+  --text-dim:#6E6455;
+  --text-faint:#A69A82;
+  --accent:#D9427E;
+  --accent-strong:#D9427E;
+  --accent-strong-hover:#C13570;
+  --on-accent:#FFFFFF;
+  --accent-soft:rgba(217,66,126,.08);
+  --danger:#D3564C;
+  --danger-soft:rgba(211,86,76,.09);
+  --danger-border:#F0C4BD;
+  --success:#4E9C6E;
+  --warning:#B08A3E;
+  --sidebar-bg:#FBF6EA;
   --font-mono:'IBM Plex Mono',monospace;
-  --shadow:0 2px 6px rgba(0,0,0,.35), 0 10px 26px rgba(0,0,0,.3);
-  --nav-home:#E7E4DA;
-  --nav-routine:#7FD9BF;
-  --nav-input:#C7A8F2;
-  --nav-weekly:#7FB4E8;
-  --nav-digest:#F0A0C4;
-  --nav-reports:#F0C36B;
-  --nav-shopdora:#F29E5A;
+  --shadow:0 1px 2px rgba(46,42,34,.04), 0 6px 18px rgba(46,42,34,.06);
+  --nav-home:#8C8570;
+  --nav-routine:#3F9E82;
+  --nav-input:#9169C2;
+  --nav-weekly:#4A7FBD;
+  --nav-digest:#D9427E;
+  --nav-reports:#C9932E;
+  --nav-shopdora:#D07A34;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Pretendard',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);height:100vh;overflow:hidden;color:var(--text);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
@@ -417,10 +417,10 @@ function sectionEmoji(title){
   return '📌'
 }
 const STICKY_COLORS={
-  paper:{bg:'#332F26',border:'#5C543F'},
-  white:{bg:'#2A2A2E',border:'#48474D'},
-  ink:{bg:'#242428',border:'#403F45'},
-  line:{bg:'#2E2C24',border:'#524C39'},
+  paper:{bg:'#FFF3AE',border:'#E8D06A'},
+  white:{bg:'#FFFFFF',border:'#E3DAC5'},
+  ink:{bg:'#DCE9FF',border:'#AFC4EC'},
+  line:{bg:'#FFE0EE',border:'#F0AFCB'},
 }
 function parseNotes(raw){
   if(!raw)return []
