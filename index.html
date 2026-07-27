@@ -541,6 +541,7 @@ function TaskItem({task, onToggle, onUpdate, onDelete, allTags, tagColors, onCha
             {task.text}
           </span>
         )}
+        {task.carriedFrom&&<span title={`${task.carriedFrom}에서 못 끝낸 업무`} style={{fontSize:10,fontWeight:700,color:'var(--danger)',background:'var(--danger-soft)',border:'1px solid var(--danger-border)',borderRadius:5,padding:'1px 6px',flexShrink:0,whiteSpace:'nowrap'}}>⏳ 이월</span>}
         <Tag t={task.tag} allTags={allTags} tagColors={tagColors} onChangeColor={onChangeColor} onChangeTag={(newTag)=>onUpdate({...task,tag:newTag})}/>
         <div style={{display:'flex',gap:2,flexShrink:0,alignItems:'center'}}>
           <button onClick={()=>{setTextVal(task.text);setEditingText(true)}} title="수정"
@@ -1299,6 +1300,28 @@ function App(){
     finally{ setLoading(false) }
   },[])
   useEffect(()=>{ refresh() },[refresh])
+  useEffect(()=>{
+    if(loading)return
+    const todayDate=toDate()
+    let already=''
+    try{already=localStorage.getItem('d2c:carryCheckDate')||''}catch(e){}
+    if(already===todayDate)return
+    try{localStorage.setItem('d2c:carryCheckDate',todayDate)}catch(e){}
+    const y=new Date();y.setDate(y.getDate()-1)
+    const yDate=toDate(y)
+    const yRow=allRows.find(r=>r.date_key===yDate)
+    if(!yRow||!yRow.tasks||!yRow.tasks.length)return
+    const pending=yRow.tasks.filter(t=>!t.done)
+    if(!pending.length)return
+    const todayRow=allRows.find(r=>r.date_key===todayDate)
+    const already2=new Set((todayRow?.tasks||[]).filter(t=>t.carriedFrom).map(t=>t.text))
+    const toAdd=pending.filter(t=>!already2.has(t.text)).map(t=>({text:t.text,tag:t.tag,done:false,highlight:t.highlight||'#D3564C',carriedFrom:yDate}))
+    if(toAdd.length){
+      const tasks=todayRow?[...toAdd,...todayRow.tasks]:toAdd
+      saveRow(todayDate,tasks,todayRow?.notes||'')
+      notify(`어제 못 끝낸 업무 ${toAdd.length}건을 오늘 최우선으로 가져왔어요!`)
+    }
+  },[loading])
   function notify(msg,type='ok'){setToast({msg,type});setTimeout(()=>setToast(null),3000)}
   function addCustomTag(tag){
     const updated=[...customTags,tag]
@@ -1480,6 +1503,7 @@ function App(){
                                 {t.done&&<i className="ti ti-check" style={{fontSize:12,color:'var(--on-accent)'}}/>}
                               </div>
                               <span style={{flex:1,textDecoration:t.done?'line-through':'none',color:t.done?'var(--text-faint)':'var(--text)'}}>{t.text}</span>
+                              {t.carriedFrom&&<span title={`${t.carriedFrom}에서 못 끝낸 업무`} style={{fontSize:10,fontWeight:700,color:'var(--danger)',background:'var(--danger-soft)',border:'1px solid var(--danger-border)',borderRadius:5,padding:'1px 6px',flexShrink:0,whiteSpace:'nowrap'}}>⏳ 이월</span>}
                             </div>
                           ))
                         )}
