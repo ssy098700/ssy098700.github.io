@@ -68,7 +68,7 @@ input,textarea,select,button{font-family:inherit}
 .card.today{border-color:var(--text)}
 .tag-wrap{position:relative;display:inline-block}
 .tag{display:inline-block;padding:2px 8px;border-radius:6px;font-size:11.5px;font-weight:700;white-space:nowrap;letter-spacing:.2px;cursor:pointer;background:var(--bg-elev-2);color:var(--text-dim);border:1px solid var(--border-soft)}
-.tag:hover{border-color:var(--text-faint)}
+.tag:hover{filter:brightness(1.15)}
 .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px}
 .stat-card{background:var(--bg-elev);border-radius:14px;padding:14px 16px;border:1px solid var(--border-soft);box-shadow:var(--shadow)}
 .stat-card .val{font-family:var(--font-mono);font-size:25px;font-weight:700;color:var(--text)}
@@ -82,7 +82,7 @@ input,textarea,select,button{font-family:inherit}
 .toast.ok{background:var(--accent-strong);color:var(--on-accent)}
 .toast.err{background:var(--danger-soft);color:var(--danger);border:1px solid var(--danger-border)}
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px}
-.modal{background:var(--bg-elev);border:1px solid var(--border);border-radius:18px;padding:26px;width:100%;max-width:490px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.modal{background:var(--bg-elev);border:1px solid var(--border);border-radius:18px;padding:26px;width:100%;max-width:490px;box-shadow:0 20px 60px rgba(0,0,0,.5);max-height:88vh;overflow-y:auto}
 .loading{display:flex;align-items:center;justify-content:center;padding:48px;color:var(--text-faint);font-size:14px;gap:8px}
 textarea{width:100%;border:1px solid var(--border);border-radius:11px;padding:10px 13px;font-size:14px;line-height:1.7;resize:vertical;background:var(--bg-elev-2);color:var(--text);outline:none;font-family:'Pretendard',sans-serif}
 textarea:focus{border-color:var(--text-dim);box-shadow:0 0 0 3px var(--accent-soft);background:var(--bg-focus)}
@@ -113,9 +113,11 @@ input:focus{border-color:var(--text-dim);box-shadow:0 0 0 3px var(--accent-soft)
 .cal-cell.today.has-task::after{background:var(--on-accent)}
 .cal-day-label{text-align:center;font-size:10px;color:var(--text-faint);font-weight:600;padding:2px 0}
 /* 태그 드롭다운 */
-.tag-dropdown{position:absolute;top:100%;left:0;z-index:50;background:var(--bg-elev-2);border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.45);padding:8px;min-width:160px;display:flex;flex-wrap:wrap;gap:4px;margin-top:3px}
+.tag-dropdown{position:absolute;top:100%;left:0;z-index:50;background:var(--bg-elev-2);border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.45);padding:9px;min-width:190px;max-width:230px;display:flex;flex-wrap:wrap;gap:4px;margin-top:3px}
 .tag-option{padding:3px 9px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--border-soft);background:var(--bg-elev-2);color:var(--text-dim);transition:all .1s}
-.tag-option:hover{background:var(--accent-strong);color:var(--on-accent);border-color:var(--accent-strong)}
+.tag-dd-label{font-size:10px;font-weight:700;color:var(--text-faint);width:100%;text-transform:uppercase;letter-spacing:.4px}
+.swatch{width:17px;height:17px;border-radius:5px;cursor:pointer;border:2px solid transparent;transition:transform .1s}
+.swatch:hover{transform:scale(1.12)}
 /* 홈 */
 .home-grid{display:grid;grid-template-columns:260px 1fr;gap:14px;align-items:start}
 @media (max-width:760px){.home-grid{grid-template-columns:1fr}}
@@ -204,6 +206,62 @@ const SB_URL = 'https://zxfytktctzgkssxbqbyj.supabase.co'
 const SB_KEY = 'sb_publishable_815pQE6fA0sXIBS3RcmDAA_6FptB6NS'
 const DEFAULT_TAGS = ['물류','마케팅','광고','CS','리서치','시딩','브로드캐스팅','KPI','캠페인','가격정책','브랜드관리','기타']
 const DAYS_KO = ['일','월','화','수','목','금','토']
+
+/* ===== 태그 색상 시스템 ===== */
+const TAG_PALETTE = [
+  '#F2A65A', // 물류 - amber
+  '#7FD9BF', // 마케팅 - mint
+  '#7FB4E8', // 광고 - sky
+  '#C7A8F2', // CS - violet
+  '#F0A0C4', // 리서치 - pink
+  '#E2685A', // 시딩 - coral
+  '#B8D46A', // 브로드캐스팅 - lime
+  '#F0C36B', // KPI - gold
+  '#8FA8D9', // 캠페인 - slate blue
+  '#D9957F', // 가격정책 - terracotta
+  '#9ED9D0', // 브랜드관리 - aqua
+  '#C9A0DC', // 기타 - lavender
+  '#E89B9B','#8CC98C','#E0C46B','#A8B4E0','#D98CC9','#7FCBD9'
+]
+const DEFAULT_TAG_COLORS = {}
+DEFAULT_TAGS.forEach((t,i)=>{ DEFAULT_TAG_COLORS[t]=TAG_PALETTE[i] })
+function hexToRgba(hex,alpha){
+  const h=(hex||'#7C7A73').replace('#','')
+  const r=parseInt(h.substring(0,2),16),g=parseInt(h.substring(2,4),16),b=parseInt(h.substring(4,6),16)
+  return `rgba(${r},${g},${b},${alpha})`
+}
+function hashTag(tag){
+  let hash=0
+  for(let i=0;i<tag.length;i++) hash = tag.charCodeAt(i) + ((hash<<5)-hash)
+  return Math.abs(hash)
+}
+function loadTagColors(){
+  let saved={}
+  try{ saved=JSON.parse(localStorage.getItem('d2c:tagColors')||'{}') }catch(e){}
+  return {...DEFAULT_TAG_COLORS,...saved}
+}
+function persistTagColor(tag,color){
+  let saved={}
+  try{ saved=JSON.parse(localStorage.getItem('d2c:tagColors')||'{}') }catch(e){}
+  saved[tag]=color
+  localStorage.setItem('d2c:tagColors',JSON.stringify(saved))
+}
+function colorForTag(tag,tagColors){
+  if(tagColors && tagColors[tag]) return tagColors[tag]
+  return TAG_PALETTE[hashTag(tag||'')%TAG_PALETTE.length]
+}
+/* ===== 태그 색상 시스템 끝 ===== */
+
+/* ===== 업무 카드 하이라이트(중요 표시) 색상 ===== */
+const HIGHLIGHT_PALETTE = [
+  {k:'yellow',c:'#F0D25A'},
+  {k:'red',c:'#E2685A'},
+  {k:'orange',c:'#F2A65A'},
+  {k:'green',c:'#8CC98C'},
+  {k:'blue',c:'#7FB4E8'},
+  {k:'purple',c:'#C7A8F2'},
+]
+
 const ROUTINE_DEFAULT = {
   daily: [
     {text:'쇼피 필리핀 CS 처리',tag:'CS'},
@@ -370,7 +428,7 @@ function parseNotes(raw){
   }catch(e){}
   return [{id:'legacy',text:raw,x:16,y:16,color:'paper',bold:false}]
 }
-function Tag({t, onChangeTag, allTags}){
+function Tag({t, onChangeTag, allTags, tagColors, onChangeColor}){
   const [open,setOpen]=useState(false)
   const ref=useRef()
   useEffect(()=>{
@@ -379,29 +437,52 @@ function Tag({t, onChangeTag, allTags}){
     document.addEventListener('mousedown',handler)
     return()=>document.removeEventListener('mousedown',handler)
   },[open])
+  const color=colorForTag(t,tagColors)
   return(
     <span ref={ref} className="tag-wrap">
-      <span className="tag" onClick={e=>{e.stopPropagation();setOpen(!open)}} title="클릭해서 분류 변경">
+      <span className="tag" onClick={e=>{e.stopPropagation();setOpen(!open)}} title="클릭해서 분류·색상 변경"
+        style={{color:color,background:hexToRgba(color,.16),borderColor:hexToRgba(color,.45)}}>
         {t} <i className="ti ti-chevron-down" style={{fontSize:9,marginLeft:2}}/>
       </span>
       {open&&(
         <div className="tag-dropdown" onClick={e=>e.stopPropagation()}>
-          {allTags.map(tag=>(
-            <button key={tag} className="tag-option"
-              onClick={()=>{onChangeTag(tag);setOpen(false)}}>
-              {tag}
-            </button>
-          ))}
+          <div className="tag-dd-label">분류 변경</div>
+          {allTags.map(tag=>{
+            const c=colorForTag(tag,tagColors)
+            return (
+              <button key={tag} className="tag-option"
+                style={{color:c,background:hexToRgba(c,.14),borderColor:hexToRgba(c,.4)}}
+                onClick={()=>{onChangeTag(tag);setOpen(false)}}>
+                {tag}
+              </button>
+            )
+          })}
+          <div className="tag-dd-label" style={{marginTop:6}}>이 태그 색상</div>
+          <div style={{display:'flex',flexWrap:'wrap',gap:4}}>
+            {TAG_PALETTE.map((c,i)=>(
+              <div key={i} className="swatch" title={c}
+                onClick={()=>onChangeColor&&onChangeColor(t,c)}
+                style={{background:c,borderColor:color===c?'var(--text)':'transparent'}}/>
+            ))}
+          </div>
         </div>
       )}
     </span>
   )
 }
-function TaskItem({task, onToggle, onUpdate, onDelete, allTags, onDragStart, onDragOver, onDrop, isDragging}){
+function TaskItem({task, onToggle, onUpdate, onDelete, allTags, tagColors, onChangeColor, onDragStart, onDragOver, onDrop, isDragging}){
   const [editingText,setEditingText]=useState(false)
   const [editingMemo,setEditingMemo]=useState(false)
   const [textVal,setTextVal]=useState(task.text)
   const [memoVal,setMemoVal]=useState('')
+  const [hlOpen,setHlOpen]=useState(false)
+  const hlRef=useRef()
+  useEffect(()=>{
+    if(!hlOpen)return
+    const handler=(e)=>{if(hlRef.current&&!hlRef.current.contains(e.target))setHlOpen(false)}
+    document.addEventListener('mousedown',handler)
+    return()=>document.removeEventListener('mousedown',handler)
+  },[hlOpen])
   const saveText=()=>{
     setEditingText(false)
     const t=textVal.trim()
@@ -412,16 +493,37 @@ function TaskItem({task, onToggle, onUpdate, onDelete, allTags, onDragStart, onD
     setEditingMemo(false)
     if(memoVal!==(task.memo||''))onUpdate({...task,memo:memoVal})
   }
+  const hl=task.highlight||null
   return(
     <div className="task-wrap"
       draggable
       onDragStart={onDragStart}
       onDragOver={e=>{e.preventDefault();e.stopPropagation();onDragOver&&onDragOver(e)}}
       onDrop={e=>{e.stopPropagation();onDrop&&onDrop(e)}}
-      style={{opacity:isDragging?0.4:1,cursor:'grab'}}>
+      style={{opacity:isDragging?0.4:1,cursor:'grab',background:hl?hexToRgba(hl,.14):undefined,borderLeft:hl?`3px solid ${hl}`:'3px solid transparent',paddingLeft:5}}>
       <div style={{display:'flex',alignItems:'flex-start',gap:8,flexWrap:'wrap'}}>
         <div style={{color:'var(--text-faint)',fontSize:13,cursor:'grab',paddingTop:3,flexShrink:0}} title="드래그해서 순서 변경">
           <i className="ti ti-grip-vertical"/>
+        </div>
+        <div ref={hlRef} style={{position:'relative',flexShrink:0,paddingTop:3}}>
+          <div onClick={()=>setHlOpen(!hlOpen)} title="중요 표시 색상"
+            style={{width:15,height:15,borderRadius:'50%',cursor:'pointer',background:hl?hl:'transparent',border:hl?'none':'1.5px dashed var(--text-faint)'}}/>
+          {hlOpen&&(
+            <div className="tag-dropdown" style={{minWidth:140}} onClick={e=>e.stopPropagation()}>
+              <div className="tag-dd-label">중요 표시</div>
+              <div style={{display:'flex',flexWrap:'wrap',gap:5}}>
+                {HIGHLIGHT_PALETTE.map(p=>(
+                  <div key={p.k} className="swatch" style={{width:19,height:19,background:p.c,borderColor:hl===p.c?'var(--text)':'transparent'}}
+                    onClick={()=>{onUpdate({...task,highlight:p.c});setHlOpen(false)}}/>
+                ))}
+                <div className="swatch" title="지우기"
+                  style={{width:19,height:19,background:'var(--bg-elev-2)',border:'1.5px dashed var(--text-faint)',display:'flex',alignItems:'center',justifyContent:'center'}}
+                  onClick={()=>{onUpdate({...task,highlight:null});setHlOpen(false)}}>
+                  <i className="ti ti-x" style={{fontSize:11,color:'var(--text-faint)'}}/>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
         <div onClick={onToggle} style={{width:17,height:17,borderRadius:5,flexShrink:0,marginTop:2,border:task.done?'none':'1.5px solid var(--text-faint)',background:task.done?'var(--accent-strong)':'transparent',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',transition:'all .15s'}}>
           {task.done&&<i className="ti ti-check" style={{fontSize:11,color:'var(--on-accent)'}}/>}
@@ -437,7 +539,7 @@ function TaskItem({task, onToggle, onUpdate, onDelete, allTags, onDragStart, onD
             {task.text}
           </span>
         )}
-        <Tag t={task.tag} allTags={allTags} onChangeTag={(newTag)=>onUpdate({...task,tag:newTag})}/>
+        <Tag t={task.tag} allTags={allTags} tagColors={tagColors} onChangeColor={onChangeColor} onChangeTag={(newTag)=>onUpdate({...task,tag:newTag})}/>
         <div style={{display:'flex',gap:2,flexShrink:0,alignItems:'center'}}>
           <button onClick={()=>{setTextVal(task.text);setEditingText(true)}} title="수정"
             style={{border:'none',background:'transparent',color:'var(--text-faint)',cursor:'pointer',padding:'1px 3px',fontSize:14}}>
@@ -473,7 +575,7 @@ function TaskItem({task, onToggle, onUpdate, onDelete, allTags, onDragStart, onD
     </div>
   )
 }
-function ManualInput({onSave, allTags, onAddTag}){
+function ManualInput({onSave, allTags, onAddTag, tagColors, onChangeColor}){
   const [mode,setMode]=useState('single')
   const [text,setText]=useState('')
   const [bulkText,setBulkText]=useState('')
@@ -526,11 +628,15 @@ function ManualInput({onSave, allTags, onAddTag}){
       <div style={{marginBottom:10}}>
         <div style={{fontSize:11.5,color:'var(--text-faint)',marginBottom:6,fontWeight:600}}>카테고리 (전체 항목에 동일 적용)</div>
         <div style={{display:'flex',gap:5,flexWrap:'wrap',alignItems:'center'}}>
-          {allTags.map(t=>(
-            <button key={t} onClick={()=>setTag(t)} style={{padding:'3px 10px',borderRadius:20,fontSize:12,fontWeight:600,cursor:'pointer',border:'1px solid var(--border-soft)',background:tag===t?'var(--accent-strong)':'var(--bg-elev-2)',color:tag===t?'var(--on-accent)':'var(--text-dim)',transition:'all .15s'}}>
-              {t}
-            </button>
-          ))}
+          {allTags.map(t=>{
+            const c=colorForTag(t,tagColors)
+            const active=tag===t
+            return (
+              <button key={t} onClick={()=>setTag(t)} style={{padding:'3px 10px',borderRadius:20,fontSize:12,fontWeight:600,cursor:'pointer',border:`1px solid ${active?c:hexToRgba(c,.4)}`,background:active?hexToRgba(c,.28):hexToRgba(c,.1),color:active?c:'var(--text-dim)',transition:'all .15s'}}>
+                {t}
+              </button>
+            )
+          })}
           <button onClick={()=>setShowAddTag(!showAddTag)} style={{padding:'3px 10px',borderRadius:20,fontSize:12,cursor:'pointer',border:'1px dashed var(--border)',background:'transparent',color:'var(--text-faint)',display:'flex',alignItems:'center',gap:3}}>
             <i className="ti ti-plus" style={{fontSize:11}}/>새 분류
           </button>
@@ -950,7 +1056,7 @@ function WeeklyReports(){
   )
 }
 /* 일일 요약 — 메신저용 */
-function DailyDigest({allRows, digestDate, setDigestDate, onSaveExtra, onToggleTask, notify}){
+function DailyDigest({allRows, digestDate, setDigestDate, onSaveExtra, onToggleTask, notify, tagColors}){
   const recordedDates = allRows
     .filter(r=>r.date_key && !r.date_key.startsWith('__') && ((r.tasks&&r.tasks.length>0) || (r.notes&&r.notes.trim())))
     .map(r=>r.date_key)
@@ -1028,12 +1134,13 @@ function DailyDigest({allRows, digestDate, setDigestDate, onSaveExtra, onToggleT
           {done.length===0?<div className="digest-placeholder">완료한 업무가 없습니다</div>:
             <ul className="digest-list">{done.map((t,i)=>{
               const idx=tasks.findIndex(x=>x===t)
+              const c=colorForTag(t.tag,tagColors)
               return(
                 <li key={i}>
                   <div className="digest-check done" onClick={()=>onToggleTask(digestDate,idx)} title="완료 취소">
                     <i className="ti ti-check" style={{fontSize:12,color:'var(--on-accent)'}}/>
                   </div>
-                  <span className="digest-tag">{t.tag}</span>
+                  <span className="digest-tag" style={{color:c,background:hexToRgba(c,.16),borderColor:hexToRgba(c,.4)}}>{t.tag}</span>
                   <span className="digest-task-text done">{t.text}</span>
                 </li>
               )
@@ -1044,11 +1151,12 @@ function DailyDigest({allRows, digestDate, setDigestDate, onSaveExtra, onToggleT
           {pending.length===0?<div className="digest-placeholder">진행중인 업무가 없습니다</div>:
             <ul className="digest-list">{pending.map((t,i)=>{
               const idx=tasks.findIndex(x=>x===t)
+              const c=colorForTag(t.tag,tagColors)
               return(
                 <li key={i}>
                   <div className="digest-check" onClick={()=>onToggleTask(digestDate,idx)} title="완료로 표시">
                   </div>
-                  <span className="digest-tag">{t.tag}</span>
+                  <span className="digest-tag" style={{color:c,background:hexToRgba(c,.16),borderColor:hexToRgba(c,.4)}}>{t.tag}</span>
                   <span className="digest-task-text">{t.text}</span>
                 </li>
               )
@@ -1084,6 +1192,7 @@ function App(){
   const [notionWebhook,setNotionWebhook]=useState(()=>{try{return localStorage.getItem('d2c:notion')||''}catch(e){return ''}})
   const [notionInput,setNotionInput]=useState('')
   const [customTags,setCustomTags]=useState(()=>{try{return JSON.parse(localStorage.getItem('d2c:tags')||'[]')}catch(e){return[]}})
+  const [tagColors,setTagColors]=useState(loadTagColors)
   const contentRef=useRef()
   const allTags=[...DEFAULT_TAGS,...customTags]
   const refresh=useCallback(async()=>{
@@ -1098,6 +1207,10 @@ function App(){
     const updated=[...customTags,tag]
     setCustomTags(updated)
     localStorage.setItem('d2c:tags',JSON.stringify(updated))
+  }
+  function changeTagColor(tag,color){
+    persistTagColor(tag,color)
+    setTagColors(prev=>({...prev,[tag]:color}))
   }
   const getRow=(dk)=>allRows.find(r=>r.date_key===dk)
   const rows=allRows.filter(r=>r.week_key===curWeek)
@@ -1299,7 +1412,7 @@ function App(){
                     <div style={{fontSize:12,fontWeight:700,color:'var(--text-dim)',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:10}}>📆 날짜 선택</div>
                     <input type="date" value={selDate} onChange={e=>setSelDate(e.target.value)} style={{width:170}}/>
                   </div>
-                  <ManualInput allTags={allTags} onAddTag={addCustomTag} onSave={(tasksArr)=>addTasks(selDate,tasksArr)}/>
+                  <ManualInput allTags={allTags} onAddTag={addCustomTag} tagColors={tagColors} onChangeColor={changeTagColor} onSave={(tasksArr)=>addTasks(selDate,tasksArr)}/>
                 </div>
               )}
               {!loading&&view==='weekly'&&(
@@ -1369,7 +1482,7 @@ function App(){
                           </div>
                           <div style={{flex:1,display:'flex',flexDirection:'column',gap:2}}>
                             {row?.tasks?.map((t,i)=>(
-                              <TaskItem key={i} task={t} allTags={allTags}
+                              <TaskItem key={i} task={t} allTags={allTags} tagColors={tagColors} onChangeColor={changeTagColor}
                                 isDragging={dragState?.dateKey===d&&dragState?.idx===i}
                                 onToggle={()=>toggleTask(d,i)}
                                 onUpdate={(updated)=>updateTask(d,i,updated)}
@@ -1398,7 +1511,7 @@ function App(){
               )}
               {!loading&&view==='digest'&&(
                 <DailyDigest allRows={allRows} digestDate={digestDate} setDigestDate={setDigestDate}
-                  onSaveExtra={saveExtra} onToggleTask={toggleTask} notify={notify}/>
+                  onSaveExtra={saveExtra} onToggleTask={toggleTask} notify={notify} tagColors={tagColors}/>
               )}
               {!loading&&view==='reports'&&(
                 <WeeklyReports/>
@@ -1426,6 +1539,26 @@ function App(){
                 if(notionInput.trim()){localStorage.setItem('d2c:notion',notionInput);setNotionWebhook(notionInput)}
                 setShowSettings(false);notify('저장됐습니다.')
               }}>저장</button>
+            </div>
+            <div style={{fontSize:14,fontWeight:700,color:'var(--text)',marginBottom:4,marginTop:20,paddingTop:16,borderTop:'1px solid var(--border-soft)'}}>🎨 태그 색상 관리</div>
+            <div style={{fontSize:12.5,color:'var(--text-dim)',lineHeight:1.7,marginBottom:10}}>
+              태그마다 원하는 색을 눌러서 지정하세요. (태그를 클릭해도 바로 바꿀 수 있어요)
+            </div>
+            <div style={{display:'flex',flexDirection:'column',gap:9,maxHeight:230,overflowY:'auto',paddingRight:4}}>
+              {allTags.map(tag=>{
+                const c=colorForTag(tag,tagColors)
+                return(
+                  <div key={tag} style={{display:'flex',alignItems:'center',gap:9}}>
+                    <span style={{fontSize:12,fontWeight:700,minWidth:76,color:c,background:hexToRgba(c,.14),border:`1px solid ${hexToRgba(c,.4)}`,borderRadius:6,padding:'2px 7px',textAlign:'center'}}>{tag}</span>
+                    <div style={{display:'flex',gap:4,flexWrap:'wrap',flex:1}}>
+                      {TAG_PALETTE.map((p,i)=>(
+                        <div key={i} className="swatch" onClick={()=>changeTagColor(tag,p)}
+                          style={{background:p,borderColor:c===p?'var(--text)':'transparent'}}/>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })}
             </div>
           </div>
         </div>
