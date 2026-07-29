@@ -153,6 +153,7 @@ input:focus{border-color:var(--text-dim);box-shadow:0 0 0 3px var(--accent-soft)
 .digest-check.done{background:var(--accent-strong);border-color:var(--accent-strong)}
 .digest-task-text{flex:1}
 .digest-task-text.done{color:var(--text-faint);text-decoration:line-through}
+.digest-task-memo{font-size:12.5px;color:var(--text-faint);margin:0 0 2px 27px;line-height:1.55;white-space:pre-wrap;word-break:break-all}
 .digest-tag{font-size:11px;font-weight:700;color:var(--text-dim);background:var(--bg-elev-2);border:1px solid var(--border-soft);padding:1px 7px;border-radius:5px;flex-shrink:0}
 .digest-summary-card{border-color:var(--border)}
 .digest-summary-text{font-size:14.5px;color:var(--text-dim);line-height:1.8}
@@ -1089,10 +1090,10 @@ function DailyDigest({allRows, digestDate, setDigestDate, onSaveExtra, onToggleT
     if(daySummary){ lines.push(''); lines.push(`📋 ${daySummary}`) }
     lines.push('')
     lines.push('✅ 오늘 완료')
-    lines.push(done.length? done.map(t=>`- ${t.text}`).join('\n') : '- 없음')
+    lines.push(done.length? done.map(t=>`- ${t.text}`+(t.memo&&t.memo.trim()?`\n  · ${t.memo.trim()}`:'')).join('\n') : '- 없음')
     lines.push('')
     lines.push('🔄 진행중')
-    lines.push(pending.length? pending.map(t=>`- ${t.text}`).join('\n') : '- 없음')
+    lines.push(pending.length? pending.map(t=>`- ${t.text}`+(t.memo&&t.memo.trim()?`\n  · ${t.memo.trim()}`:'')).join('\n') : '- 없음')
     if(extra.issue&&extra.issue.trim()){ lines.push(''); lines.push('⚠️ 이슈·도움요청'); lines.push(extra.issue.trim()) }
     if(extra.priority&&extra.priority.trim()){ lines.push(''); lines.push('🎯 내일 최우선순위'); lines.push(extra.priority.trim()) }
     if(extra.memo&&extra.memo.trim()){ lines.push(''); lines.push('📝 개인 메모'); lines.push(extra.memo.trim()) }
@@ -1139,12 +1140,15 @@ function DailyDigest({allRows, digestDate, setDigestDate, onSaveExtra, onToggleT
               const idx=tasks.findIndex(x=>x===t)
               const c=colorForTag(t.tag,tagColors)
               return(
-                <li key={i}>
-                  <div className="digest-check done" onClick={()=>onToggleTask(digestDate,idx)} title="완료 취소">
-                    <i className="ti ti-check" style={{fontSize:12,color:'var(--on-accent)'}}/>
+                <li key={i} style={{flexDirection:'column',alignItems:'stretch',gap:2}}>
+                  <div style={{display:'flex',alignItems:'center',gap:9}}>
+                    <div className="digest-check done" onClick={()=>onToggleTask(digestDate,idx)} title="완료 취소">
+                      <i className="ti ti-check" style={{fontSize:12,color:'var(--on-accent)'}}/>
+                    </div>
+                    <span className="digest-tag" style={{color:c,background:hexToRgba(c,.16),borderColor:hexToRgba(c,.4)}}>{t.tag}</span>
+                    <span className="digest-task-text done">{t.text}</span>
                   </div>
-                  <span className="digest-tag" style={{color:c,background:hexToRgba(c,.16),borderColor:hexToRgba(c,.4)}}>{t.tag}</span>
-                  <span className="digest-task-text done">{t.text}</span>
+                  {t.memo&&<div className="digest-task-memo"><i className="ti ti-notes" style={{fontSize:11,marginRight:4}}/>{t.memo}</div>}
                 </li>
               )
             })}</ul>}
@@ -1156,11 +1160,14 @@ function DailyDigest({allRows, digestDate, setDigestDate, onSaveExtra, onToggleT
               const idx=tasks.findIndex(x=>x===t)
               const c=colorForTag(t.tag,tagColors)
               return(
-                <li key={i}>
-                  <div className="digest-check" onClick={()=>onToggleTask(digestDate,idx)} title="완료로 표시">
+                <li key={i} style={{flexDirection:'column',alignItems:'stretch',gap:2}}>
+                  <div style={{display:'flex',alignItems:'center',gap:9}}>
+                    <div className="digest-check" onClick={()=>onToggleTask(digestDate,idx)} title="완료로 표시">
+                    </div>
+                    <span className="digest-tag" style={{color:c,background:hexToRgba(c,.16),borderColor:hexToRgba(c,.4)}}>{t.tag}</span>
+                    <span className="digest-task-text">{t.text}</span>
                   </div>
-                  <span className="digest-tag" style={{color:c,background:hexToRgba(c,.16),borderColor:hexToRgba(c,.4)}}>{t.tag}</span>
-                  <span className="digest-task-text">{t.text}</span>
+                  {t.memo&&<div className="digest-task-memo"><i className="ti ti-notes" style={{fontSize:11,marginRight:4}}/>{t.memo}</div>}
                 </li>
               )
             })}</ul>}
